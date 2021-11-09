@@ -6,29 +6,59 @@ using System.Diagnostics;
 
 namespace MeuSeleniumCSharp.GoogleSearch
 {
-    public class GoogleSearchTextoTeste : QA_WebScript
+    public class GoogleSearchTextoTeste : TestScript
     {
-        private void Executar()
+        public void DATA()
+        {
+
+            Dados.Add(prmFluxo: @"{'Nome':'Alexandre Bartie'}");
+            Dados.Add(prmFluxo: @"{'Nome':'Teste de Software'}");
+            Dados.Add(prmFluxo: @"{'Nome':'Albert Einstein'}");
+
+            Dados.Save();
+
+        }
+        public void SETUP()
         {
 
             Robot.GoURL(prmUrl: "http://www.google.com.br");
 
-            Robot.SetTexto("Alexandre Bartie","name=q");
+            Robot.Mapping("Nome", "name=q");
+
+        }
+
+        public void PLAY()
+        {
+
+            Robot.Input("Nome", "Alexandre Bartie");
+
+        }
+        public void CHECK()
+        {
 
             Robot.Submit();
 
         }
+
     }
 
-    public class GoogleSearchImagemTeste : QA_WebScript
+    public class GoogleSearchImagemTeste : TestScript
     {
 
-        private void Executar()
+        public void SETUP()
         {
 
-            Robot.GoURL(prmUrl: "https://www.google.com/maps/search/");
+            Robot.GoURL(prmUrl: "http://www.google.com.br");
 
-            Robot.SetTexto("Pizzaria", "searchboxinput");
+            Robot.Mapping("Nome", "name=q");
+
+        }
+
+        public void PLAY()
+        {
+
+            Robot.Input("Nome", "Alexandre Bartie");
+
             Robot.Submit();
 
         }

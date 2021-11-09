@@ -1,54 +1,63 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text.Json;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace MeuSeleniumCSharp
 {
-    class QA_WebHub
+    public class TestProject
     {
 
-        private QA_WebSuite Suite = new QA_WebSuite();
+        public TestHub _hub;
 
+        public TestConfig Config = new TestConfig();
+
+        public TestHub Hub
+        {
+            get
+            {
+                if (_hub == null)
+                    _hub = new TestHub(this);
+                return _hub;
+            }
+
+        }                
+
+    }
+
+    public class TestHub
+    {
+
+        public TestProject Projeto;
+
+        private List<TestSuite> Suites = new List<TestSuite>();
+        public TestHub(TestProject prmProjeto)
+        {
+            Projeto = prmProjeto;
+        }
+
+        public void AddSuite(TestSuite prmSuite)
+        {
+
+            prmSuite.Setup(this);
+
+            Suites.Add(prmSuite);
+        }
         public void Executar(eTipoDriver prmTipoDriver)
         {
-            // Script = new GoogleSearch.GoogleSearchTextoTeste(Grid);
-            //Script = new GoogleSearch.GoogleSearchImagemTeste(Grid);
 
-            //Script = new BookRoom.BookRoomTeste(Grid);
-
-            Suite.AddScript(new Katalon.KatalonTeste());
-
-            Suite.Executar(prmTipoDriver);
+            foreach (TestSuite Suite in Suites)
+                Suite.Executar(prmTipoDriver);
 
         }
 
     }
-
-    public class QA_WebSuite
+    public class TestConfig
     {
 
-        private QA_WebMotor Motor;
+        public int PauseAfterTestCase;
 
-        public List<QA_WebScript> Scripts = new List<QA_WebScript>();
+        public int PauseAfterTestScript;
 
-        public void AddScript(QA_WebScript prmScript)
-        {
-            Scripts.Add(prmScript);
-        }
-
-        public void Executar(eTipoDriver prmTipoDriver)
-        {
-            Motor = new QA_WebMotor(eTipoDriver.ChromeDriver);
-
-            foreach (QA_WebScript Script in Scripts)
-            { 
-                Script.Executar(Motor);
-            }
-
-            Motor.Encerrar();
-
-        }
+        public int PauseAfterTestSuite;
 
     }
 }

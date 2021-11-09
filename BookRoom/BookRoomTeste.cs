@@ -5,7 +5,7 @@ using System.Text;
 namespace MeuSeleniumCSharp.BookRoom
 {
 
-    public class BookRoomTeste : QA_WebScript
+    public class BookRoomTeste : TestScript
     {
         private void Executar()
         {

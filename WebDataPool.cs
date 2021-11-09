@@ -15,9 +15,9 @@ namespace MeuSeleniumCSharp
 
         private QA_DataFluxos Fluxos;
 
-        public bool IsOk = true;
+        public bool IsOK = true;
 
-        public bool IsFluxos;
+        public bool IsOFF = true;
 
         public QA_DataPool(QA_WebRobot prmRobot)
         {
@@ -31,7 +31,6 @@ namespace MeuSeleniumCSharp
         { get => Fonte.RootElement; }
         private QA_WebDebug Debug
         { get => Robot.Debug; }
-
         private string fluxoJSON
         { get => Fluxos.JSON(); }
         public void Add(string prmFluxo)
@@ -48,16 +47,16 @@ namespace MeuSeleniumCSharp
 
                 Entrada = root.EnumerateArray();
 
-                IsOk = true;
+                IsOK = true;
 
-                IsFluxos = true;
+                IsOFF = false;
 
             }
 
             catch (Exception e)
-            { Debug.Erro("Erro no JSON:Parse " + e.Message); Debug.Erro(fluxoJSON); IsOk = false; }
+            { Debug.Erro("Erro no JSON:Parse " + e.Message); Debug.Erro(fluxoJSON); IsOK = false; }
 
-            return IsOk;
+            return IsOK;
         }
         public bool Next()
         { 

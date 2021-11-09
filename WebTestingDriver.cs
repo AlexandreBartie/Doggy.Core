@@ -6,6 +6,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Edge;
 using System.Collections.ObjectModel;
+using System.Threading;
 
 namespace MeuSeleniumCSharp
 {
@@ -20,12 +21,64 @@ namespace MeuSeleniumCSharp
         Opcao = 10,
         Botao = 20
     }
-    public class QA_WebScript
+    public class TestSuite
+    {
+
+        private TestHub Hub;
+
+        private QA_WebMotor Motor;
+
+        public eTipoDriver tipoDriver;
+
+        public List<TestScript> Scripts = new List<TestScript>();
+        public string nome
+        {
+            get => this.GetType().Name;
+        }
+
+        public TestConfig Config
+        {
+            get => Hub.Projeto.Config;
+        }
+
+        public void Setup(TestHub prmHub)
+        {
+            Hub = prmHub;
+        }
+
+        public void AddScript(TestScript prmScript)
+        {
+            Scripts.Add(prmScript);
+        }
+
+        public void Executar(eTipoDriver prmTipoDriver)
+        {
+
+            tipoDriver = prmTipoDriver;
+
+            Motor = new QA_WebMotor(this);
+
+            foreach (TestScript Script in Scripts)
+            {
+                Script.Executar(Motor);
+            }
+
+            Motor.Encerrar();
+
+        }
+
+    }
+    public class TestScript
     {
 
         public string nome;
 
         private QA_WebMotor _motor;
+        public string nome_extendido()
+        { return (Suite.nome + '.' + nome); }
+
+        public string metodo_extendido(string prmMetodo)
+        { return (nome_extendido() + ':' + prmMetodo + "()"); }
 
         public void Executar(QA_WebMotor prmMotor)
         {
@@ -33,35 +86,55 @@ namespace MeuSeleniumCSharp
             this.nome = this.GetType().Name;
             this.Motor = prmMotor;
 
-            Bloco("DATA");
+            Metodo("DATA") ;
 
-            if (Dados.IsOk)
+            if (Dados.IsOK)
             {
 
-                Bloco("SETUP");
+                Metodo("SETUP");
 
-                if (Dados.IsFluxos)
+                MetodoEXECUCAO();
+
+            }
+
+            Robot.Pause(Config.PauseAfterTestCase);
+
+        }
+        private void MetodoEXECUCAO()
+        {
+
+            if (Dados.IsOFF)
+                Metodo("PLAY;CHECK;CLEANUP");
+            else
+            {
+                while (Dados.Next())
                 {
-                    while (Dados.Next())
-                    { BlocoTESTE(); }
+                    Metodo("PLAY;CHECK;CLEANUP");
+                    Motor.Refresh();
                 }
-                else
-                    BlocoTESTE();
-
-                Bloco("CLEANUP");
             }
         }
-        private void BlocoTESTE()
+
+        private void Metodo(string prmNome)
         {
 
-            Bloco("PLAY");
-            Bloco("CHECK");
+            xLista lista = new xLista(prmNome);
 
-        }
+            foreach (string metodo in lista)
+            {
+                try
+                {
+                    this.GetType().GetMethod(metodo).Invoke(this, null);
+                }
 
-        private void Bloco(string prmMetodo)
-        {
-            this.GetType().GetMethod(prmMetodo).Invoke(this, null);
+                catch
+                {
+                    Robot.Log.Aviso("SCRIPT: " + metodo_extendido(metodo) + " não encontrado");
+                }
+
+            }
+
+
         }
 
         public QA_WebMotor Motor
@@ -76,6 +149,14 @@ namespace MeuSeleniumCSharp
         public QA_DataPool Dados
         {
             get => Robot.Dados;
+        }
+        public TestSuite Suite
+        {
+            get => Motor.Suite;
+        }
+        public TestConfig Config
+        {
+            get => Suite.Config;
         }
     }
     public class QA_WebPage
@@ -130,6 +211,10 @@ namespace MeuSeleniumCSharp
 
             return (false);
         }
+
+        public void Refresh()
+        {  Mapa.Refresh(); }
+
         private bool TemLastControl()
         { return !(LastControl == null); }
     }
@@ -190,6 +275,14 @@ namespace MeuSeleniumCSharp
 
             return Elemento.SetAction(Target.valor);
         }
+        public void Refresh()
+        {
+
+            _elemento = null;
+
+            foreach (QA_WebElemento item in Elementos)
+                item.Refresh();
+        }
 
         public bool TemElemento()
         { return !(_elemento == null); }
@@ -205,6 +298,8 @@ namespace MeuSeleniumCSharp
 
         private xTupla _chave = new xTupla();
 
+        private QA_WebDominio Dominio;
+
         private QA_WebTarget _target;
 
         public QA_WebElemento(QA_WebPage prmPage, string prmKey, string prmTarget)
@@ -215,6 +310,9 @@ namespace MeuSeleniumCSharp
             _tipo = eTipoElemento.Input;
 
             _chave.Set(prmTarget);
+
+            Dominio = new QA_WebDominio(this);
+
         }
 
         public QA_WebTarget Target
@@ -237,20 +335,20 @@ namespace MeuSeleniumCSharp
         public string filtro;
         public IWebElement control
         { get => Target.control; }
-        public void Dominio(string prmLista)
+        public void SetDomain(string prmLista)
         {
-            Dominio(prmLista, null);
+            SetDomain(prmLista, null);
         }
-        public void Dominio(string prmLista, string prmSintaxe)
+        public void SetDomain(string prmLista, string prmSintaxe)
         {
-            Target.SetDominio(prmLista, prmSintaxe);
+            Dominio.Setup(prmLista, prmSintaxe);
         }
         public bool SetAction(string prmValor)
         {
 
-            if (Target.IsDominio())
+            if (Dominio.IsON())
             {
-                return (Target.SetAction(prmValor));
+                return (Dominio.SetAction(prmValor));
             }
             else
             {
@@ -258,7 +356,14 @@ namespace MeuSeleniumCSharp
                 {
 
                     case eTipoElemento.Input:
-                        { Click(); return SendKeys(prmValor); }
+                        {
+                            if (Click())
+                            {
+                                Clear();
+                                return (SendKeys(prmValor));
+                            }
+                            return (false);
+                        }
 
                     case eTipoElemento.Botao:
                         { return Click(); }
@@ -300,16 +405,111 @@ namespace MeuSeleniumCSharp
 
             return (false);
         }
+        public void Refresh()
+        { _target = null; }
         public bool Erro(string prmErro)
+        { return Page.Log.Erro("QA-LOG: " + prmErro); }
+    }
+    public class QA_WebDominio
+    {
+        private QA_WebElemento Elemento;
+
+        private xLista lista;
+
+        private string filtro;
+
+        private ReadOnlyCollection<IWebElement> Opcoes;
+        public xTupla Chave
+        { get => Elemento.Chave; }
+        public QA_WebRobot Robot
+        { get => Elemento.Robot; }
+        public QA_WebDominio(QA_WebElemento prmElemento)
         {
-            return Page.Log.Erro(prmErro);
+            Elemento = prmElemento;
+
+            lista = new xLista();
+
         }
+        public void Setup(string prmLista, string prmSintaxe)
+        {
+
+            lista.Importar(prmLista);
+
+            filtro = prmSintaxe;
+
+        }
+        public bool SetAction(string prmValor)
+        {
+
+            if (GetElementos())
+            {
+
+                xLista fluxo = new xLista(prmValor, prmSeparador: "+");
+
+                foreach (string item in fluxo)
+                {
+                    if (!SetFluxo(item))
+                        Robot.Debug.Erro("Domínio não encontrado na lista ... " + item);
+                }
+
+            }
+            else
+                Robot.Debug.Erro("Busca de Domínios falhou ... " + GetXPath());
+
+            return (false);
+        }
+        private bool SetFluxo(string prmFluxo)
+        {
+
+            int indice = lista.GetContain(prmFluxo.Trim());
+
+            if (IsIndiceOk(indice))
+            {
+                GetElemento(indice).Click();
+
+                return (true);
+            }
+            return (false);
+        }
+        private bool GetElementos()
+        {
+
+            Opcoes = Robot.GetElementsByXPath(GetXPath());
+
+            if (!(Opcoes == null))
+                return (Opcoes.Count > 0);
+
+            return (false);
+        }
+        private IWebElement GetElemento(int prmIndice)
+        {
+
+            return (Opcoes[prmIndice - 1]);
+        }
+        private string GetXPath()
+        {
+            string raiz_elemento = "//*[@{0}='{1}']";
+
+            if (filtro == null)
+                return (string.Format(raiz_elemento, Chave.tag, Chave.valor));
+
+            return (string.Format(raiz_elemento + filtro, Chave.tag, Chave.valor));
+
+        }
+        public bool IsIndiceOk(int prmIndice)
+        {
+
+            if (!(prmIndice == 0))
+                return (Opcoes.Count >= prmIndice);
+            return (false);
+        }
+
+        public bool IsON()
+        { return (lista.IsOK); }
     }
     public class QA_WebTarget
     {
         private QA_WebElemento Elemento;
-
-        private QA_WebDominio Dominio;
 
         public IWebElement control;
 
@@ -323,14 +523,6 @@ namespace MeuSeleniumCSharp
             Elemento  = prmElemento;
 
             Setup(Chave.tag, Chave.valor);
-
-            Dominio = new QA_WebDominio(this);
-
-        }
-        public void SetDominio(string prmLista, string prmSintaxe)
-        {
-
-            Dominio.Setup(prmLista, prmSintaxe);
 
         }
         private void Setup(string prmTag, string prmValor)
@@ -366,109 +558,8 @@ namespace MeuSeleniumCSharp
                     break;
             }
         }
-        public bool SetAction(string prmValor)
-        { return (Dominio.SetAction(prmValor)); }
-        public bool IsDominio()
-        { return Dominio.IsListaOk(); }
     }
-    public class QA_WebDominio
-    {
-        private QA_WebTarget Target;
-
-        private xLista lista;
-
-        private string filtro;
-
-        private ReadOnlyCollection<IWebElement> Opcoes;
-        public xTupla Chave
-        { get => Target.Chave; }
-        public QA_WebRobot Robot
-        { get => Target.Robot; }
-        public QA_WebDominio(QA_WebTarget prmTarget)
-        {
-            Target = prmTarget;
-
-            lista = new xLista();
-
-        }
-        public void Setup(string prmLista, string prmSintaxe)
-        {
-           
-            lista.Importar(prmLista);
-
-            filtro = prmSintaxe;
-                
-        }
-        public bool SetAction(string prmValor)
-        {
-   
-            if (GetElementos())
-            {
-
-                xLista fluxo = new xLista(prmValor, prmSeparador: "+");
-
-                foreach (string item in fluxo)
-                {
-                    if (!SetFluxo(item))
-                        Robot.Debug.Erro("Domínio não encontrado na lista ... " + item);
-                }
-
-            }
-            else
-                Robot.Debug.Erro("Busca de Domínios falhou ... " + GetXPath());
-
-            return (false);
-        }
-        private bool SetFluxo(string prmFluxo)
-        {
-            
-            int indice = lista.GetContain(prmFluxo.Trim());
-
-            if (IsIndiceOk(indice))
-            {
-                GetElemento(indice).Click();
-
-                return (true);
-            }
-            return (false);
-        }
-        private bool GetElementos()
-        {
-
-            Opcoes = Robot.GetElementsByXPath(GetXPath());
-
-            if (!(Opcoes == null))
-                return (Opcoes.Count > 0);
-
-            return (false);
-        }
-        private IWebElement GetElemento(int prmIndice)
-        {
-            
-            return (Opcoes[prmIndice - 1]);
-        }
-        private string GetXPath()
-        {
-            string raiz_elemento = "//*[@{0}='{1}']";
-
-            if (filtro == null)
-                return (string.Format(raiz_elemento, Chave.tag, Chave.valor));
-
-            return (string.Format(raiz_elemento + filtro, Chave.tag, Chave.valor));
-
-        }
-        public bool IsIndiceOk(int prmIndice)
-        {
-
-            if (!(prmIndice == 0))
-                return (Opcoes.Count >= prmIndice );
-            return (false); 
-        }
-        
-        public bool IsListaOk()
-        { return (lista.IsOK); }
-    }
-    public class QA_WebAtributos
+     public class QA_WebAtributos
     {
 
         private QA_WebTarget Target;
@@ -491,12 +582,12 @@ namespace MeuSeleniumCSharp
     public class QA_WebMotor
     {
 
+        public TestSuite Suite;
+
         private IWebDriver _driver;
 
-        public eTipoDriver tipo;
-
-        public QA_WebMotor(eTipoDriver prmTipo)
-        { tipo = prmTipo; }
+        public QA_WebMotor(TestSuite prmSuite)
+        { Suite = prmSuite; }
 
         private QA_WebRobot _robot;
 
@@ -514,13 +605,28 @@ namespace MeuSeleniumCSharp
             {
                 if (_driver == null)
                 {
-                    if (tipo == eTipoDriver.EdgeDriver)
-                        _driver = new EdgeDriver();
-                    else
-                        _driver = new ChromeDriver();
+                    switch (Suite.tipoDriver)
+                    {
+
+                        case eTipoDriver.EdgeDriver:
+                            _driver = new EdgeDriver();
+                            break;
+
+                        default:
+                            _driver = new ChromeDriver();
+                            break;
+
+                    }
+
                 }
                 return _driver;
             }
+        }
+
+        public void Refresh()
+        {
+
+            Robot.Page.Refresh();
         }
 
         public IWebElement GetElementByXPath(string prmXPath)
@@ -590,16 +696,10 @@ namespace MeuSeleniumCSharp
         {
             return (Page.AddItem(prmKey, prmTarget));
         }
-        public void SetMap(string prmKey, string prmValor)
+        public void Input(string prmKey, string prmValor)
         {
 
             string valor = Dados.GetValor(prmKey, prmValor);
-
-            if (valor == "Mulher")
-            { Debug.Stop(); }
-
-            if (valor == prmValor)
-            { Debug.Stop(); }
 
             Action.SetMap(prmKey, valor);
         }
@@ -609,7 +709,7 @@ namespace MeuSeleniumCSharp
             return (Action.GoURL(prmUrl));
         }
 
-        public bool SetFocus(string prmTupla)
+/*        public bool SetFocus(string prmTupla)
         {
             return (Action.SetFocus(prmTupla));
         }
@@ -620,7 +720,7 @@ namespace MeuSeleniumCSharp
         public void SetTexto(string prmTexto, string prmTarget)
         {
             Action.SetTexto(prmTexto, prmTarget);
-        }
+        }*/
         public void Submit()
         { Page.Submit(); }
 
@@ -630,9 +730,8 @@ namespace MeuSeleniumCSharp
         public void Quit()
         { driver.Quit(); }
 
-        public void Stop()
-        { Debug.Stop(); }
-
+        public void Pause(int prmSegundos)
+        { Thread.Sleep(TimeSpan.FromSeconds(prmSegundos)); }
         public IWebElement GetElementBy(By prmTupla)
         {
             try
@@ -716,6 +815,11 @@ namespace MeuSeleniumCSharp
         public QA_WebLog(QA_WebRobot prmRobot)
         {
             Robot = prmRobot;
+        }
+        public bool Aviso(string prmAviso)
+        {
+            Debug.Print(prmAviso);
+            return false;
         }
         public bool Erro(string prmErro)
         {

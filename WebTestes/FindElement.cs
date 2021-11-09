@@ -4,7 +4,7 @@ using OpenQA.Selenium;
 
 namespace MeuSeleniumCSharp.WebTestes
 {
-    public class FindElementTeste : QA_WebScript
+    public class FindElementTeste : TestScript
     {
 
         public void SETUP()
