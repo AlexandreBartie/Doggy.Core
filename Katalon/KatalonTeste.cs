@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
@@ -10,10 +11,27 @@ namespace MeuSeleniumCSharp.Katalon
         public void DATA()
         {
 
-            //Dados.AddSQL(prmSQL: "select alguem que tenha 70 anos ou mais  ");
+            if (Pool.SetView(prmTag: "CandidatoNovo"))
+                Robot.Debug.Console(Pool.View.GetJSon());
+            else
+                Robot.Debug.Stop();
 
-            //Dados.OpenCSV("C:\JGDSJGJDJAS\JHKJFDAS\CSV\tSTcREDITO.csv");
+            if (Pool.SetView(prmTag: "Candidatos"))
+                Robot.Debug.Console(Pool.View.GetJSon());
+            else
+                Robot.Debug.Stop();
 
+
+            if (Pool.SetView(prmTag: "CandidatosOrdenadosASC"))
+                Robot.Debug.Console(Pool.View.GetJSon());
+            else
+                Robot.Debug.Stop();
+
+            if (Pool.SetView(prmTag: "CandidatosOrdenadosDESC"))
+                Robot.Debug.Console(Pool.View.GetJSon());
+            else
+                Robot.Debug.Stop(); 
+            
             Dados.Add(prmFluxo: @"{'Nome':'Aderson','Sexo':'Homem', 'email':'alexandre_bartie@hotmail.com'}");
             Dados.Add(prmFluxo: @"{'Nome':'Lisia','Sexo':'Homem', 'email':'alexandre_bartie@hotmail.com'}");
             Dados.Add(prmFluxo: @"{'Expectativa':'Salário + Desafio'}");

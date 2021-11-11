@@ -3,161 +3,15 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Diagnostics;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Edge;
 using System.Collections.ObjectModel;
-using System.Threading;
 
 namespace MeuSeleniumCSharp
 {
-    public enum eTipoDriver : int
-    {
-        ChromeDriver = 0,
-        EdgeDriver = 1
-    }
     public enum eTipoElemento : int
     {
         Input = 0,
         Opcao = 10,
         Botao = 20
-    }
-    public class TestSuite
-    {
-
-        private TestHub Hub;
-
-        private QA_WebMotor Motor;
-
-        public eTipoDriver tipoDriver;
-
-        public List<TestScript> Scripts = new List<TestScript>();
-        public string nome
-        {
-            get => this.GetType().Name;
-        }
-
-        public TestConfig Config
-        {
-            get => Hub.Projeto.Config;
-        }
-
-        public void Setup(TestHub prmHub)
-        {
-            Hub = prmHub;
-        }
-
-        public void AddScript(TestScript prmScript)
-        {
-            Scripts.Add(prmScript);
-        }
-
-        public void Executar(eTipoDriver prmTipoDriver)
-        {
-
-            tipoDriver = prmTipoDriver;
-
-            Motor = new QA_WebMotor(this);
-
-            foreach (TestScript Script in Scripts)
-            {
-                Script.Executar(Motor);
-            }
-
-            Motor.Encerrar();
-
-        }
-
-    }
-    public class TestScript
-    {
-
-        public string nome;
-
-        private QA_WebMotor _motor;
-        public string nome_extendido()
-        { return (Suite.nome + '.' + nome); }
-
-        public string metodo_extendido(string prmMetodo)
-        { return (nome_extendido() + ':' + prmMetodo + "()"); }
-
-        public void Executar(QA_WebMotor prmMotor)
-        {
-
-            this.nome = this.GetType().Name;
-            this.Motor = prmMotor;
-
-            Metodo("DATA") ;
-
-            if (Dados.IsOK)
-            {
-
-                Metodo("SETUP");
-
-                MetodoEXECUCAO();
-
-            }
-
-            Robot.Pause(Config.PauseAfterTestCase);
-
-        }
-        private void MetodoEXECUCAO()
-        {
-
-            if (Dados.IsOFF)
-                Metodo("PLAY;CHECK;CLEANUP");
-            else
-            {
-                while (Dados.Next())
-                {
-                    Metodo("PLAY;CHECK;CLEANUP");
-                    Motor.Refresh();
-                }
-            }
-        }
-
-        private void Metodo(string prmNome)
-        {
-
-            xLista lista = new xLista(prmNome);
-
-            foreach (string metodo in lista)
-            {
-                try
-                {
-                    this.GetType().GetMethod(metodo).Invoke(this, null);
-                }
-
-                catch
-                {
-                    Robot.Log.Aviso("SCRIPT: " + metodo_extendido(metodo) + " não encontrado");
-                }
-
-            }
-
-
-        }
-
-        public QA_WebMotor Motor
-        {
-            get => _motor;
-            set => _motor = value;
-        }
-        public QA_WebRobot Robot
-        {
-            get => Motor.Robot;
-        }
-        public QA_DataPool Dados
-        {
-            get => Robot.Dados;
-        }
-        public TestSuite Suite
-        {
-            get => Motor.Suite;
-        }
-        public TestConfig Config
-        {
-            get => Suite.Config;
-        }
     }
     public class QA_WebPage
     {
@@ -179,7 +33,8 @@ namespace MeuSeleniumCSharp
 
         public QA_WebElemento Elemento
         { get => Mapa.Elemento; }
-        public QA_WebLog Log
+
+        public TestLog Log
         { get => Robot.Log; }
         public QA_WebElemento AddItem(string prmKey, string prmTarget)
         {
@@ -579,114 +434,49 @@ namespace MeuSeleniumCSharp
         public Size dimensao
         { get => control.Size; }
     }
-    public class QA_WebMotor
-    {
-
-        public TestSuite Suite;
-
-        private IWebDriver _driver;
-
-        public QA_WebMotor(TestSuite prmSuite)
-        { Suite = prmSuite; }
-
-        private QA_WebRobot _robot;
-
-        public QA_WebRobot Robot
-        {
-            get
-            {
-                if (_robot == null) { _robot = new QA_WebRobot(this); }
-                return _robot;
-            }
-        }
-        public IWebDriver driver
-        {   
-            get 
-            {
-                if (_driver == null)
-                {
-                    switch (Suite.tipoDriver)
-                    {
-
-                        case eTipoDriver.EdgeDriver:
-                            _driver = new EdgeDriver();
-                            break;
-
-                        default:
-                            _driver = new ChromeDriver();
-                            break;
-
-                    }
-
-                }
-                return _driver;
-            }
-        }
-
-        public void Refresh()
-        {
-
-            Robot.Page.Refresh();
-        }
-
-        public IWebElement GetElementByXPath(string prmXPath)
-        {
-            try
-            {
-                return driver.FindElement(By.XPath(prmXPath));
-            }
-            catch (Exception e)
-            {
-                Robot.Debug.Erro(e);
-            }
-            return (null);
-        }
-        public ReadOnlyCollection<IWebElement> GetElementsByXPath(string prmXPath)
-        {
-            try
-            {
-                return driver.FindElements(By.XPath(prmXPath));
-            }
-            catch (Exception e)
-            {
-                Robot.Debug.Erro(e);
-            }
-            return (null);
-        }
-    public void Encerrar()
-        { Robot.Quit(); }
-
-    }
     public class QA_WebRobot
     {
 
-        private QA_WebMotor Motor;
+        private TestMotor Motor;
 
         public QA_WebPage Page;
 
         public QA_WebAction Action;
 
-        public QA_WebLog Log;
-
         public QA_WebDebug Debug;
 
-        public QA_DataPool Dados;
+        public QA_MassaDados Dados;
 
-        public QA_WebRobot(QA_WebMotor prmMotor)
+        public QA_WebRobot(TestMotor prmMotor)
         {
 
             Motor = prmMotor;
 
-            Dados = new QA_DataPool(this);
+            Dados = new QA_MassaDados(this);
 
             Page = new QA_WebPage(this);
 
             Action = new QA_WebAction(this);
 
-            Log = new QA_WebLog(this);
-
             Debug = new QA_WebDebug(this);
 
+        }
+        public TestProject Projeto
+        {
+            get { return Motor.Suite.Projeto; }
+        }
+        public TestKernel Kernel
+        {
+            get { return Projeto.Kernel; }
+        }
+            
+        public TestLog Log
+        {
+            get { return Projeto.Kernel.Log; }
+        }
+        public DataPoolConnection Pool
+        {
+            get { return Projeto.Hub.Pool; }
         }
         public IWebDriver driver
         {
@@ -731,7 +521,7 @@ namespace MeuSeleniumCSharp
         { driver.Quit(); }
 
         public void Pause(int prmSegundos)
-        { Thread.Sleep(TimeSpan.FromSeconds(prmSegundos)); }
+        { Kernel.Pause(prmSegundos); }
         public IWebElement GetElementBy(By prmTupla)
         {
             try
@@ -807,25 +597,6 @@ namespace MeuSeleniumCSharp
         public void Console(string prmTexto)
         { Debug.Print(prmTexto); }
 
-    }
-    public class QA_WebLog
-    {
-        private QA_WebRobot Robot;
-
-        public QA_WebLog(QA_WebRobot prmRobot)
-        {
-            Robot = prmRobot;
-        }
-        public bool Aviso(string prmAviso)
-        {
-            Debug.Print(prmAviso);
-            return false;
-        }
-        public bool Erro(string prmErro)
-        {
-            Debug.Print(prmErro);
-            return false;
-        }
     }
     public class QA_WebAction
     {

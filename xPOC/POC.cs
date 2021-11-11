@@ -7,58 +7,34 @@ namespace MeuSeleniumCSharp
 {
     public class POC : TestProject
     {
-
-        public void Executar()
+        public void DATA()
         {
 
-            //Config.PauseAfterTestCase = 5;
+            Hub.AddDataBase(prmTag: "RH", prmConexao: @"Data Source=PC-ENGENHARIA\SQLEXPRESS;Initial Catalog=QA_POC;Integrated Security=True;MultipleActiveResultSets=True");
 
-            //Hub.AddSuite(new SuiteKatalon());
-            ////Hub.AddSuite(new SuiteGoogle());
+            Hub.AddDataView(prmTag: "CandidatoNovo", prmSQL: "SELECT nome, sobrenome, genero FROM Candidatos ORDER BY nascimento");
+            Hub.AddDataView(prmTag: "Candidatos", prmSQL: "SELECT nome, sobrenome, genero FROM Candidatos");
+            Hub.AddDataView(prmTag: "CandidatosOrdenadosASC", prmSQL: "SELECT nome, sobrenome, genero FROM Candidatos ORDER BY nome ASC");
+            Hub.AddDataView(prmTag: "CandidatosOrdenadosDESC", prmSQL: "SELECT nome, sobrenome, genero FROM Candidatos ORDER BY nome DESC");
 
-            //Hub.Executar(prmTipoDriver: eTipoDriver.ChromeDriver);
+        }
+        public void BUILD()
+        {
 
-            //
+            Hub.name = "POC - Automação de Testes";
 
-            BaseDados Base = new BaseDados(prmConexao: @"Data Source=PC-ENGENHARIA\SQLEXPRESS;Initial Catalog=QA_POC;Integrated Security=True");
+            Hub.AddSuite(new SuiteKatalon());
+            //Hub.AddSuite(new SuiteGoogle());
 
-            if (Base.IsOK())
-            {
+        }
+        public void START()
+        {
 
-                if (Base.Executar(prmSQL: "SELECT * FROM Candidatos where senha = '123456'"))
-                {
+            Hub.Config.PauseAfterTestCase = 5;
 
-                    while (Base.cursor.Ler())
-                    {
+            Hub.Config.OnlyDATA = true;
 
-                        //Debug.Assert(false);
-                        System.Diagnostics.Debug.WriteLine("\t{0}\t{1}\t{2}",
-                        Base.cursor.GetValor(0), Base.cursor.GetValor(1), Base.cursor.GetValor(2));
-                        // Base.cursor.GetValor("nome"), Base.cursor.GetValor("sobrenome"), Base.cursor.GetValor("genero"));
-                    }
-
-                    Base.cursor.Fechar();
-
-                }
-                else
-                {
-                    MessageBox.Show("Erro de Execução SQL ...", "POC");
-                }
-
-            }
-            else
-            {
-
-                MessageBox.Show("Erro de Conexao ...", "POC");
-
-                if (false)
-                {
-
-
-
-                }
-
-            }
+            Hub.Executar(prmTipoDriver: eTipoDriver.ChromeDriver);
 
         }
     }

@@ -5,34 +5,37 @@ using System.Diagnostics;
 
 namespace MeuSeleniumCSharp
 {
-    public class QA_DataPool
+    public class QA_MassaDados
     {
         private QA_WebRobot Robot;
 
-        public JsonDocument Fonte;
+        public JsonDocument JSON;
 
         public JsonElement.ArrayEnumerator Entrada;
 
-        private QA_DataFluxos Fluxos;
+        private QA_FluxosDados Fluxos;
 
         public bool IsOK = true;
 
         public bool IsOFF = true;
 
-        public QA_DataPool(QA_WebRobot prmRobot)
+        public QA_MassaDados(QA_WebRobot prmRobot)
         {
 
             Robot = prmRobot;
-            
-            Fluxos = new QA_DataFluxos(this);
+
+            Fluxos = new QA_FluxosDados(this);
         }
 
+        private TestProject Projeto
+        { get => Robot.Projeto; }
         private JsonElement root
-        { get => Fonte.RootElement; }
+        { get => JSON.RootElement; }
         private QA_WebDebug Debug
         { get => Robot.Debug; }
         private string fluxoJSON
         { get => Fluxos.JSON(); }
+
         public void Add(string prmFluxo)
         {
             Fluxos.Add(prmFluxo);
@@ -43,7 +46,7 @@ namespace MeuSeleniumCSharp
             try
             { 
 
-                Fonte = JsonDocument.Parse(fluxoJSON);
+                JSON = JsonDocument.Parse(fluxoJSON);
 
                 Entrada = root.EnumerateArray();
 
@@ -80,17 +83,16 @@ namespace MeuSeleniumCSharp
         }
 
     }
-
-    public class QA_DataFluxos
+    public class QA_FluxosDados
     {
 
-        private QA_DataPool Pool;
+        private QA_MassaDados Entrada;
 
         public string lista;
 
-        public QA_DataFluxos(QA_DataPool prmPool)
+        public QA_FluxosDados(QA_MassaDados prmMassaDados)
         {
-            Pool = prmPool;
+            Entrada = prmMassaDados;
         }
 
         public void Add(string prmFluxo)

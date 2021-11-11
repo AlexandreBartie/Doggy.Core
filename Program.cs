@@ -11,8 +11,6 @@ namespace MeuSeleniumCSharp
 
             POC Teste = new POC();
 
-            Teste.Executar();
-
         }
 
     }
