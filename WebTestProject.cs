@@ -61,6 +61,18 @@ namespace MeuSeleniumCSharp
         {
             return (Pool.AddDataView(prmTag, prmSQL));
         }
+        public void AddDataModel(string prmTag, string prmModelo)
+        {
+            Pool.AddDataModel(prmTag, prmModelo);
+        }
+        public void AddDataVariant(string prmTag)
+        {
+            AddDataVariant(prmTag, prmVariacao: "");
+        }
+        public void AddDataVariant(string prmTag, string prmVariacao)
+        {
+            Pool.AddDataVariant(prmTag, prmVariacao);
+        }
         public void AddSuite(TestSuite prmSuite)
         {
 
@@ -181,7 +193,7 @@ namespace MeuSeleniumCSharp
         private void MetodoEXECUCAO()
         {
 
-            if (Dados.IsOFF)
+            if (!Dados.IsONLINE)
                 Metodo("PLAY;CHECK;CLEANUP");
             else
             {

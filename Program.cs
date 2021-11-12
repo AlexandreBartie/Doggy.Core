@@ -9,7 +9,7 @@ namespace MeuSeleniumCSharp
         static void Main()
         {
 
-            POC Teste = new POC();
+            ProjetoPOC POC = new ProjetoPOC();
 
         }
 

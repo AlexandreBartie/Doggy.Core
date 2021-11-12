@@ -584,7 +584,8 @@ namespace MeuSeleniumCSharp
 
         public void Erro(Exception prmErro)
         { Erro(prmErro.Message); }
-
+        public void Erro(string prmRotulo, Exception prmErro)
+        { Erro(prmRotulo + " " + prmErro.Message); }
         public void Erro(string prmErro)
         { Console(prmErro); }
 
