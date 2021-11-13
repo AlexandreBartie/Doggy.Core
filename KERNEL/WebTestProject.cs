@@ -14,65 +14,29 @@ namespace MeuSeleniumCSharp
         ChromeDriver = 0,
         EdgeDriver = 1
     }
-    public class TestProject
+    public class TestProject : IDataLocalConnection
     {
 
-        public TestHub Hub;
-        
+        public string name;
+
+        public DataPoolConnection Pool = new DataPoolConnection();
+
+        public List<TestSuite> Suites = new List<TestSuite>();
+
         public TestKernel Kernel = new TestKernel();
 
         public TestProject()
         {
-            Hub = new TestHub(this);
 
-            Kernel.InvokeMethod(this, prmMetodo: "DATA;BUILD;START");
+            Dados.Setup(this, Pool);
 
-        }
-        public void Pause(int prmSegundos)
-        { Thread.Sleep(TimeSpan.FromSeconds(prmSegundos)); }
+            Kernel.Call(this, Kernel.GetProjectBlockCode());
 
-    }
-
-    public class TestHub
-    {
-
-        public TestProject Projeto;
-
-        public DataPoolConnection Pool = new DataPoolConnection();
-
-        private List<TestSuite> Suites = new List<TestSuite>();
-
-        public string name; 
-
-        public TestHub(TestProject prmProjeto)
-        {
-            Projeto = prmProjeto;
         }
 
         public TestConfig Config
+        { get => Kernel.Config; }
 
-        { get => Projeto.Kernel.Config; }
-
-        public bool AddDataBase(string prmTag, string prmConexao)
-        {
-            return (Pool.AddDataBase(prmTag, prmConexao));
-        }
-        public bool AddDataView(string prmTag, string prmSQL)
-        {
-            return (Pool.AddDataView(prmTag, prmSQL));
-        }
-        public void AddDataModel(string prmTag, string prmModelo)
-        {
-            Pool.AddDataModel(prmTag, prmModelo);
-        }
-        public void AddDataVariant(string prmTag)
-        {
-            AddDataVariant(prmTag, prmVariacao: "");
-        }
-        public void AddDataVariant(string prmTag, string prmVariacao)
-        {
-            Pool.AddDataVariant(prmTag, prmVariacao);
-        }
         public void AddSuite(TestSuite prmSuite)
         {
 
@@ -87,35 +51,34 @@ namespace MeuSeleniumCSharp
                 Suite.Executar(prmTipoDriver);
 
         }
+        public void Pause(int prmSegundos)
+        { Kernel.Pause(prmSegundos); }
 
     }
-    public class TestSuite
+    public class TestSuite : IDataLocalConnection
     {
 
-        private TestHub Hub;
+        public TestProject Projeto;
 
         private TestMotor Motor;
 
         public eTipoDriver tipoDriver;
 
         public List<TestScript> Scripts = new List<TestScript>();
-        public string nome
-        {
-            get => this.GetType().Name;
-        }
 
-        public TestProject Projeto
-        {
-            get => Hub.Projeto;
-        }
-        public TestConfig Config
-        {
-            get => Projeto.Kernel.Config;
-        }
+        public string nome { get => this.GetType().Name; }
 
-        public void Setup(TestHub prmHub)
+        public TestConfig Config { get => Projeto.Config; }
+
+        public DataPoolConnection Pool => Projeto.Pool;
+
+        public void Setup(TestProject prmProjeto)
         {
-            Hub = prmHub;
+            
+            Projeto = prmProjeto;
+
+            Dados.Setup(this, prmProjeto.Pool);
+
         }
 
         public void AddScript(TestScript prmScript)
@@ -136,25 +99,48 @@ namespace MeuSeleniumCSharp
 
             }
 
-            Projeto.Pause(Config.PauseAfterTestSuite);
-
-            Motor.Encerrar();
+            Encerrar();
 
         }
 
+        private void Encerrar()
+        {
+
+            if (!Config.OnlyDATA)
+            {
+
+                Projeto.Pause(Config.PauseAfterTestSuite);
+
+                Motor.Encerrar();
+            }
+            
+        }
+
     }
-    public class TestScript
+    public class TestScript : IDataLocalConnection
     {
 
         public string nome;
 
         public TestMotor Motor;
 
+        public QA_WebRobot Robot => Motor.Robot;
+
+        public QA_MassaDados Massa => Robot.Massa;
+
+        public TestSuite Suite => Motor.Suite;
+
+        public TestConfig Config => Suite.Config;
+
+        private void Metodo(string prmMetodo) => Robot.Kernel.Call(this, prmMetodo);
+
         public void Executar(TestMotor prmMotor)
         {
 
             this.nome = this.GetType().Name;
             this.Motor = prmMotor;
+
+            Dados.Setup(this, Suite.Pool);
 
 
             if (MetodoDADOS())
@@ -179,7 +165,7 @@ namespace MeuSeleniumCSharp
             if (Config.OnlyDATA)
                 return (false);
 
-            return (Dados.IsOK);
+            return (Massa.IsOK);
 
         }
         private bool MetodoSETUP()
@@ -193,42 +179,18 @@ namespace MeuSeleniumCSharp
         private void MetodoEXECUCAO()
         {
 
-            if (!Dados.IsONLINE)
+            if (!Massa.IsONLINE)
                 Metodo("PLAY;CHECK;CLEANUP");
             else
             {
-                while (Dados.Next())
+                while (Massa.Next())
                 {
                     Metodo("PLAY;CHECK;CLEANUP");
                     Motor.Refresh();
                 }
             }
         }
-
-        public QA_WebRobot Robot
-        {
-            get => Motor.Robot;
-        }
-        public QA_MassaDados Dados
-        {
-            get => Robot.Dados;
-        }
-        public DataPoolConnection Pool
-        {
-            get => Robot.Pool;
-        }
-        public TestSuite Suite
-        {
-            get => Motor.Suite;
-        }
-        public TestConfig Config
-        {
-            get => Suite.Config;
-        }
-        private void Metodo(string prmMetodo)
-        { Robot.Kernel.InvokeMethod(this, prmMetodo); }
     }
-
     public class TestMotor
     {
 
@@ -245,7 +207,8 @@ namespace MeuSeleniumCSharp
         {
             get
             {
-                if (_robot == null) { _robot = new QA_WebRobot(this); }
+                if (_robot == null)
+                    { _robot = new QA_WebRobot(this); }
                 return _robot;
             }
         }
@@ -255,6 +218,9 @@ namespace MeuSeleniumCSharp
             {
                 if (_driver == null)
                 {
+
+                    Debug.Assert(false);
+
                     switch (Suite.tipoDriver)
                     {
 
@@ -273,13 +239,11 @@ namespace MeuSeleniumCSharp
             }
         }
 
-        public void Refresh()
-        {
+        public void Refresh() => Robot.Page.Refresh();
 
-            Robot.Page.Refresh();
-        }
+        public void Encerrar() => Robot.Quit();
 
-        public IWebElement GetElementByXPath(string prmXPath)
+/*        public IWebElement GetElementByXPath(string prmXPath)
         {
             try
             {
@@ -302,9 +266,7 @@ namespace MeuSeleniumCSharp
                 Robot.Debug.Erro(e);
             }
             return (null);
-        }
-        public void Encerrar()
-        { Robot.Quit(); }
+        }*/
 
     }
     public class TestConfig
@@ -319,7 +281,6 @@ namespace MeuSeleniumCSharp
         public int PauseAfterTestSuite;
 
     }
-
     public class TestLog
     {
         public bool Aviso(string prmAviso)
@@ -336,10 +297,18 @@ namespace MeuSeleniumCSharp
     }
     public class TestKernel
     {
+
         public TestLog Log = new TestLog();
 
         public TestConfig Config = new TestConfig();
-        public bool InvokeMethod(Object prmObjeto, string prmMetodo)
+
+        public string GetProjectBlockCode() => ("DATA; BUILD; START");
+
+        public string GetAdicaoElementos() => ("+");
+    
+        public string GetXPathBuscaRaizElementos() => "//*[@{0}='{1}']";
+
+        public bool Call(Object prmObjeto, string prmMetodo)
         {
 
             bool vlOk = true;
@@ -355,9 +324,10 @@ namespace MeuSeleniumCSharp
 
                 catch
                 {
-                    Log.Aviso(string.Format("Método não encontrado: {0}.{1}" + prmObjeto.GetType().FullName, metodo));
+                    Log.Aviso(string.Format("Método não encontrado: {0}.{1}", prmObjeto.GetType().FullName, metodo));
 
                     vlOk = false;
+
                 }
 
             }
@@ -365,10 +335,8 @@ namespace MeuSeleniumCSharp
             return (vlOk);
 
         }
-
         public void Pause(int prmSegundos)
         { Thread.Sleep(TimeSpan.FromSeconds(prmSegundos)); }
 
     }
-
 }

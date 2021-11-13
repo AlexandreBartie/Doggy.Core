@@ -260,10 +260,10 @@ namespace MeuSeleniumCSharp
 
             return (false);
         }
-        public void Refresh()
-        { _target = null; }
-        public bool Erro(string prmErro)
-        { return Page.Log.Erro("QA-LOG: " + prmErro); }
+        public void Refresh() => _target = null;
+
+        public bool Erro(string prmErro) => Page.Log.Erro("QA-LOG: " + prmErro);
+
     }
     public class QA_WebDominio
     {
@@ -274,10 +274,12 @@ namespace MeuSeleniumCSharp
         private string filtro;
 
         private ReadOnlyCollection<IWebElement> Opcoes;
-        public xTupla Chave
-        { get => Elemento.Chave; }
-        public QA_WebRobot Robot
-        { get => Elemento.Robot; }
+        public xTupla Chave { get => Elemento.Chave; }
+
+        public QA_WebRobot Robot { get => Elemento.Robot; }
+
+        public TestKernel Kernel { get => Robot.Kernel; }
+
         public QA_WebDominio(QA_WebElemento prmElemento)
         {
             Elemento = prmElemento;
@@ -299,7 +301,7 @@ namespace MeuSeleniumCSharp
             if (GetElementos())
             {
 
-                xLista fluxo = new xLista(prmValor, prmSeparador: "+");
+                xLista fluxo = new xLista(prmValor, prmSeparador: Kernel.GetAdicaoElementos());
 
                 foreach (string item in fluxo)
                 {
@@ -343,7 +345,7 @@ namespace MeuSeleniumCSharp
         }
         private string GetXPath()
         {
-            string raiz_elemento = "//*[@{0}='{1}']";
+            string raiz_elemento = Kernel.GetXPathBuscaRaizElementos();
 
             if (filtro == null)
                 return (string.Format(raiz_elemento, Chave.tag, Chave.valor));
@@ -368,10 +370,8 @@ namespace MeuSeleniumCSharp
 
         public IWebElement control;
 
-        public xTupla Chave
-        { get => Elemento.Chave; }
-        public QA_WebRobot Robot
-        { get => Elemento.Robot; }
+        public xTupla Chave { get => Elemento.Chave; }
+        public QA_WebRobot Robot { get => Elemento.Robot; }
 
         public QA_WebTarget(QA_WebElemento prmElemento)
         {
@@ -445,14 +445,14 @@ namespace MeuSeleniumCSharp
 
         public QA_WebDebug Debug;
 
-        public QA_MassaDados Dados;
+        public QA_MassaDados Massa;
 
         public QA_WebRobot(TestMotor prmMotor)
         {
 
             Motor = prmMotor;
 
-            Dados = new QA_MassaDados(this);
+            Massa = new QA_MassaDados(this);
 
             Page = new QA_WebPage(this);
 
@@ -472,11 +472,7 @@ namespace MeuSeleniumCSharp
             
         public TestLog Log
         {
-            get { return Projeto.Kernel.Log; }
-        }
-        public DataPoolConnection Pool
-        {
-            get { return Projeto.Hub.Pool; }
+            get { return Kernel.Log; }
         }
         public IWebDriver driver
         {
@@ -489,7 +485,7 @@ namespace MeuSeleniumCSharp
         public void Input(string prmKey, string prmValor)
         {
 
-            string valor = Dados.GetValor(prmKey, prmValor);
+            string valor = Massa.GetValor(prmKey, prmValor);
 
             Action.SetMap(prmKey, valor);
         }
@@ -569,6 +565,48 @@ namespace MeuSeleniumCSharp
                 Debug.Erro(e);
             }
             return (null);
+        }
+
+    }
+    public class QA_MassaDados
+    {
+        private QA_WebRobot Robot;
+
+        public xJSON JSON = new xJSON();
+
+        public QA_MassaDados(QA_WebRobot prmRobot)
+        {
+
+            Robot = prmRobot;
+
+        }
+        private QA_WebDebug Debug
+        { get => Robot.Debug; }
+        public bool IsOK
+        { get => JSON.IsOK; }
+        public bool IsONLINE
+        { get => JSON.IsON; }
+        public void Add(string prmFluxo)
+        {
+            JSON.Add(prmFluxo);
+        }
+        public bool Save()
+        {
+
+            if (!JSON.Save())
+                Debug.Erro("Erro no JSON:Parse ", JSON.Erro); Debug.Erro(JSON.fluxo);
+
+            return (JSON.IsOK);
+
+        }
+        public bool Next()
+        {
+            return (JSON.Next());
+        }
+
+        public string GetValor(string prmKey, string prmPadrao)
+        {
+            return (JSON.GetValor(prmKey, prmPadrao));
         }
 
     }

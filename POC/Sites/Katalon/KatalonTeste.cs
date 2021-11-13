@@ -6,29 +6,44 @@ namespace MeuSeleniumCSharp.Katalon
         public void DATA()
         {
 
-            xLista lista = new xLista("Candidato=Padrao;Candidato=Primeiro;Candidato=Ultimo;Candidato+Novo;Candidato-Email");
+            Dados.AddDataBase(prmTag: "RH", prmConexao: @"Data Source=PC-ENGENHARIA\SQLEXPRESS;Initial Catalog=QA_POC;Integrated Security=True; MultipleActiveResultSets = True");
+
+            Dados.AddDataModel(prmTag: "Candidato", prmModelo: @"{'#ENTIDADES#':'Candidatos','#ATRIBUTOS#':'nome + sobrenome + email + nascimento'}");
+
+            Dados.AddDataVariant(prmTag: "=Padrao");
+
+            Dados.AddDataVariant(prmTag: "=Primeiro", prmVariacao: @"{'#ORDEM#': 'nome'}");
+            Dados.AddDataVariant(prmTag: "=Ultimo", prmVariacao: @"{'#ORDEM#': 'nome DESC'}");
+            Dados.AddDataVariant(prmTag: "+Novo", prmVariacao: @"{'#ORDEM#': 'nascimento'}");
+            Dados.AddDataVariant(prmTag: "+Velho", prmVariacao: @"{'#ORDEM#': 'nascimento DESC'}");
+
+            Dados.AddDataVariant(prmTag: "-Email", prmVariacao: @"{'#REGRAS#': 'email is null'}");
+
+            xLista lista = new xLista("Candidato=Padrao;Candidato=Primeiro;Candidato=Ultimo;Candidato+Novo;Candidato+Velho;Candidato-Email");
 
             foreach (string visao in lista)
             {
 
-                if (Pool.SetView(prmTag: visao))
+                if (Dados.SetView(prmTag: visao))
                 {
-                    Robot.Debug.Console("MASSA DINÂMICA" + ": " + Pool.View.GetJSon());
-                    Robot.Debug.Console("SQL " + Pool.View.tag + ": " + Pool.View.sql);
+                    //Robot.Debug.Console("MASSA: " + Pool.View.GetJSon());
+                    Robot.Debug.Console("... " + Dados.View.memo());
                 }
                 else
                     Robot.Debug.Stop();
 
             }
-           
-            Dados.Add(prmFluxo: @"{'Nome':'Aderson','Sexo':'Homem', 'email':'alexandre_bartie@hotmail.com'}");
-            Dados.Add(prmFluxo: @"{'Nome':'Lisia','Sexo':'Homem', 'email':'alexandre_bartie@hotmail.com'}");
-            Dados.Add(prmFluxo: @"{'Expectativa':'Salário + Desafio'}");
-            Dados.Add(prmFluxo: @"{'Expectativa':'Liderança + Ambiente + Equipe'}");
-            Dados.Add(prmFluxo: @"{'Expectativa':'Salário + Desafio'}");
-            Dados.Add(prmFluxo: @"{'Expectativa':'Liderança + Ambiente + Equipe'}");
 
-            Dados.Save();
+            Massa.Add(prmFluxo: @"{'Nome':'Aderson','Sexo':'Homem', 'email':'alexandre_bartie@hotmail.com'}");
+            Massa.Add(prmFluxo: @"{'email':'alexandre_bartie@hotmail.com'}");//, "AlunoSemAutorizacao");
+            Massa.Add(prmFluxo: @"{'email':'alexandre_bartie@hotmail.com'}");//, "Candidato+Velho");
+            Massa.Add(prmFluxo: @"{'Nome':'Lisia','Sexo':'Homem', 'email':'alexandre_bartie@hotmail.com'}");
+            Massa.Add(prmFluxo: @"{'Expectativa':'Salário + Desafio'}");// "Candidato=Primeiro");
+            Massa.Add(prmFluxo: @"{'Expectativa':'Liderança + Ambiente + Equipe'}");
+            Massa.Add(prmFluxo: @"{'Expectativa':'Salário + Desafio'}");
+            Massa.Add(prmFluxo: @"{'Expectativa':'Liderança + Ambiente + Equipe'}");
+
+            Massa.Save();
 
         }
         public void SETUP()

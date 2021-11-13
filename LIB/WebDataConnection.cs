@@ -12,14 +12,11 @@ namespace MeuSeleniumCSharp
         private List<DataBaseConnection> Bases = new List<DataBaseConnection>();
         private List<DataViewConnection> Visoes = new List<DataViewConnection>();
 
-        private DataBaseConnection DataBaseCorrente;
-        private DataViewConnection DataViewCorrente;
+        public DataBaseConnection DataBaseCorrente;
+        public DataViewConnection DataViewCorrente;
 
-        private DataModelConnection DataModelCorrente;
-        private DataVariantConnection DataVariantCorrente;
-
-        public DataViewConnection View
-        { get => DataViewCorrente; }
+        public DataModelConnection DataModelCorrente;
+        public DataVariantConnection DataVariantCorrente;
 
         public bool AddDataBase(string prmTag, string prmConexao)
         {
@@ -76,8 +73,6 @@ namespace MeuSeleniumCSharp
 
                     DataViewCorrente = Visao;
 
-                   // DataViewCorrente.Next();
-
                     return (true);
 
                 }
@@ -105,9 +100,23 @@ namespace MeuSeleniumCSharp
             return (retorno);
 
         }
+        public string memo()
+        {
+
+            string memo = "";
+
+            foreach (DataBaseConnection Base in Bases)
+                memo += Base.memo() + Environment.NewLine;
+
+            foreach (DataViewConnection Visao in Visoes)
+                memo += Visao.memo() + Environment.NewLine;
+
+            
+            return (memo);
+        
+        }
 
     }
-
     public class DataBaseConnection
     {
 
@@ -169,8 +178,9 @@ namespace MeuSeleniumCSharp
 
         }
 
-        public bool IsOK()
-        { return (conexao.State == ConnectionState.Open); }
+        public bool IsOK() => (conexao.State == ConnectionState.Open);
+
+        public string memo() => (String.Format("BASE:[{0,25}] CONEXÃO: {1}", tag, conexao));
 
     }
     public class DataModelConnection
@@ -193,37 +203,20 @@ namespace MeuSeleniumCSharp
 
         }
 
-        public string GetSQL(int prmQtde)
-        {
-            return (GetSELECT(prmQtde) + " " + GetFROM()); 
-        }
-        private string GetSELECT(int prmQtde)
-        {
-            return (string.Format("SELECT {0} {1}", GetLinhas(prmQtde), GetListaCampos()));
-        }
-        private string GetFROM()
-        {
-            return (string.Format("FROM {0}", GetListaTabelas()));
-        }
-        private string GetListaTabelas()
-        {
-            return (TratarSQL(JSON.GetValor("#ENTIDADES")));
-        }
-        private string GetListaCampos()
-        {
-            return (TratarSQL(JSON.GetValor("#ATRIBUTOS", prmPadrao: "*")));
-        }
-        private string GetLinhas(int prmQtde)
-        {
-            return (string.Format("TOP {0}", prmQtde));
-        }
+        public string GetSQL(int prmQtde) => (GetSELECT(prmQtde) + " " + GetFROM());
 
-        private string TratarSQL(string prmLista)
-        {
+        private string GetSELECT(int prmQtde) => (string.Format("SELECT {0} {1}", GetLinhas(prmQtde), GetListaCampos()));
 
-            return (new xLista(prmLista, prmSeparador: "+").memo(", "));
+        private string GetFROM() => (string.Format("FROM {0}", GetListaTabelas()));
 
-        }
+        private string GetListaTabelas() => (TratarSQL(JSON.GetValor("#ENTIDADES#")));
+
+        private string GetListaCampos() => (TratarSQL(JSON.GetValor("#ATRIBUTOS#", prmPadrao: "*")));
+
+        private string GetLinhas(int prmQtde) => (string.Format("TOP {0}", prmQtde));
+
+        private string TratarSQL(string prmLista) => (new xLista(prmLista, prmSeparador: "+").memo(", "));
+
     }
     public class DataVariantConnection
     {
@@ -249,14 +242,11 @@ namespace MeuSeleniumCSharp
 
         public string CriarSQL(int prmQtde)
         {
-
-            return (Modelo.GetSQL(prmQtde) + GetExtensaoSQL());
-
+            return (string.Format("{0} {1}", Modelo.GetSQL(prmQtde), GetExtensaoSQL()));
         }
-
         private string GetExtensaoSQL()
         {
-            return (string.Format("{0} {1}", GetWHERE(), GetORDERBY()));
+            return (string.Format("{0} {1}", GetWHERE(), GetORDERBY()).Trim());
         }
         private string GetWHERE()
         {
@@ -268,11 +258,12 @@ namespace MeuSeleniumCSharp
         }
         private string GetRegras(string prmFormato)
         {
-            return (JSON.FindValor("#REGRAS", prmFormato));
+           
+            return (JSON.FindValor("#REGRAS#", prmFormato));
         }
         private string GetOrdenacao(string prmFormato)
         {
-            return (JSON.FindValor("#ORDEM", prmFormato));
+            return (JSON.FindValor("#ORDEM#", prmFormato));
         }
     }
     public class DataViewConnection
@@ -284,10 +275,9 @@ namespace MeuSeleniumCSharp
 
         public DataCursorConnection Cursor;
 
-        public string sql
-        { get => Cursor.sql; }
-        public Exception erro
-        { get => Cursor.erro; }
+        public string sql { get => Cursor.sql; }
+        public Exception erro { get => Cursor.erro; }
+
 
         public DataViewConnection(string prmTag, string prmSQL, DataBaseConnection prmDataBase)
         {
@@ -300,27 +290,23 @@ namespace MeuSeleniumCSharp
 
         }
 
-        public bool Next()
-        { return Cursor.Next(); }
+        public bool Next() => Cursor.Next();
 
-        public string GetName(int prmIndice)
-        { return Cursor.GetName(prmIndice); }
-        public string GetValor(int prmIndice)
-        { return Cursor.GetValor(prmIndice); }
+        public string GetName(int prmIndice) => Cursor.GetName(prmIndice); 
 
-        public string GetValor(string prmNome)
-        { return Cursor.GetValor(prmNome); }
-        public string GetJSon()
-        { return Cursor.GetJSON(); }
+        public string GetValor(int prmIndice) => Cursor.GetValor(prmIndice);
 
-        public bool Fechar()
-        { return (Cursor.Fechar()); }
+        public string GetValor(string prmNome) => Cursor.GetValor(prmNome);
 
-        public bool IsOK()
-        { return (Cursor.IsOK()); }
+        public string GetJSon() => Cursor.GetJSON();
+
+        public bool Fechar() => Cursor.Fechar();
+
+        public bool IsOK() => Cursor.IsOK();
+      
+        public string memo() => String.Format("VIEW:[{0,25}] SQL: {1}", tag, sql);
 
     }
-
     public class DataCursorConnection
     {
 
@@ -437,40 +423,107 @@ namespace MeuSeleniumCSharp
 
 
     }
-/*
-
-
-    public class DataRowConnection
+    public class DataLocalConnection
     {
 
-*//*        public bool Ler()
-        { return reader.Read(); }
+        private Object Origem;
 
-        public string GetName(int prmIndice)
+        public DataPoolConnection Pool;
+        
+        public DataViewConnection View
+        { get => Pool.DataViewCorrente; }
+
+        public void Setup(Object prmOrigem, DataPoolConnection prmPool)
         {
+            
+            Origem = prmOrigem;
 
-            return reader.GetName(prmIndice);
+            Pool = prmPool;
 
         }
-        public string GetValor(int prmIndice)
+        public bool AddDataBase(string prmTag, string prmConexao)
         {
+            return (Pool.AddDataBase(prmTag, prmConexao));
+        }
+        public bool AddDataView(string prmTag, string prmSQL)
+        {
+            return (Pool.AddDataView(prmTag, prmSQL));
+        }
+        public void AddDataModel(string prmTag, string prmModelo)
+        {
+            Pool.AddDataModel(prmTag, prmModelo);
+        }
+        public void AddDataVariant(string prmTag)
+        {
+            AddDataVariant(prmTag, prmVariacao: "");
+        }
+        public void AddDataVariant(string prmTag, string prmVariacao)
+        {
+            Pool.AddDataVariant(prmTag, prmVariacao);
+        }
+        public bool SetView(string prmTag)
+        { 
+            return (Pool.SetView(prmTag)); 
+        }
+        public string memo()
+        {
+            return(Pool.memo());
+        }
+    }
+    public class IDataLocalConnection
+    {
 
-            return reader.GetSqlValue(prmIndice).ToString();
+        private DataLocalConnection _Dados;
+
+        public DataLocalConnection Dados
+        {
+            get
+            {
+                if (_Dados == null)
+                    _Dados = new DataLocalConnection();
+
+                return _Dados;
+
+            }
 
         }
-        public string GetValor(string prmNome)
+
+    }
+
+    /*
+
+
+        public class DataRowConnection
         {
 
-            return reader.GetString(prmNome);
+    *//*        public bool Ler()
+            { return reader.Read(); }
 
-        }
-        public string GetJSon(int prmIndice)
-        {
+            public string GetName(int prmIndice)
+            {
 
-            return string.Format("'{0}': '{1}'", GetName(prmIndice), GetValor(prmIndice));
+                return reader.GetName(prmIndice);
 
-        }*//*
-    }*/
+            }
+            public string GetValor(int prmIndice)
+            {
+
+                return reader.GetSqlValue(prmIndice).ToString();
+
+            }
+            public string GetValor(string prmNome)
+            {
+
+                return reader.GetString(prmNome);
+
+            }
+            public string GetJSon(int prmIndice)
+            {
+
+                return string.Format("'{0}': '{1}'", GetName(prmIndice), GetValor(prmIndice));
+
+            }*//*
+        }*/
 
     //private CursorDados _cursor;
 

@@ -72,7 +72,7 @@ namespace MeuSeleniumCSharp
 
             foreach (string item in prmLista.Split(separador))
             {
-                this.Add(item);
+                this.Add(item.Trim());
             }
 
         }
@@ -97,6 +97,7 @@ namespace MeuSeleniumCSharp
                 separador = prmSeparador;
 
             }
+
             return lista;
         }
         public int qtde
@@ -265,8 +266,6 @@ namespace MeuSeleniumCSharp
         {
 
             string fluxo = @prmFluxo.Replace("'", "\"");
-
-            Debug.Print(fluxo);
 
             if (lista == null)
                 lista = fluxo;

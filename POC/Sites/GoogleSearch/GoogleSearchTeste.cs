@@ -11,11 +11,11 @@ namespace MeuSeleniumCSharp.GoogleSearch
         public void DATA()
         {
 
-            Dados.Add(prmFluxo: @"{'Nome':'Alexandre Bartie'}");
-            Dados.Add(prmFluxo: @"{'Nome':'Teste de Software'}");
-            Dados.Add(prmFluxo: @"{'Nome':'Albert Einstein'}");
+            Massa.Add(prmFluxo: @"{'Nome':'Alexandre Bartie'}");
+            Massa.Add(prmFluxo: @"{'Nome':'Teste de Software'}");
+            Massa.Add(prmFluxo: @"{'Nome':'Albert Einstein'}");
 
-            Dados.Save();
+            Massa.Save();
 
         }
         public void SETUP()
