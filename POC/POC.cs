@@ -10,37 +10,18 @@ namespace MeuSeleniumCSharp
         public void DATA()
         {
 
-            if (false)
-                Dados.AddDataBase(prmTag: "RH", prmConexao: @"Data Source=PC-ENGENHARIA\SQLEXPRESS;Initial Catalog=QA_POC;Integrated Security=True; MultipleActiveResultSets = True");
+            Dados.AddDataBase(prmTag: "RH", prmConexao: @"Data Source=PC-ENGENHARIA\SQLEXPRESS;Initial Catalog=QA_POC;Integrated Security=True; MultipleActiveResultSets = True");
 
-            if (false)
-            {
+            Dados.AddDataModel(prmTag: "Candidato", prmModelo: @"{'#ENTIDADES#':'Candidatos','#ATRIBUTOS#':'nome + sobrenome + email + nascimento'}");
 
-                Dados.AddDataModel(prmTag: "Candidato", prmModelo: @"{'#ENTIDADES':'Candidatos','#ATRIBUTOS':'nome + sobrenome + email + nascimento'}");
+            Dados.AddDataVariant(prmTag: "=Padrao");
 
-                Dados.AddDataVariant(prmTag: "=Padrao");
+            Dados.AddDataVariant(prmTag: "=Primeiro", prmRegra: @"{'#ORDEM#': 'nome ASC'}");
+            Dados.AddDataVariant(prmTag: "=Ultimo", prmRegra: @"{'#ORDEM#': 'nome DESC'}");
+            Dados.AddDataVariant(prmTag: "+Novo", prmRegra: @"{'#ORDEM#': 'nascimento DESC'}");
+            Dados.AddDataVariant(prmTag: "+Velho", prmRegra: @"{'#ORDEM#': 'nascimento ASC'}");
 
-                Dados.AddDataVariant(prmTag: "=Primeiro", prmVariacao: @"{'#ORDEM': 'nome'}");
-                Dados.AddDataVariant(prmTag: "=Ultimo", prmVariacao: @"{'#ORDEM': 'nome DESC'}");
-                Dados.AddDataVariant(prmTag: "+Novo", prmVariacao: @"{'#ORDEM': 'nascimento'}");
-                Dados.AddDataVariant(prmTag: "+Velho", prmVariacao: @"{'#ORDEM': 'nascimento DESC'}");
-
-                Dados.AddDataVariant(prmTag: "-Email", prmVariacao: @"{'#REGRAS': 'email is null'}");
-
-            }
-            if (false)
-            {
-                
-                //Hub.AddDataView(prmTag: "Candidato=Padrao", prmSQL: "SELECT TOP 1 nome, sobrenome, email FROM Candidatos WHERE id = 10");
-
-                //Hub.AddDataView(prmTag: "Candidato=AnalistaFinanceiro", prmSQL: "SELECT TOP 1 nome, sobrenome, email FROM Candidatos ORDER BY nome ASC WHERE depto = 1");
-                //Hub.AddDataView(prmTag: "Candidato=GerenteFinanceiro", prmSQL: "SELECT TOP 1 nome, sobrenome, email FROM Candidatos ORDER BY nome DESC");
-                //Hub.AddDataView(prmTag: "Candidato+Novo", prmSQL: "SELECT TOP 1 nome, sobrenome, email FROM Candidatos ORDER BY nascimento");
-                //Hub.AddDataView(prmTag: "Candidato+Velho", prmSQL: "SELECT TOP 1 nome, sobrenome, email FROM Candidatos ORDER BY nascimento DESC");
-
-                //Hub.AddDataView(prmTag: "Candidato-Email", prmSQL: "SELECT TOP 1 nome, sobrenome, email FROM Candidatos WHERE email is null");
-
-            }
+            Dados.AddDataVariant(prmTag: "-Email", prmRegra: @"{'#REGRAS#': 'email is null'}");
 
         }
         public void BUILD()
@@ -55,9 +36,9 @@ namespace MeuSeleniumCSharp
         public void START()
         {
 
-            this.Config.PauseAfterTestCase = 5;
+            this.Config.PauseAfterTestCase = 2;
 
-            this.Config.OnlyDATA = true;
+            this.Config.OnlyDATA = false;
 
             this.Executar(prmTipoDriver: eTipoDriver.ChromeDriver);
 

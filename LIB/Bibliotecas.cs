@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.Json;
 using System.Diagnostics;
 
 namespace MeuSeleniumCSharp
@@ -76,11 +75,8 @@ namespace MeuSeleniumCSharp
             }
 
         }
-        public string memo()
-        {
-            return memo(prmSeparador: "");
-        }
 
+        public string memo() => memo(prmSeparador: "");
         public string memo(string prmSeparador)
         {
 
@@ -100,12 +96,12 @@ namespace MeuSeleniumCSharp
 
             return lista;
         }
-        public int qtde
-        { get => this.Count; }
-        public bool vazio
-        { get => (qtde == 0); }
-        public bool IsOK
-        { get => !vazio; }
+        public int qtde { get => this.Count; }
+
+        public bool vazio { get => (qtde == 0); }
+
+        public bool IsOK { get => !vazio; }
+
         public string item(int prmIndice)
         {
             if (!vazio)
@@ -148,136 +144,7 @@ namespace MeuSeleniumCSharp
         public string ultimo()
         { return item(qtde); }
     }
-    public class xJSON
-    {
 
-        public JsonDocument doc;
-
-        public JsonElement.ArrayEnumerator Corpo;
-
-        private xDadosJSON Dados;
-
-        public bool _IsOK;
-        public bool _IsON;
-
-        public Exception _Erro;
-
-        private JsonElement root
-        { get => doc.RootElement; }
-        private JsonElement item
-        { get => Corpo.Current; }
-        public bool IsOK
-        { get => _IsOK; }
-        public bool IsON
-        { get => _IsON; }
-        public Exception Erro
-        { get => _Erro; }
-        public string fluxo
-        { get => Dados.memo(); }
-        public xJSON()
-        {
-            Dados = new xDadosJSON(this);
-        }
-        public xJSON(string prmFluxo)
-        {
-
-            Dados = new xDadosJSON(this);
-
-            Save(prmFluxo);
-
-        }
-        public void Add(string prmFluxo)
-        {
-            Dados.Add(prmFluxo);
-        }
-        private bool Save(string prmFluxo)
-        {
-
-            Add(prmFluxo);
-
-            return (Save());
-
-        }
-        public bool Save()
-        {
-
-            try
-            {
-
-                doc = JsonDocument.Parse(fluxo);
-
-                Corpo = root.EnumerateArray();
-
-                _IsON = Next();
-
-            }
-
-            catch (Exception e)
-            { _Erro = e; }
-
-            return (IsON);
-        }
-        public bool Next()
-        {
-            return (Corpo.MoveNext());
-        }
-        public string FindValor(string prmKey, string prmFormato)
-        {
-
-            string vlValor = GetValor(prmKey);
-
-            if (vlValor != "")
-                return (String.Format(prmFormato, vlValor));
-
-            return (vlValor);
-
-        }
-
-        public string GetValor(string prmKey)
-        { return GetValor(prmKey, prmPadrao: ""); }
-        public string GetValor(string prmKey, string prmPadrao)
-        {
-            try
-            {
-                string valor = item.GetProperty(prmKey).GetString();
-
-                return (valor);
-
-            }
-            catch (Exception e)
-            { _Erro = e; }
-
-            return (prmPadrao);
-        }
-    }
-    public class xDadosJSON
-    {
-
-        private xJSON JSON;
-
-        public string lista;
-
-        public xDadosJSON(xJSON prmJSON)
-        {
-            JSON = prmJSON;
-        }
-
-        public void Add(string prmFluxo)
-        {
-
-            string fluxo = @prmFluxo.Replace("'", "\"");
-
-            if (lista == null)
-                lista = fluxo;
-            else
-                lista += ", " + fluxo;
-
-        }
-
-        public string memo()
-        { return ("[ " + lista + " ]"); }
-
-    }
 
 }
 

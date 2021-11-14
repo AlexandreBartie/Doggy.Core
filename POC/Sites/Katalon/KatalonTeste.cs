@@ -1,4 +1,5 @@
-﻿
+﻿using System.Diagnostics;
+
 namespace MeuSeleniumCSharp.Katalon
 {
     public class KatalonTeste : TestScript
@@ -6,42 +7,21 @@ namespace MeuSeleniumCSharp.Katalon
         public void DATA()
         {
 
-            Dados.AddDataBase(prmTag: "RH", prmConexao: @"Data Source=PC-ENGENHARIA\SQLEXPRESS;Initial Catalog=QA_POC;Integrated Security=True; MultipleActiveResultSets = True");
+           //
 
-            Dados.AddDataModel(prmTag: "Candidato", prmModelo: @"{'#ENTIDADES#':'Candidatos','#ATRIBUTOS#':'nome + sobrenome + email + nascimento'}");
+            Massa.SetView(prmTag: "Candidato=Padrao");
 
-            Dados.AddDataVariant(prmTag: "=Padrao");
+            Massa.Add(prmFluxo: @"{ }");
+            Massa.Add(prmFluxo: @"{ }", prmView: "Candidato=Primeiro");
+            Massa.Add(prmFluxo: @"{ }", prmView: "Candidato=Ultimo");
+            Massa.Add(prmFluxo: @"{ }", prmView: "Candidato+Novo");
+            Massa.Add(prmFluxo: @"{ }", prmView: "Candidato+Velho");
 
-            Dados.AddDataVariant(prmTag: "=Primeiro", prmVariacao: @"{'#ORDEM#': 'nome'}");
-            Dados.AddDataVariant(prmTag: "=Ultimo", prmVariacao: @"{'#ORDEM#': 'nome DESC'}");
-            Dados.AddDataVariant(prmTag: "+Novo", prmVariacao: @"{'#ORDEM#': 'nascimento'}");
-            Dados.AddDataVariant(prmTag: "+Velho", prmVariacao: @"{'#ORDEM#': 'nascimento DESC'}");
-
-            Dados.AddDataVariant(prmTag: "-Email", prmVariacao: @"{'#REGRAS#': 'email is null'}");
-
-            xLista lista = new xLista("Candidato=Padrao;Candidato=Primeiro;Candidato=Ultimo;Candidato+Novo;Candidato+Velho;Candidato-Email");
-
-            foreach (string visao in lista)
-            {
-
-                if (Dados.SetView(prmTag: visao))
-                {
-                    //Robot.Debug.Console("MASSA: " + Pool.View.GetJSon());
-                    Robot.Debug.Console("... " + Dados.View.memo());
-                }
-                else
-                    Robot.Debug.Stop();
-
-            }
-
-            Massa.Add(prmFluxo: @"{'Nome':'Aderson','Sexo':'Homem', 'email':'alexandre_bartie@hotmail.com'}");
-            Massa.Add(prmFluxo: @"{'email':'alexandre_bartie@hotmail.com'}");//, "AlunoSemAutorizacao");
-            Massa.Add(prmFluxo: @"{'email':'alexandre_bartie@hotmail.com'}");//, "Candidato+Velho");
-            Massa.Add(prmFluxo: @"{'Nome':'Lisia','Sexo':'Homem', 'email':'alexandre_bartie@hotmail.com'}");
-            Massa.Add(prmFluxo: @"{'Expectativa':'Salário + Desafio'}");// "Candidato=Primeiro");
-            Massa.Add(prmFluxo: @"{'Expectativa':'Liderança + Ambiente + Equipe'}");
-            Massa.Add(prmFluxo: @"{'Expectativa':'Salário + Desafio'}");
-            Massa.Add(prmFluxo: @"{'Expectativa':'Liderança + Ambiente + Equipe'}");
+            Massa.Add(prmFluxo: @"{ 'Nome': 'Alexandre', 'email': 'alexandre_bartie@hotmail.com' }");
+            Massa.Add(prmFluxo: @"{ 'Nome': 'Alexandre', 'Sobrenome': 'Bartie', 'email': 'alexandre.bartie@gmail.com' }");
+            Massa.Add(prmFluxo: @"{ 'Nome': 'Lisia', 'Sobrenome': 'Amantos', 'sexo': 'Mulher', 'email': 'lisia.amantos@gmail.com' }");
+            Massa.Add(prmFluxo: @"{ 'Expectativa':'Salário + Desafio' }");
+            Massa.Add(prmFluxo: @"{ 'Expectativa':'Liderança + Ambiente + Equipe' }");
 
             Massa.Save();
 

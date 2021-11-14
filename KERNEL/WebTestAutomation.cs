@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Diagnostics;
 using OpenQA.Selenium;
 using System.Collections.ObjectModel;
+using MeuSeleniumCSharp.LIB;
 
 namespace MeuSeleniumCSharp
 {
@@ -306,12 +307,12 @@ namespace MeuSeleniumCSharp
                 foreach (string item in fluxo)
                 {
                     if (!SetFluxo(item))
-                        Robot.Debug.Erro("Domínio não encontrado na lista ... " + item);
+                        Robot.Trace.Erro("Domínio não encontrado na lista ... " + item);
                 }
 
             }
             else
-                Robot.Debug.Erro("Busca de Domínios falhou ... " + GetXPath());
+                Robot.Trace.Erro("Busca de Domínios falhou ... " + GetXPath());
 
             return (false);
         }
@@ -443,7 +444,7 @@ namespace MeuSeleniumCSharp
 
         public QA_WebAction Action;
 
-        public QA_WebDebug Debug;
+        public QA_WebTrace Trace;
 
         public QA_MassaDados Massa;
 
@@ -458,30 +459,21 @@ namespace MeuSeleniumCSharp
 
             Action = new QA_WebAction(this);
 
-            Debug = new QA_WebDebug(this);
+            Trace = new QA_WebTrace(this);
 
         }
-        public TestProject Projeto
-        {
-            get { return Motor.Suite.Projeto; }
-        }
-        public TestKernel Kernel
-        {
-            get { return Projeto.Kernel; }
-        }
+        public TestProject Projeto { get => Motor.Suite.Projeto; }
+
+        public TestProject Dado { get => Projeto; }
+
+        public TestKernel Kernel { get => Projeto.Kernel; }
             
-        public TestLog Log
-        {
-            get { return Kernel.Log; }
-        }
-        public IWebDriver driver
-        {
-            get { return Motor.driver; }
-        }
-        public QA_WebElemento Mapping(string prmKey, string prmTarget)
-        {
-            return (Page.AddItem(prmKey, prmTarget));
-        }
+        public TestLog Log { get  => Kernel.Log; }
+
+        public IWebDriver driver  { get => Motor.driver; }
+
+        public QA_WebElemento Mapping(string prmKey, string prmTarget) => (Page.AddItem(prmKey, prmTarget));
+
         public void Input(string prmKey, string prmValor)
         {
 
@@ -489,24 +481,23 @@ namespace MeuSeleniumCSharp
 
             Action.SetMap(prmKey, valor);
         }
-
         public bool GoURL(string prmUrl)
         {
             return (Action.GoURL(prmUrl));
         }
 
-/*        public bool SetFocus(string prmTupla)
-        {
-            return (Action.SetFocus(prmTupla));
-        }
-        public void SetClick(string prmTarget)
-        {
-            Action.SetClick(prmTarget);
-        }
-        public void SetTexto(string prmTexto, string prmTarget)
-        {
-            Action.SetTexto(prmTexto, prmTarget);
-        }*/
+        /*
+         *         public bool SetFocus(string prmTupla)
+        { return (Action.SetFocus(prmTupla) ); }
+                public void SetClick(string prmTarget)
+                {
+                    Action.SetClick(prmTarget);
+                }
+                public void SetTexto(string prmTexto, string prmTarget)
+                {
+                    Action.SetTexto(prmTexto, prmTarget);
+                }*/
+
         public void Submit()
         { Page.Submit(); }
 
@@ -526,7 +517,7 @@ namespace MeuSeleniumCSharp
             }
             catch (Exception e)
             {
-                Debug.Erro(e);
+                Trace.Erro(e);
             }
             return (null);
         }
@@ -538,7 +529,7 @@ namespace MeuSeleniumCSharp
             }
             catch (Exception e)
             {
-                Debug.Erro(e);
+                Trace.Erro(e);
             }
             return (null);
         }
@@ -550,7 +541,7 @@ namespace MeuSeleniumCSharp
             }
             catch (Exception e)
             {
-                Debug.Erro(e);
+                Trace.Erro(e);
             }
             return (null);
          }
@@ -562,7 +553,7 @@ namespace MeuSeleniumCSharp
             }
             catch (Exception e)
             {
-                Debug.Erro(e);
+                Trace.Erro(e);
             }
             return (null);
         }
@@ -572,7 +563,11 @@ namespace MeuSeleniumCSharp
     {
         private QA_WebRobot Robot;
 
-        public xJSON JSON = new xJSON();
+        public xJSON JSON = new LIB.xJSON();
+
+        private DataViewConnection DefaultView;
+
+        private bool IsON;
 
         public QA_MassaDados(QA_WebRobot prmRobot)
         {
@@ -580,21 +575,46 @@ namespace MeuSeleniumCSharp
             Robot = prmRobot;
 
         }
-        private QA_WebDebug Debug
-        { get => Robot.Debug; }
-        public bool IsOK
-        { get => JSON.IsOK; }
-        public bool IsONLINE
-        { get => JSON.IsON; }
+        private QA_WebTrace Trace { get => Robot.Trace; }
+        private DataPoolConnection Pool { get => Robot.Projeto.Pool; }
+
+        public bool IsONLINE { get => IsON; }
+        private bool IsSTATIC => (DefaultView == null);
+        public bool IsOK { get => JSON.IsOK; }
+        public bool IsCurrent { get => JSON.IsCurrent; }
+   
+        public bool SetView(string prmTag)
+        {
+
+            DefaultView = null;
+
+            if (Pool.SetView(prmTag))
+                DefaultView = Pool.DataViewCorrente;
+
+            return (IsSTATIC);
+
+        }
         public void Add(string prmFluxo)
         {
-            JSON.Add(prmFluxo);
+            if (IsSTATIC)
+               JSON.Add(prmFluxo);
+            else
+                AddCombine(prmFluxo, prmMestre:DefaultView.GetJSon());
+        }
+        public void Add(string prmFluxo, string prmView)
+        {
+            AddCombine(prmFluxo, prmMestre: Pool.GetView(prmView));
+        }
+        private void AddCombine(string prmFluxo, string prmMestre)
+        {
+            JSON.Add(prmFluxo, prmMestre);
         }
         public bool Save()
         {
+            IsON = true;
 
             if (!JSON.Save())
-                Debug.Erro("Erro no JSON:Parse ", JSON.Erro); Debug.Erro(JSON.fluxo);
+                { Trace.Erro("ERRO{JSON:Save} " + JSON.fluxo); }
 
             return (JSON.IsOK);
 
@@ -610,31 +630,23 @@ namespace MeuSeleniumCSharp
         }
 
     }
-    public class QA_WebDebug
+    public class QA_WebTrace
     {
         private QA_WebRobot Robot;
-        public QA_WebDebug(QA_WebRobot prmRobot)
-        {
+        public QA_WebTrace(QA_WebRobot prmRobot)
+        { 
 
             Robot = prmRobot;
 
         }
 
-        public void Erro(Exception prmErro)
-        { Erro(prmErro.Message); }
-        public void Erro(string prmRotulo, Exception prmErro)
-        { Erro(prmRotulo + " " + prmErro.Message); }
-        public void Erro(string prmErro)
-        { Console(prmErro); }
+        public void Erro(Exception prmErro) { Erro(prmErro.Message); }
+        public void Erro(string prmRotulo, Exception prmErro) { Erro(prmRotulo + " " + prmErro.Message); }
+        public void Erro(string prmErro) { Console(prmErro); }
 
-        public void Stop()
-        { Debug.Assert(false); }
-
-        public void Stop(string prmTexto)
-        { Console(prmTexto); Stop(); }
-
-        public void Console(string prmTexto)
-        { Debug.Print(prmTexto); }
+        public void Stop() { Debug.Assert(false); }
+        public void Stop(string prmTexto) { Console(prmTexto); Stop(); }
+        public void Console(string prmTexto) { Debug.Print(prmTexto); }
 
     }
     public class QA_WebAction

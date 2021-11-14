@@ -142,7 +142,6 @@ namespace MeuSeleniumCSharp
 
             Dados.Setup(this, Suite.Pool);
 
-
             if (MetodoDADOS())
             {
                 if (MetodoSETUP())
@@ -183,10 +182,12 @@ namespace MeuSeleniumCSharp
                 Metodo("PLAY;CHECK;CLEANUP");
             else
             {
-                while (Massa.Next())
+                while (Massa.IsCurrent)
                 {
                     Metodo("PLAY;CHECK;CLEANUP");
                     Motor.Refresh();
+
+                    Massa.Next();
                 }
             }
         }
@@ -218,8 +219,6 @@ namespace MeuSeleniumCSharp
             {
                 if (_driver == null)
                 {
-
-                    Debug.Assert(false);
 
                     switch (Suite.tipoDriver)
                     {

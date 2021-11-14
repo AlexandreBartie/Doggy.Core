@@ -3,6 +3,7 @@ using System.Data.SqlClient;
 using System.Data;
 using System.Collections.Generic;
 using System;
+using MeuSeleniumCSharp.LIB;
 
 namespace MeuSeleniumCSharp
 {
@@ -46,16 +47,22 @@ namespace MeuSeleniumCSharp
             return (DataBaseCorrente != null);
 
         }
-        public bool AddDataVariant(string prmTag, string prmVariacao)
+        public bool AddDataVariant(string prmTag)
         {
 
-            return (AddDataVariant(prmTag, prmVariacao, prmQtde: 1));
+            return (AddDataVariant(prmTag, prmRegra: "", prmQtde: 1));
 
         }
-        public bool AddDataVariant(string prmTag, string prmVariacao, int prmQtde)
+        public bool AddDataVariant(string prmTag, string prmRegra)
         {
 
-            DataVariantCorrente = new DataVariantConnection(prmTag, prmVariacao, DataModelCorrente);
+            return (AddDataVariant(prmTag, prmRegra, prmQtde: 1));
+
+        }
+        public bool AddDataVariant(string prmTag, string prmRegra, int prmQtde)
+        {
+
+            DataVariantCorrente = new DataVariantConnection(prmTag, prmRegra, DataModelCorrente);
 
             string ViewSQL = DataVariantCorrente.CriarSQL(prmQtde);
 
@@ -82,6 +89,15 @@ namespace MeuSeleniumCSharp
             Debug.Assert(false);
 
             return (false);
+
+        }
+
+        public string GetView(string prmTag)
+        {
+            if (SetView(prmTag))
+                return DataViewCorrente.GetJSon();
+
+            return ("");
 
         }
         public bool IsOk()
@@ -223,26 +239,36 @@ namespace MeuSeleniumCSharp
 
         public string tag;
 
-        public xJSON JSON;
+        private xJSON JSON;
+
+        private string regra;
 
         public DataModelConnection Modelo;
 
-        public DataVariantConnection(string prmTag, string prmVariacao, DataModelConnection prmModelo)
+        public DataVariantConnection(string prmTag, string prmRegra, DataModelConnection prmModelo)
         {
 
             tag = prmTag;
 
             Modelo = prmModelo;
 
-            JSON = new xJSON(prmVariacao);
+            if (prmRegra.Trim() != "")
+                JSON = new xJSON(prmRegra);
 
         }
-        public string tag_extendida
-        { get => Modelo.tag + tag; }
+        public string tag_extendida { get => Modelo.tag + tag; }
+        public bool IsRegraOK { get => JSON != null; }
 
         public string CriarSQL(int prmQtde)
         {
-            return (string.Format("{0} {1}", Modelo.GetSQL(prmQtde), GetExtensaoSQL()));
+
+            string sql = Modelo.GetSQL(prmQtde);
+
+            if (IsRegraOK)
+                sql += " " + GetExtensaoSQL();
+
+            return (sql);
+            
         }
         private string GetExtensaoSQL()
         {
@@ -292,7 +318,7 @@ namespace MeuSeleniumCSharp
 
         public bool Next() => Cursor.Next();
 
-        public string GetName(int prmIndice) => Cursor.GetName(prmIndice); 
+        public string GetName(int prmIndice) => Cursor.GetName(prmIndice);
 
         public string GetValor(int prmIndice) => Cursor.GetValor(prmIndice);
 
@@ -303,8 +329,9 @@ namespace MeuSeleniumCSharp
         public bool Fechar() => Cursor.Fechar();
 
         public bool IsOK() => Cursor.IsOK();
-      
+
         public string memo() => String.Format("VIEW:[{0,25}] SQL: {1}", tag, sql);
+        public string data() => String.Format("DATA:[{0,25}] Fluxo: {1}", tag, GetJSon());
 
     }
     public class DataCursorConnection
@@ -455,15 +482,19 @@ namespace MeuSeleniumCSharp
         }
         public void AddDataVariant(string prmTag)
         {
-            AddDataVariant(prmTag, prmVariacao: "");
+            Pool.AddDataVariant(prmTag);
         }
-        public void AddDataVariant(string prmTag, string prmVariacao)
+        public void AddDataVariant(string prmTag, string prmRegra)
         {
-            Pool.AddDataVariant(prmTag, prmVariacao);
+            Pool.AddDataVariant(prmTag, prmRegra);
         }
         public bool SetView(string prmTag)
         { 
             return (Pool.SetView(prmTag)); 
+        }
+        public string GetView(string prmTag)
+        {
+            return (Pool.GetView(prmTag));
         }
         public string memo()
         {

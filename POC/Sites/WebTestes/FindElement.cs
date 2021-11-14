@@ -29,15 +29,15 @@ namespace MeuSeleniumCSharp.WebTestes
                 {
                     IReadOnlyCollection<IWebElement> lista = Robot.GetElementsByXPath(filtro);
 
-                    Robot.Debug.Stop();
+                    Robot.Trace.Stop();
                     break;
                 }
                 catch (Exception e)
                 {
-                    Robot.Debug.Erro(e);
+                    Robot.Trace.Erro(e);
                    }
 
-                Robot.Debug.Stop();
+                Robot.Trace.Stop();
             }
 
             int cont = 0;
@@ -46,7 +46,7 @@ namespace MeuSeleniumCSharp.WebTestes
             {
                 cont++;
 
-                Robot.Debug.Stop(String.Format("Contador: {0} - {1}", cont, item.GetAttribute("label")));
+                Robot.Trace.Stop(String.Format("Contador: {0} - {1}", cont, item.GetAttribute("label")));
 
                 item.Click();
 
