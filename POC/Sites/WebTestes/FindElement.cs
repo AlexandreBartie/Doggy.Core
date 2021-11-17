@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using OpenQA.Selenium;
 
-namespace Miranda.WebTestes
+namespace Dooggy.WebTestes
 {
     public class FindElementTeste : TestScript
     {

@@ -4,9 +4,9 @@ using System.Drawing;
 using System.Diagnostics;
 using OpenQA.Selenium;
 using System.Collections.ObjectModel;
-using Miranda.LIB;
+using Dooggy.LIB;
 
-namespace Miranda
+namespace Dooggy
 {
     public enum eTipoElemento : int
     {

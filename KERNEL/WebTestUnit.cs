@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Miranda
+namespace Dooggy
 {
     public class TestCase
     {

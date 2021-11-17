@@ -3,9 +3,9 @@ using System.Data.SqlClient;
 using System.Data;
 using System.Collections.Generic;
 using System;
-using Miranda.LIB;
+using Dooggy.LIB;
 
-namespace Miranda
+namespace Dooggy
 {
     public class DataPoolConnection
     {

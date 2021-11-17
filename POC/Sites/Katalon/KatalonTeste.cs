@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace Miranda.Katalon
+namespace Dooggy.Katalon
 {
     public class KatalonTeste : TestScript
     {

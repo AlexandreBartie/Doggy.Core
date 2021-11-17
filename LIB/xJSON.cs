@@ -2,7 +2,7 @@
 using System.Text.Json;
 using System.Diagnostics;
 
-namespace Miranda.LIB
+namespace Dooggy.LIB
 {
     public class xJSON
     {

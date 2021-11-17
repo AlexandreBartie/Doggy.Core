@@ -4,7 +4,7 @@ using System.Text;
 using System.Diagnostics;
 
 
-namespace Miranda.GoogleSearch
+namespace Dooggy.GoogleSearch
 {
     public class GoogleSearchTextoTeste : TestScript
     {

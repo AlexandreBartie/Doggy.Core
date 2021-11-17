@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Miranda.BookRoom
+namespace Dooggy.BookRoom
 {
 
     public class BookRoomTeste : TestScript

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace Miranda
+namespace Dooggy
 {
     public class xTupla
     {
