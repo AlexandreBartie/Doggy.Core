@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Forms;
 
-namespace MeuSeleniumCSharp
+namespace Miranda
 {
     public class ProjetoPOC : TestProject
     {
@@ -33,7 +33,7 @@ namespace MeuSeleniumCSharp
             //this.AddSuite(new SuiteGoogle());
 
         }
-        public void START()
+        public void CONFIG()
         {
 
             this.Config.PauseAfterTestCase = 2;

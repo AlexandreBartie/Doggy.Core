@@ -4,7 +4,7 @@ using System.Text;
 using System.Diagnostics;
 
 
-namespace MeuSeleniumCSharp.GoogleSearch
+namespace Miranda.GoogleSearch
 {
     public class GoogleSearchTextoTeste : TestScript
     {

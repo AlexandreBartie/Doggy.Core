@@ -2,7 +2,7 @@ using System;
 using System.Data.Entity;
 using System.Data.SqlClient;
 
-namespace MeuSeleniumCSharp
+namespace Miranda
 {
     static class Program
     {

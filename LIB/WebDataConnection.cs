@@ -3,9 +3,9 @@ using System.Data.SqlClient;
 using System.Data;
 using System.Collections.Generic;
 using System;
-using MeuSeleniumCSharp.LIB;
+using Miranda.LIB;
 
-namespace MeuSeleniumCSharp
+namespace Miranda
 {
     public class DataPoolConnection
     {

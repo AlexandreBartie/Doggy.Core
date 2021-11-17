@@ -2,7 +2,7 @@
 using System.Text.Json;
 using System.Diagnostics;
 
-namespace MeuSeleniumCSharp.LIB
+namespace Miranda.LIB
 {
     public class xJSON
     {

@@ -7,7 +7,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Edge;
 
-namespace MeuSeleniumCSharp
+namespace Miranda
 {
     public enum eTipoDriver : int
     {
@@ -301,7 +301,7 @@ namespace MeuSeleniumCSharp
 
         public TestConfig Config = new TestConfig();
 
-        public string GetProjectBlockCode() => ("DATA; BUILD; START");
+        public string GetProjectBlockCode() => ("DATA; BUILD; CONFIG");
 
         public string GetAdicaoElementos() => ("+");
     

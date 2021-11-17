@@ -4,9 +4,9 @@ using System.Drawing;
 using System.Diagnostics;
 using OpenQA.Selenium;
 using System.Collections.ObjectModel;
-using MeuSeleniumCSharp.LIB;
+using Miranda.LIB;
 
-namespace MeuSeleniumCSharp
+namespace Miranda
 {
     public enum eTipoElemento : int
     {

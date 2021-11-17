@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MeuSeleniumCSharp.BookRoom
+namespace Miranda.BookRoom
 {
 
     public class BookRoomTeste : TestScript

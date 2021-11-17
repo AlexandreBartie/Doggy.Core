@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace MeuSeleniumCSharp.Katalon
+namespace Miranda.Katalon
 {
     public class KatalonTeste : TestScript
     {

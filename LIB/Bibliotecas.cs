@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace MeuSeleniumCSharp
+namespace Miranda
 {
     public class xTupla
     {

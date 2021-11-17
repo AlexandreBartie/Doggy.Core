@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MeuSeleniumCSharp
+namespace Miranda
 {
     public class TestCase
     {
