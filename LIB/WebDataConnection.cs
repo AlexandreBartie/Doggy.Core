@@ -231,7 +231,7 @@ namespace Dooggy
 
         private string GetLinhas(int prmQtde) => (string.Format("TOP {0}", prmQtde));
 
-        private string TratarSQL(string prmLista) => (new xLista(prmLista, prmSeparador: "+").memo(", "));
+        private string TratarSQL(string prmLista) => new xMemo(prmLista, prmSeparador: "+").memo(", ");
 
     }
     public class DataVariantConnection

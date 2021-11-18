@@ -285,7 +285,7 @@ namespace Dooggy
         {
             Elemento = prmElemento;
 
-            lista = new xLista();
+            lista = new xLista(";");
 
         }
         public void Setup(string prmLista, string prmSintaxe)
@@ -302,7 +302,7 @@ namespace Dooggy
             if (GetElementos())
             {
 
-                xLista fluxo = new xLista(prmValor, prmSeparador: Kernel.GetAdicaoElementos());
+                xLista fluxo = new xLista(Kernel.GetAdicaoElementos(), prmValor);
 
                 foreach (string item in fluxo)
                 {
@@ -565,6 +565,8 @@ namespace Dooggy
 
         public xJSON JSON = new LIB.xJSON();
 
+        public QA_FonteDados Fonte;
+
         private DataViewConnection DefaultView;
 
         private bool IsON;
@@ -574,9 +576,13 @@ namespace Dooggy
 
             Robot = prmRobot;
 
+            Fonte = new QA_FonteDados(this);
+
         }
+
+        public TestProject Project { get => Robot.Projeto; }
         private QA_WebTrace Trace { get => Robot.Trace; }
-        private DataPoolConnection Pool { get => Robot.Projeto.Pool; }
+        private DataPoolConnection Pool { get => Project.Pool; }
 
         public bool IsONLINE { get => IsON; }
         private bool IsSTATIC => (DefaultView == null);
@@ -628,6 +634,65 @@ namespace Dooggy
         {
             return (JSON.GetValor(prmKey, prmPadrao));
         }
+
+    }
+
+    public class QA_FonteDados
+    {
+
+        private QA_MassaDados Massa;
+
+        private xFileTXT _FileTXT;
+
+        private xFileJUnit _FileJUnit;
+
+        private TestConfig Config { get => Massa.Project.Config; }
+        public xFileTXT FileTXT
+        { 
+            get
+            {
+                if (_FileTXT is null)
+                    _FileTXT = new xFileTXT();
+                return (_FileTXT);
+            }
+            set
+            {
+                _FileTXT = value;
+            }
+        }
+        public xFileJUnit FileJUnit
+        {
+            get
+            {
+                if (_FileJUnit is null)
+                    _FileJUnit = new xFileJUnit();
+                return (_FileJUnit);
+            }
+            set
+            {
+                _FileJUnit = value;
+            }
+        }
+        public QA_FonteDados(QA_MassaDados prmMassa)
+        {
+
+            Massa = prmMassa;
+
+        }
+
+        //public bool OpenTXT()
+        //{
+            
+        //    return (OpenTXT(prmPath: Config.PathFileSources, prmName: "ArqDadosAutorizarDebito.csv"));
+
+        //}
+        //public bool OpenTXT(string prmPath)
+        //{
+
+        //    return (OpenTXT(prmPath, prmName: "ArqDadosAutorizarDebito.csv"));
+
+        //}
+        //public bool OpenTXT(string prmPath, string prmName) => FileTXT.Open(prmPath, prmName);
 
     }
     public class QA_WebTrace

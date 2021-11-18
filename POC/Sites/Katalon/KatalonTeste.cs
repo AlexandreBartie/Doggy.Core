@@ -7,8 +7,6 @@ namespace Dooggy.Katalon
         public void DATA()
         {
 
-           //
-
             Massa.SetView(prmTag: "Candidato=Padrao");
 
             Massa.Add(prmFluxo: @"{ }");

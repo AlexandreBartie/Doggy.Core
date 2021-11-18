@@ -138,7 +138,7 @@ namespace Dooggy.LIB
 
             // Lista acomodara o Fluxo Combinado
 
-            xLista lista = new xLista();
+            xMemo Memo = new xMemo(";");
 
             // Sobrepor valores do MESTRE que estão presentes no FLUXO
 
@@ -151,7 +151,7 @@ namespace Dooggy.LIB
                 { mix = Mestre.GetProperty(prmKey: prop.Name); }
 
 
-                lista.Add(string.Format("'{0}': '{1}'", mix.Name, mix.Value));
+                Memo.Add(string.Format("'{0}': '{1}'", mix.Name, mix.Value));
 
             }
 
@@ -161,12 +161,12 @@ namespace Dooggy.LIB
             {
 
                 if (!Fluxo.Find(prmKey: prop.Name))
-                { lista.Add(string.Format("'{0}': '{1}'", prop.Name, prop.Value)); }
+                { Memo.Add(string.Format("'{0}': '{1}'", prop.Name, prop.Value)); }
 
             }
 
 
-            return ("{ " + lista.memo(", ") + " }");
+            return ("{ " + Memo.memo(", ") + " }");
 
         }
         public bool Save()

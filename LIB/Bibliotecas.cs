@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text;
+using Microsoft.VisualBasic.FileIO;
 
 namespace Dooggy
 {
@@ -27,10 +29,10 @@ namespace Dooggy
         { get => tag + separador + valor; }
         public void Set(string prmTupla)
         {
-            xLista Lista = new xLista(prmTupla, prmSeparador: "=");
+            xLista lista = new xLista(prmTupla, prmSeparador: "=");
 
-            _tag = Lista.primeiro();
-            _valor = Lista.ultimo();
+            _tag = lista.First;
+            _valor = lista.Last;
         }
         private void Set(string prmTag, string prmValor)
         {
@@ -40,7 +42,9 @@ namespace Dooggy
         public string GetOpcao(string prmKey, string prmOpcoes)
         {
 
-            xLista Lista = new xLista(prmOpcoes, prmSeparador: ";");
+            xLista Lista = new xLista(";");
+
+            Lista.Importar(prmOpcoes);
 
             return (Lista.GetFindx("[" + prmKey + "]"));
 
@@ -48,66 +52,86 @@ namespace Dooggy
     }
     public class xLista : List<string>
     {
-        private string separador = ";";
+
+        public string separador;
 
         public xLista()
-        {
+        {}
 
-        }
-        public xLista(string prmLista)
-        {
-            Importar(prmLista);
-        }
-        public xLista(string prmLista, string prmSeparador)
+        public xLista (string prmSeparador)
         {
 
             separador = prmSeparador;
 
+        }
+        public xLista(string prmLista, string prmSeparador)
+        {
+            separador = prmSeparador;
+
             Importar(prmLista);
+
         }
 
         public void Importar(string prmLista)
         {
-
             foreach (string item in prmLista.Split(separador))
             {
+  
                 this.Add(item.Trim());
+
             }
 
         }
 
-        public string memo() => memo(prmSeparador: "");
-        public string memo(string prmSeparador)
-        {
-
-            string lista = "";
-            string separador = "";
-
-            foreach (string item in this)
-            {
-
-                string texto = separador + item.Trim();
-
-                lista += texto;
-
-                separador = prmSeparador;
-
-            }
-
-            return lista;
-        }
         public int qtde { get => this.Count; }
 
         public bool vazio { get => (qtde == 0); }
 
         public bool IsOK { get => !vazio; }
 
-        public string item(int prmIndice)
+        public string First { get => Item(1); }
+
+        public string Last { get => Item(qtde); }
+
+        public bool IsRange(int prmIndice) => ((prmIndice >= 1) && (prmIndice <= qtde)); 
+
+        public bool Excluir(int prmIndice)
+        {
+            if (IsRange(prmIndice))
+            {
+
+                this.RemoveAt(prmIndice - 1);
+
+                return (true);
+            }
+
+            return (false);
+
+        }
+        public string Item(int prmIndice)
         {
             if (!vazio)
                 return (this[prmIndice - 1]);
             else
                 return ("");
+        }
+
+        public string GetRemove() => GetRemove(prmIndice: 1);
+
+        public string GetRemove(int prmIndice)
+        {
+            if (IsRange(prmIndice))
+            {
+
+                string valor = Item(prmIndice);
+
+                Excluir(prmIndice);
+
+                return (valor);
+            }
+
+            return ("");
+
         }
         public int GetID(string prmTexto)
         {
@@ -134,17 +158,42 @@ namespace Dooggy
             }
             return (0);
         }
-
         public string GetFindx(string prmTexto)
         {
             return GetFind(prmTexto).Replace(prmTexto, "");
         }
-        public string primeiro()
-        { return item(1); }
-        public string ultimo()
-        { return item(qtde); }
-    }
 
+    }
+    public class xMemo : xLista
+    {
+
+        public xMemo(string prmSeparador)
+        { separador = prmSeparador; }
+
+        public xMemo(string prmTexto, string prmSeparador)
+        { separador = prmSeparador; Importar(prmTexto); }
+
+        public string memo() => memo(separador);
+
+        public string memo(string prmSeparador)
+        {
+
+            string lista = "";
+            string aux = "";
+
+            foreach (string item in this)
+            {
+
+                lista += (aux + item.Trim());
+
+                aux = prmSeparador;
+
+            }
+
+            return lista;
+        }
+
+    }
 
 }
 

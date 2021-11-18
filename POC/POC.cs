@@ -29,16 +29,18 @@ namespace Dooggy
 
             this.name = "POC - Automação de Testes";
 
-            this.AddSuite(new SuiteKatalon());
-            //this.AddSuite(new SuiteGoogle());
+            //this.AddSuite(new SuiteKatalon());
+            this.AddSuite(new SuiteGoogle());
 
         }
         public void CONFIG()
         {
 
-            this.Config.PauseAfterTestCase = 2;
+            this.Config.PathFileSources = @"C:\Users\alexa\OneDrive\Área de Trabalho\";
 
-            this.Config.OnlyDATA = false;
+            this.Config.OnlyDATA = true;
+
+            this.Config.PauseAfterTestCase = 2;
 
             this.Executar(prmTipoDriver: eTipoDriver.ChromeDriver);
 

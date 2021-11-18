@@ -271,6 +271,8 @@ namespace Dooggy
     public class TestConfig
     {
 
+        public string PathFileSources;
+
         public bool OnlyDATA;
 
         public int PauseAfterTestCase;
@@ -301,7 +303,7 @@ namespace Dooggy
 
         public TestConfig Config = new TestConfig();
 
-        public string GetProjectBlockCode() => ("DATA; BUILD; CONFIG");
+        public string GetProjectBlockCode() => ("DATA, BUILD, CONFIG");
 
         public string GetAdicaoElementos() => ("+");
     
@@ -312,7 +314,9 @@ namespace Dooggy
 
             bool vlOk = true;
 
-            xLista lista = new xLista(prmMetodo);
+            xLista lista = new xLista(",");
+
+            lista.Importar(prmMetodo);
 
             foreach (string metodo in lista)
             {
