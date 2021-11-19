@@ -316,7 +316,7 @@ namespace Dooggy
 
             xLista lista = new xLista(",");
 
-            lista.Importar(prmMetodo);
+            lista.Parse(prmMetodo);
 
             foreach (string metodo in lista)
             {

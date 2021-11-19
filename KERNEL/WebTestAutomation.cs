@@ -291,7 +291,7 @@ namespace Dooggy
         public void Setup(string prmLista, string prmSintaxe)
         {
 
-            lista.Importar(prmLista);
+            lista.Parse(prmLista);
 
             filtro = prmSintaxe;
 

@@ -256,7 +256,7 @@ namespace Dooggy
                 JSON = new xJSON(prmRegra);
 
         }
-        public string tag_extendida { get => Modelo.tag + tag; }
+        public string tag_extendida { get => Modelo.tag + tag; }    
         public bool IsRegraOK { get => JSON != null; }
 
         public string CriarSQL(int prmQtde)

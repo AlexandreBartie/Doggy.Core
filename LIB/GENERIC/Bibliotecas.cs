@@ -44,7 +44,7 @@ namespace Dooggy
 
             xLista Lista = new xLista(";");
 
-            Lista.Importar(prmOpcoes);
+            Lista.Parse(prmOpcoes);
 
             return (Lista.GetFindx("[" + prmKey + "]"));
 
@@ -68,18 +68,18 @@ namespace Dooggy
         {
             separador = prmSeparador;
 
-            Importar(prmLista);
+            Parse(prmLista);
 
         }
 
-        public void Importar(string prmLista)
+        public virtual void Parse(string prmLista)
         {
-            foreach (string item in prmLista.Split(separador))
-            {
-  
-                this.Add(item.Trim());
 
-            }
+            if (prmLista.Trim() != "")
+                foreach (string item in prmLista.Split(separador))
+                {
+                    this.Add(item.Trim());
+                }
 
         }
 
@@ -162,16 +162,16 @@ namespace Dooggy
         {
             return GetFind(prmTexto).Replace(prmTexto, "");
         }
-
     }
     public class xMemo : xLista
     {
-
+        public xMemo()
+        { }
         public xMemo(string prmSeparador)
         { separador = prmSeparador; }
 
         public xMemo(string prmTexto, string prmSeparador)
-        { separador = prmSeparador; Importar(prmTexto); }
+        { separador = prmSeparador; Parse(prmTexto); }
 
         public string memo() => memo(separador);
 
@@ -191,6 +191,25 @@ namespace Dooggy
             }
 
             return lista;
+        }
+
+    }
+    public class xParseCSV : xMemo
+    {
+        public xParseCSV(string prmTexto)
+        { separador = ","; Parse(prmTexto); }
+
+        public xParseCSV(string prmTexto, string prmSeparador)
+        { separador = prmSeparador; Parse(prmTexto); }
+        
+        public override void Parse(string prmLista)
+        {
+            if (prmLista.Trim() != "")
+                foreach (string item in prmLista.Split(separador))
+                {
+                    this.Add(item.Trim());
+                }
+
         }
 
     }

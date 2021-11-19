@@ -145,13 +145,6 @@ namespace Dooggy.LIB
 
         }
 
-        public void Add(string prmLine)
-        {
-
-            Fluxos.Add(prmLine);
-
-        }
-
         public string memo()
         {
             return string.Format("CT[{0,30}]: {1}{2}", nome, Parametros.memo(), Fluxos.memo()) ; 
@@ -221,15 +214,17 @@ namespace Dooggy.LIB
 
         public void Add(string prmLine)
         {
-   
-            xMemo item = new xMemo(prmLine, prmSeparador: ",");
+
+            Debug.Assert(false);
+
+            xMemo item = new xMemo(ParseCSV(prmLine), prmSeparador: ",");
 
             item.GetRemove();
 
             Dados.Add(item);
 
         }
-        private string GetTratar(string prmLine)
+        private string ParseCSV(string prmLine)
         {
 
             return prmLine.Replace("\"","");

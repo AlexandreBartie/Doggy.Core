@@ -4,10 +4,12 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
-    <ApplicationIcon />
+    <ApplicationIcon>MyDooggy.ico</ApplicationIcon>
     <StartupObject></StartupObject>
     <Authors>Alexandre Bartie</Authors>
     <Product>Miranda FRAMEWORK</Product>
+    <AssemblyName>MyDooggy</AssemblyName>
+    <RootNamespace>MyDooggy</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
