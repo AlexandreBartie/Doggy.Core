@@ -215,19 +215,11 @@ namespace Dooggy.LIB
         public void Add(string prmLine)
         {
 
-            Debug.Assert(false);
-
-            xMemo item = new xMemo(ParseCSV(prmLine), prmSeparador: ",");
+            xParseCSV item = new xParseCSV(prmLine);
 
             item.GetRemove();
 
             Dados.Add(item);
-
-        }
-        private string ParseCSV(string prmLine)
-        {
-
-            return prmLine.Replace("\"","");
 
         }
         public string memo()
@@ -277,7 +269,6 @@ namespace Dooggy.LIB
                 {
 
                     Debug.WriteLine(  teste.Parametros.GetJSON(fluxo));
-
 
                 }
 

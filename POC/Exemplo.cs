@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Forms;
+using System.Text;
 
 namespace Dooggy
 {
@@ -37,6 +38,8 @@ namespace Dooggy
         {
 
             this.Config.PathFileSources = @"C:\Users\alexa\OneDrive\Área de Trabalho\";
+
+            this.Config.EncodedDataJUNIT = Encoding.UTF7;
 
             this.Config.OnlyDATA = true;
 

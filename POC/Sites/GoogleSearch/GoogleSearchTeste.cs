@@ -15,10 +15,15 @@ namespace Dooggy.GoogleSearch
             //if (Massa.Fonte.FileTXT.Open(prmPath: @"C:\Users\alexa\OneDrive\Área de Trabalho\", prmName: "ArqDadosAutorizarDebito.csv"))
             //    Debug.Print(Massa.Fonte.FileTXT.memo());
 
-            if (Massa.Fonte.FileJUnit.Open(prmPath: @"C:\Users\alexa\OneDrive\Área de Trabalho\", prmName: "ArqDadosBaixaManualTesteNegativo.csv"))
+            
+            //string arquivo = "ArqCancelarCarne.csv";
+
+            string arquivo = "ArqDadosBaixaManualTesteNegativo.csv";
+
+            if (Massa.Fonte.FileJUnit.Open(prmPath: @"C:\Users\alexa\OneDrive\Área de Trabalho\", prmName: arquivo))
             {
 
-                if (false)
+                if (true)
                 {
                     foreach (LIB.xTestCaseJUnit teste in Massa.Fonte.FileJUnit.TestCases)
                     {
@@ -30,12 +35,11 @@ namespace Dooggy.GoogleSearch
                         Debug.WriteLine(teste.Fluxos.memo());
                         Debug.WriteLine("===============================================");
 
-                        Debug.Assert(false);
-
                     }
                 }
                 else
                 {
+
                     foreach (xMemo fluxo in Massa.Fonte.FileJUnit.JSON.Dados)
                     {
 
@@ -47,10 +51,6 @@ namespace Dooggy.GoogleSearch
                 }
             }
             else Debug.Assert(false);
-
-            Debug.Print(Massa.Fonte.FileTXT.memo());
-
-            Debug.Assert(false);
 
             Massa.Add(prmFluxo: @"{'Nome':'Alexandre Bartie'}");
             Massa.Add(prmFluxo: @"{'Nome':'Teste de Software'}");

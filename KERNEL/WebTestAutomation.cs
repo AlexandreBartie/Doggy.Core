@@ -647,6 +647,7 @@ namespace Dooggy
         private xFileJUnit _FileJUnit;
 
         private TestConfig Config { get => Massa.Project.Config; }
+
         public xFileTXT FileTXT
         { 
             get
@@ -665,7 +666,10 @@ namespace Dooggy
             get
             {
                 if (_FileJUnit is null)
+                {
                     _FileJUnit = new xFileJUnit();
+                    _FileJUnit.SetEncoding(Config.EncodedDataJUNIT);
+                }
                 return (_FileJUnit);
             }
             set
@@ -679,20 +683,6 @@ namespace Dooggy
             Massa = prmMassa;
 
         }
-
-        //public bool OpenTXT()
-        //{
-            
-        //    return (OpenTXT(prmPath: Config.PathFileSources, prmName: "ArqDadosAutorizarDebito.csv"));
-
-        //}
-        //public bool OpenTXT(string prmPath)
-        //{
-
-        //    return (OpenTXT(prmPath, prmName: "ArqDadosAutorizarDebito.csv"));
-
-        //}
-        //public bool OpenTXT(string prmPath, string prmName) => FileTXT.Open(prmPath, prmName);
 
     }
     public class QA_WebTrace

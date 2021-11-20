@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "DOOGGY": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

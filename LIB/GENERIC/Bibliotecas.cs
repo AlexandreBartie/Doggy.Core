@@ -93,7 +93,9 @@ namespace Dooggy
 
         public string Last { get => Item(qtde); }
 
-        public bool IsRange(int prmIndice) => ((prmIndice >= 1) && (prmIndice <= qtde)); 
+        public bool IsRange(int prmIndice) => ((prmIndice >= 1) && (prmIndice <= qtde));
+
+        public string log { get => GetLog(); }
 
         public bool Excluir(int prmIndice)
         {
@@ -162,6 +164,24 @@ namespace Dooggy
         {
             return GetFind(prmTexto).Replace(prmTexto, "");
         }
+        private string GetLog()
+        {
+
+            string aux = "";
+
+            string resultado = "";
+
+            foreach (string item in this)
+            {
+
+                resultado += aux + item.Length.ToString();
+
+                aux = separador;
+
+            }
+
+            return (resultado);
+        }
     }
     public class xMemo : xLista
     {
@@ -196,6 +216,9 @@ namespace Dooggy
     }
     public class xParseCSV : xMemo
     {
+
+        string delimitador = "|";//"\"";
+
         public xParseCSV(string prmTexto)
         { separador = ","; Parse(prmTexto); }
 
@@ -204,13 +227,140 @@ namespace Dooggy
         
         public override void Parse(string prmLista)
         {
+
             if (prmLista.Trim() != "")
+            {
+
+                string texto;
+                string lista = "";
+                string resto = prmLista;
+
+                bool IsDelimitedStartON = false;
+                bool IsDelimitedEndON = false;
+
                 foreach (string item in prmLista.Split(separador))
                 {
-                    this.Add(item.Trim());
+
+                    bool IsCycleBegin = false;
+                    bool IsCycleEnding = false;
+
+                    bool IsDetectStart = false;
+                    bool IsDetectEnd = false;
+
+                    texto = item.Trim();
+
+                    resto = GetSubstring(resto, prmIndice: item.Length + 1);
+
+
+                    // Delimitador ISOLADO, tratamento especial
+                    if (texto == delimitador)
+
+                        // Delimitador START ON
+                        if (IsDelimitedStartON)
+
+                            // sinalizar fechar o ciclo
+                            IsCycleEnding = true;
+
+                        // Delimitador START OFF
+                        else
+
+                        // sinalizar iniciar o ciclo
+                        {
+                       
+                            IsCycleBegin = true;
+                        }
+
+                    else
+                    {
+
+                        // Detectar Delimitadores INICIAL e FINAL 
+                        IsDetectStart = texto.StartsWith(delimitador);
+                        IsDetectEnd = texto.EndsWith(delimitador);
+
+                        // Ciclo: EM ABERTO
+                        if ((IsDelimitedStartON))
+
+                            // Delimitador FINAL detectado
+                            if (IsDetectEnd)
+
+                                //  sinalizar FECHAR CICLO
+                                IsCycleEnding = true;
+
+                            // Delimitador FINAL não detectado
+                            else
+
+                                //  manter espacos, pois o CICLO está em aberto
+                                texto = item;
+
+                        // Ciclo: NÃO ABERTO
+                        else
+
+                            // Delimitador INICIAL localizado: 
+                            if ((IsDetectStart & !IsDetectEnd))
+
+                            //sinalizar INICIAR CICLO (apenas se localizador delimitador FINAL no futuro)
+                            IsCycleBegin = ExisteDelimitadorEND(resto);
+
+                    }
+
+                    // Ciclo recém INICIADO: retirar espacos brancos iniciais 
+                    if (IsCycleBegin)
+                        { texto = item.TrimStart(); IsDelimitedStartON = true; }
+
+                    // Ciclo recém FECHADO: : retirar espacos brancos finais 
+                    if (IsCycleEnding)
+                        { texto = item.TrimEnd(); IsDelimitedEndON = true; }
+
+                    // Delimitadores não ENCONTRADOS
+                    if (!(IsDelimitedStartON | IsDelimitedEndON))
+                        this.Add(texto);
+                    else 
+                    { 
+                        // Delimitador INICIAL JÁ encontrado
+                        if (IsDelimitedStartON)
+                        {
+                            if (lista == "")
+                                lista += texto;
+                            else
+                               lista += separador + texto;
+                        }
+
+                        // Delimitador FINAL JÁ encontrado
+                        if (IsDelimitedEndON)
+                        { this.Add(lista); lista = ""; IsDelimitedStartON = false; IsDelimitedEndON = false; }
+
+                    }
+
                 }
 
+                if (lista != "")
+                    this.Add(lista);
+
+            }    
+    
         }
+
+        private string GetSubstring(string prmTexto, int prmIndice)
+        {
+
+            if (prmIndice <= prmTexto.Length)
+                return prmTexto.Substring(prmIndice);
+
+            return "";
+        }
+
+        private bool ExisteDelimitadorEND(string prmTexto)
+        {
+            string texto = prmTexto.Replace(" ", "");
+            string alvo = delimitador + separador;
+
+            if (texto.EndsWith(delimitador))
+            { return (true);  }
+
+
+            return (texto.IndexOf(alvo) != -1) ;
+        }
+
 
     }
 

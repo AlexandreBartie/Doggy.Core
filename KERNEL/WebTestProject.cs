@@ -6,6 +6,7 @@ using System;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Edge;
+using System.Text;
 
 namespace Dooggy
 {
@@ -273,6 +274,8 @@ namespace Dooggy
 
         public string PathFileSources;
 
+        public Encoding EncodedDataJUNIT;
+        
         public bool OnlyDATA;
 
         public int PauseAfterTestCase;
