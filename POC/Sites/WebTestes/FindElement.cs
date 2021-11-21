@@ -29,15 +29,11 @@ namespace Dooggy.WebTestes
                 {
                     IReadOnlyCollection<IWebElement> lista = Robot.GetElementsByXPath(filtro);
 
-                    Robot.Trace.Stop();
-                    break;
                 }
                 catch (Exception e)
                 {
-                    Robot.Trace.Erro(e);
+                    Robot.Trace.Log.Erro(e);
                    }
-
-                Robot.Trace.Stop();
             }
 
             int cont = 0;
@@ -45,8 +41,6 @@ namespace Dooggy.WebTestes
             foreach (IWebElement item in teste.FindElements(By.XPath(filtro)))
             {
                 cont++;
-
-                Robot.Trace.Stop(String.Format("Contador: {0} - {1}", cont, item.GetAttribute("label")));
 
                 item.Click();
 

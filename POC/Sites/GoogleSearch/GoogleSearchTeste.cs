@@ -11,46 +11,42 @@ namespace Dooggy.GoogleSearch
         public void DATA()
         {
 
-
-            //if (Massa.Fonte.FileTXT.Open(prmPath: @"C:\Users\alexa\OneDrive\Área de Trabalho\", prmName: "ArqDadosAutorizarDebito.csv"))
-            //    Debug.Print(Massa.Fonte.FileTXT.memo());
-
-            
-            //string arquivo = "ArqCancelarCarne.csv";
-
-            string arquivo = "ArqDadosBaixaManualTesteNegativo.csv";
-
-            if (Massa.Fonte.FileJUnit.Open(prmPath: @"C:\Users\alexa\OneDrive\Área de Trabalho\", prmName: arquivo))
+            if (false)
             {
 
-                if (true)
+                string arquivo = "ArqDadosBaixaManualTesteNegativo.csv";
+
+                if (Massa.Fonte.FileJUnit.Open(prmPath: @"C:\Users\alexa\OneDrive\Área de Trabalho\", prmName: arquivo))
                 {
-                    foreach (LIB.xTestCaseJUnit teste in Massa.Fonte.FileJUnit.TestCases)
+
+                    if (true)
                     {
+                        foreach (LIB.xTestCaseJUnit teste in Massa.Fonte.FileJUnit.TestCases)
+                        {
 
-                        Debug.WriteLine("===============================================");
-                        Debug.WriteLine(teste.nome);
-                        Debug.WriteLine("===============================================");
-                        Debug.WriteLine(teste.Parametros.memo());
-                        Debug.WriteLine(teste.Fluxos.memo());
-                        Debug.WriteLine("===============================================");
+                            Debug.WriteLine("===============================================");
+                            Debug.WriteLine(teste.nome);
+                            Debug.WriteLine("===============================================");
+                            Debug.WriteLine(teste.Parametros.memo());
+                            Debug.WriteLine(teste.Fluxos.memo());
+                            Debug.WriteLine("===============================================");
 
+                        }
                     }
-                }
-                else
-                {
-
-                    foreach (xMemo fluxo in Massa.Fonte.FileJUnit.JSON.Dados)
+                    else
                     {
 
-                        Debug.WriteLine(fluxo.memo());
+                        foreach (xMemo fluxo in Massa.Fonte.FileJUnit.JSON.Dados)
+                        {
 
-                        Debug.Assert(false);
+                            Debug.WriteLine(fluxo.memo());
 
+                            Debug.Assert(false);
+
+                        }
                     }
                 }
             }
-            else Debug.Assert(false);
 
             Massa.Add(prmFluxo: @"{'Nome':'Alexandre Bartie'}");
             Massa.Add(prmFluxo: @"{'Nome':'Teste de Software'}");
@@ -62,7 +58,7 @@ namespace Dooggy.GoogleSearch
         public void SETUP()
         {
 
-            Robot.GoURL(prmUrl: "http://www.google.com.br");
+            //Robot.GoURL(prmUrl: "http://www.google.com.br");
 
             Robot.Mapping("Nome", "name=q");
 

@@ -32,11 +32,10 @@ namespace Dooggy
 
         }
 
-        public QA_WebElemento Elemento
-        { get => Mapa.Elemento; }
+        public QA_WebElemento Elemento { get => Mapa.Elemento; }
 
-        public TestLog Log
-        { get => Robot.Log; }
+        public TestTrace Trace { get => Robot.Trace; }
+
         public QA_WebElemento AddItem(string prmKey, string prmTarget)
         {
             return (Mapa.AddKey(prmKey, prmTarget));
@@ -57,13 +56,16 @@ namespace Dooggy
             {
                 if (TemLastControl())
                 {
-                    LastControl.Submit();              
+                    LastControl.Submit();
+                    
+
+
                     return (true);
                 }
             }
 
             catch (Exception e)
-            { Log.Erro(e.Message); }
+            { Trace.Log.Erro(e.Message); }
 
             return (false);
         }
@@ -158,6 +160,17 @@ namespace Dooggy
 
         private QA_WebTarget _target;
 
+        public string key { get => _key; }
+
+        public eTipoElemento tipo { get => _tipo; }
+
+        public xTupla Chave { get => _chave; }
+
+        public IWebElement control { get => Target.control; }
+
+
+        public string filltro;
+
         public QA_WebElemento(QA_WebPage prmPage, string prmKey, string prmTarget)
         {
             Page = prmPage;
@@ -175,22 +188,14 @@ namespace Dooggy
         { get
             {
                 if (_target == null)
-                    { _target = new QA_WebTarget(this); }
+                { _target = new QA_WebTarget(this); }
                 return _target;
             }
         }
-        public QA_WebRobot Robot
-        { get => Page.Robot; }
-        public string key
-        { get => _key; }
-        public eTipoElemento tipo
-        { get => _tipo; }
-        public xTupla Chave
-        { get => _chave; }
 
-        public string filtro;
-        public IWebElement control
-        { get => Target.control; }
+        public QA_WebRobot Robot { get => Page.Robot; }
+        public TestTrace Trace { get => Robot.Trace; }
+
         public void SetDomain(string prmLista)
         {
             SetDomain(prmLista, null);
@@ -213,7 +218,7 @@ namespace Dooggy
 
                     case eTipoElemento.Input:
                         {
-                            if (Click())
+                            if (Click(prmFake: true))
                             {
                                 Clear();
                                 return (SendKeys(prmValor));
@@ -228,49 +233,67 @@ namespace Dooggy
 
             }
 
-            return Erro(prmErro: "AÇÃO não encontrada ... " + tipo);
+            return Trace.Log.Erro(prmErro: "AÇÃO não encontrada" + tipo.ToString());
 
         }
+
+        public void Refresh() => _target = null;
+
         public bool Clear()
         {
             try
             { control.Clear(); return (true); }
 
             catch (Exception e)
-            { Erro(e.Message); }
+            { };
 
             return (false);
         }
-        public bool Click()
+
+        public bool Click() => Click(prmFake: false);
+
+        public bool Click(bool prmFake)
         {
             try
-            { control.Click(); return (true); }
+            { 
+                control.Click();
+
+                if (!prmFake )
+                    Trace.ActionElement("Click", key);
+
+                return (true); 
+            
+            }
 
             catch (Exception e)
-            { Erro(e.Message); }
+            { Trace.ActionFail("Click", e); }
 
             return (false);
         }
         public bool SendKeys(string prmTexto)
         {
             try
-            { control.SendKeys(prmTexto); return (true); }
+            { 
+                control.SendKeys(prmTexto);
+
+                Trace.ActionElement("Input", key, prmTexto); 
+                
+                return (true); 
+            
+            }
 
             catch (Exception e)
-            { Erro(e.Message); }
+            { Trace.ActionFail("SendKeys", e); }
 
             return (false);
         }
-        public void Refresh() => _target = null;
-
-        public bool Erro(string prmErro) => Page.Log.Erro("QA-LOG: " + prmErro);
 
     }
     public class QA_WebDominio
     {
         private QA_WebElemento Elemento;
 
-        private xLista lista;
+        private xLista lista = new xLista();
 
         private string filtro;
 
@@ -285,13 +308,11 @@ namespace Dooggy
         {
             Elemento = prmElemento;
 
-            lista = new xLista(";");
-
         }
         public void Setup(string prmLista, string prmSintaxe)
         {
 
-            lista.Parse(prmLista);
+            lista.Parse(prmLista, ";");
 
             filtro = prmSintaxe;
 
@@ -307,12 +328,12 @@ namespace Dooggy
                 foreach (string item in fluxo)
                 {
                     if (!SetFluxo(item))
-                        Robot.Trace.Erro("Domínio não encontrado na lista ... " + item);
+                        Robot.Trace.Log.Erro("Domínio não encontrado na lista ... " + item);
                 }
 
             }
             else
-                Robot.Trace.Erro("Busca de Domínios falhou ... " + GetXPath());
+                Robot.Trace.Log.Erro("Busca de Domínios falhou ... " + GetXPath());
 
             return (false);
         }
@@ -410,7 +431,7 @@ namespace Dooggy
                     break;
 
                 default:
-                    Elemento.Erro(prmErro: "TARGET não encontrado ... " + prmTag);
+                    Elemento.Trace.InternalError.TargetNotFound(prmTag);
                     break;
             }
         }
@@ -444,8 +465,6 @@ namespace Dooggy
 
         public QA_WebAction Action;
 
-        public QA_WebTrace Trace;
-
         public QA_MassaDados Massa;
 
         public QA_WebRobot(TestMotor prmMotor)
@@ -459,8 +478,6 @@ namespace Dooggy
 
             Action = new QA_WebAction(this);
 
-            Trace = new QA_WebTrace(this);
-
         }
         public TestProject Projeto { get => Motor.Suite.Projeto; }
 
@@ -468,7 +485,7 @@ namespace Dooggy
 
         public TestKernel Kernel { get => Projeto.Kernel; }
             
-        public TestLog Log { get  => Kernel.Log; }
+        public TestTrace Trace { get  => Kernel.Trace; }
 
         public IWebDriver driver  { get => Motor.driver; }
 
@@ -485,30 +502,25 @@ namespace Dooggy
         {
             return (Action.GoURL(prmUrl));
         }
-
-        /*
-         *         public bool SetFocus(string prmTupla)
-        { return (Action.SetFocus(prmTupla) ); }
-                public void SetClick(string prmTarget)
-                {
-                    Action.SetClick(prmTarget);
-                }
-                public void SetTexto(string prmTexto, string prmTarget)
-                {
-                    Action.SetTexto(prmTexto, prmTarget);
-                }*/
-
         public void Submit()
         { Page.Submit(); }
 
-        public void Refresh()
-        { driver.Navigate().Refresh(); }
+        public bool Refresh()
+        {  
+            try
+            { driver.Navigate().Refresh(); return (true);  }
 
+            catch
+            { Debug.Assert(false);  }
+
+            return (false);
+
+        }
         public void Quit()
         { driver.Quit(); }
 
-        public void Pause(int prmSegundos)
-        { Kernel.Pause(prmSegundos); }
+        public void Pause(int prmSegundos) { Kernel.Pause(prmSegundos); }
+
         public IWebElement GetElementBy(By prmTupla)
         {
             try
@@ -517,7 +529,7 @@ namespace Dooggy
             }
             catch (Exception e)
             {
-                Trace.Erro(e);
+                Trace.Log.Erro(e);
             }
             return (null);
         }
@@ -529,7 +541,7 @@ namespace Dooggy
             }
             catch (Exception e)
             {
-                Trace.Erro(e);
+                Trace.Log.Erro(e);
             }
             return (null);
         }
@@ -541,7 +553,7 @@ namespace Dooggy
             }
             catch (Exception e)
             {
-                Trace.Erro(e);
+                Trace.Log.Erro(e);
             }
             return (null);
          }
@@ -553,7 +565,7 @@ namespace Dooggy
             }
             catch (Exception e)
             {
-                Trace.Erro(e);
+                Trace.Log.Erro(e);
             }
             return (null);
         }
@@ -563,11 +575,11 @@ namespace Dooggy
     {
         private QA_WebRobot Robot;
 
-        public xJSON JSON = new LIB.xJSON();
-
         public QA_FonteDados Fonte;
 
         private DataViewConnection DefaultView;
+
+        public xJSON JSON = new LIB.xJSON();
 
         private bool IsON;
 
@@ -581,7 +593,7 @@ namespace Dooggy
         }
 
         public TestProject Project { get => Robot.Projeto; }
-        private QA_WebTrace Trace { get => Robot.Trace; }
+        private TestTrace Trace { get => Robot.Trace; }
         private DataPoolConnection Pool { get => Project.Pool; }
 
         public bool IsONLINE { get => IsON; }
@@ -620,7 +632,7 @@ namespace Dooggy
             IsON = true;
 
             if (!JSON.Save())
-                { Trace.Erro("ERRO{JSON:Save} " + JSON.fluxo); }
+                { Trace.Log.Erro("ERRO{JSON:Save} " + JSON.fluxo); }
 
             return (JSON.IsOK);
 
@@ -685,25 +697,6 @@ namespace Dooggy
         }
 
     }
-    public class QA_WebTrace
-    {
-        private QA_WebRobot Robot;
-        public QA_WebTrace(QA_WebRobot prmRobot)
-        { 
-
-            Robot = prmRobot;
-
-        }
-
-        public void Erro(Exception prmErro) { Erro(prmErro.Message); }
-        public void Erro(string prmRotulo, Exception prmErro) { Erro(prmRotulo + " " + prmErro.Message); }
-        public void Erro(string prmErro) { Console(prmErro); }
-
-        public void Stop() { Debug.Assert(false); }
-        public void Stop(string prmTexto) { Console(prmTexto); Stop(); }
-        public void Console(string prmTexto) { Debug.Print(prmTexto); }
-
-    }
     public class QA_WebAction
     {
         private QA_WebRobot Robot;
@@ -726,8 +719,13 @@ namespace Dooggy
         }
         public bool GoURL(string prmUrl)
         {
-            Robot.driver.Navigate().GoToUrl(prmUrl);
-            return (true);
+            try
+            { Robot.driver.Navigate().GoToUrl(prmUrl); return (true); }
+
+            catch
+            { }
+
+            return (false);
         }
         public bool SetFocus(string prmTarget)
         {

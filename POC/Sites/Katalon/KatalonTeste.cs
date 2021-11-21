@@ -6,7 +6,7 @@ namespace Dooggy.Katalon
     {
         public void DATA()
         {
-
+ 
             Massa.SetView(prmTag: "Candidato=Padrao");
 
             Massa.Add(prmFluxo: @"{ }");
@@ -15,11 +15,11 @@ namespace Dooggy.Katalon
             Massa.Add(prmFluxo: @"{ }", prmView: "Candidato+Novo");
             Massa.Add(prmFluxo: @"{ }", prmView: "Candidato+Velho");
 
-            Massa.Add(prmFluxo: @"{ 'Nome': 'Alexandre', 'email': 'alexandre_bartie@hotmail.com' }");
-            Massa.Add(prmFluxo: @"{ 'Nome': 'Alexandre', 'Sobrenome': 'Bartie', 'email': 'alexandre.bartie@gmail.com' }");
-            Massa.Add(prmFluxo: @"{ 'Nome': 'Lisia', 'Sobrenome': 'Amantos', 'sexo': 'Mulher', 'email': 'lisia.amantos@gmail.com' }");
-            Massa.Add(prmFluxo: @"{ 'Expectativa':'Salário + Desafio' }");
-            Massa.Add(prmFluxo: @"{ 'Expectativa':'Liderança + Ambiente + Equipe' }");
+            //Massa.Add(prmFluxo: @"{ 'Nome': 'Alexandre', 'email': 'alexandre_bartie@hotmail.com' }");
+            //Massa.Add(prmFluxo: @"{ 'Nome': 'Alexandre', 'Sobrenome': 'Bartie', 'email': 'alexandre.bartie@gmail.com' }");
+            //Massa.Add(prmFluxo: @"{ 'Nome': 'Lisia', 'Sobrenome': 'Amantos', 'sexo': 'Mulher', 'email': 'lisia.amantos@gmail.com' }");
+            //Massa.Add(prmFluxo: @"{ 'Expectativa':'Salário + Desafio' }");
+            //Massa.Add(prmFluxo: @"{ 'Expectativa':'Liderança + Ambiente + Equipe' }");
 
             Massa.Save();
 

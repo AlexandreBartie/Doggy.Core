@@ -30,8 +30,8 @@ namespace Dooggy
 
             this.name = "POC - Automação de Testes";
 
-            //this.AddSuite(new SuiteKatalon());
-            this.AddSuite(new SuiteGoogle());
+            this.AddSuite(new SuiteKatalon());
+            //this.AddSuite(new SuiteGoogle());
 
         }
         public void CONFIG()
@@ -41,9 +41,9 @@ namespace Dooggy
 
             this.Config.EncodedDataJUNIT = Encoding.UTF7;
 
-            this.Config.OnlyDATA = true;
+            this.Config.OnlyDATA = false;
 
-            this.Config.PauseAfterTestCase = 2;
+            this.Config.PauseAfterTestCase = 0;
 
             this.Executar(prmTipoDriver: eTipoDriver.ChromeDriver);
 

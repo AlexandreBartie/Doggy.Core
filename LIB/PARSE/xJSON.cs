@@ -69,16 +69,6 @@ namespace Dooggy.LIB
         public JsonProperty GetProperty (string prmKey) => Controle.GetProperty(prmKey);
 
     }
-    public class IJSONpropertie
-    {
-
-        private xJSON JSON;
-
-        public IJSONpropertie(xJSON prmJSON)
-        {
-            JSON = prmJSON;
-        }
-    }
     public class IJSONcontrol
     {
 
