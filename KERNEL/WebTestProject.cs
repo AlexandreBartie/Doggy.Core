@@ -5,8 +5,8 @@ using System.Threading;
 using System;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Edge;
 using System.Text;
+using Dooggy.KERNEL;
 
 namespace Dooggy
 {
@@ -18,16 +18,18 @@ namespace Dooggy
     public class TestProject : IDataLocalConnection
     {
 
-        public string name;
-
-        public DataPoolConnection Pool = new DataPoolConnection();
+        public DataPoolConnection Pool;
 
         public List<TestSuite> Suites = new List<TestSuite>();
 
         public TestKernel Kernel = new TestKernel();
 
+        private string _name;
+
         public TestProject()
         {
+
+            Pool = new DataPoolConnection(Kernel.Trace.DataBase);
 
             Dados.Setup(this, Pool);
 
@@ -37,7 +39,18 @@ namespace Dooggy
 
         public TestConfig Config { get => Kernel.Config; }
 
-        public TestTrace Trace { get => Kernel.Trace; }
+        public TestTraceAction Trace { get => Kernel.Trace.Action; }
+
+        public string name { get => _name; }
+
+        public void Setup(string prmName)
+        {
+
+            _name = prmName;
+
+            Trace.ActionArea("Projeto de Teste", name);
+
+        }
 
         public void AddSuite(TestSuite prmSuite)
         {
@@ -72,7 +85,7 @@ namespace Dooggy
 
         public TestConfig Config { get => Projeto.Config; }
 
-        public TestTrace Trace { get => Projeto.Trace; }
+        public TestTraceAction Trace { get => Projeto.Trace; }
 
         public DataPoolConnection Pool => Projeto.Pool;
 
@@ -139,7 +152,7 @@ namespace Dooggy
 
         public TestKernel Kernel => Robot.Kernel;
 
-        public TestTrace Trace => Suite.Trace;
+        public TestTraceAction Trace => Suite.Trace;
 
         private void Metodo(string prmMetodo) => Robot.Kernel.Call(this, prmMetodo);
 
@@ -171,9 +184,6 @@ namespace Dooggy
         {
 
             Metodo("DATA");
-
-            if (Config.OnlyDATA)
-                return (false);
 
             return (Massa.IsOK);
 
@@ -241,7 +251,7 @@ namespace Dooggy
                     {
 
                         case eTipoDriver.EdgeDriver:
-                            _driver = new EdgeDriver();
+                            //_driver = new EdgeDriver();
                             break;
 
                         default:
@@ -259,195 +269,6 @@ namespace Dooggy
 
         public void Encerrar() => Robot.Quit();
 
-/*        public IWebElement GetElementByXPath(string prmXPath)
-        {
-            try
-            {
-                return driver.FindElement(By.XPath(prmXPath));
-            }
-            catch (Exception e)
-            {
-                Robot.Debug.Erro(e);
-            }
-            return (null);
-        }
-        public ReadOnlyCollection<IWebElement> GetElementsByXPath(string prmXPath)
-        {
-            try
-            {
-                return driver.FindElements(By.XPath(prmXPath));
-            }
-            catch (Exception e)
-            {
-                Robot.Debug.Erro(e);
-            }
-            return (null);
-        }*/
-
-    }
-    public class TestConfig
-    {
-
-        public string PathFileSources;
-
-        public Encoding EncodedDataJUNIT;
-        
-        public bool OnlyDATA;
-
-        public int PauseAfterTestCase;
-
-        public int PauseAfterTestScript;
-
-        public int PauseAfterTestSuite;
-
     }
 
-    public class TestTrace
-    {
-
-        public TestLog Log;
-
-        public TestTraceInternalError InternalError;
-
-        public TestTrace()
-        {
-
-            Log = new TestLog();
-
-            InternalError = new TestTraceInternalError(this);
-
-        }
-
-
-        public void ActionArea(string prmArea, string prmName) => Log.Trace(String.Format("{0}: [{1}]", prmArea, prmName));
-
-        public bool ActionMassaOnLine(bool prmMassaOnLine)
-        {
-
-            string texto;
-
-            if (prmMassaOnLine)
-                texto = "ON-LINE";
-            else
-                texto = "OFF-LINE";
-
-            Log.Trace(String.Format("Massa de Testes '{0}'", texto));
-
-            return (prmMassaOnLine);
-
-        }
-
-        public void ActionElement(string prmAcao, string prmElemento) => ActionElement(prmAcao, prmElemento, prmValor: null);
-        public void ActionElement(string prmAcao, string prmElemento, string prmValor)
-        {
-
-            string msg = String.Format("ACTION: {0} {1,15} := {1}", prmAcao, prmElemento);
-
-            if (prmValor != null)
-                msg += " := " + prmValor;
-
-            Log.Trace(msg);
-
-        }
-
-        public void ActionFail(string prmComando, Exception e) => InternalError.ActionFail(prmComando, e);
-
-        // public bool ActionFail(string prmErro, string prmDestaque) => (Log.Erro(String.Format("{0} ... [{1}]", prmErro, prmDestaque)));
-
-
-        //public void NoFindMetodh(string prmAcao, string prmElemento, string prmValor)
-
-        //Log.Aviso(string.Format("Método {0}.{1} não encontrado. [{2}]
-
-
-
-
-
-        //
-
-    }
-
-    public class TestTraceInternalError
-    {
-
-        private TestTrace Trace;
-
-        public TestLog Log { get => Trace.Log; }
-
-        public TestTraceInternalError(TestTrace prmTrace)
-        {
-
-            Trace = prmTrace;
-
-        }
-        public void ActionFail(string prmComando, Exception e) => Log.Erro("ACTION FAIL: ROBOT." + prmComando, e);
-
-        public void TargetNotFound(string prmTAG) => Log.Erro("TARGET NOT FOUND: " + prmTAG);
-
-    }
-    public class TestLog
-    {
-
-        public bool Trace(string prmTrace) => Message("TRACE", prmTrace);
-        public bool Aviso(string prmAviso) => Message("AVISO", prmAviso);
-        public bool Falha(string prmAviso) => Message("FALHA", prmAviso);
-        public bool Erro(Exception e) => Message("ERRO", e.Message);
-        public bool Erro(string prmErro) => Message("ERRO", prmErro);
-        public bool Erro(string prmErro, Exception e) => Message("ERRO", String.Format("{0} Error: {1}", prmErro,e.Message));
-        public bool Interno(string prmErro) => Message("KERNEL", prmErro);
-
-        private bool Message(string prmTipo, string prmMensagem)
-        {
-            Debug.WriteLine(String.Format("[{0,5}]: {1} ", prmTipo, prmMensagem));
-            return false;
-        }
-
-    }
-    public class TestKernel
-    {
-
-        public TestTrace Trace = new TestTrace();
-
-        public TestConfig Config = new TestConfig();
-
-        public string GetProjectBlockCode() => ("DATA, BUILD, CONFIG");
-        public string GetScriptBlockCode() => ("PLAY, CHECK, CLEANUP");
-        public string GetAdicaoElementos() => ("+");
-    
-        public string GetXPathBuscaRaizElementos() => "//*[@{0}='{1}']";
-
-        public bool Call(Object prmObjeto, string prmMetodo)
-        {
-
-            bool vlOk = true;
-
-            xLista lista = new xLista();
-
-            lista.Parse(prmMetodo, prmSeparador: ",");
-
-            foreach (string metodo in lista)
-            {
-                try
-                {
-                    prmObjeto.GetType().GetMethod(metodo).Invoke(prmObjeto, null);
-                }
-
-                catch
-                {
-                    
-                    Trace.Log.Aviso(string.Format("Método {0}.{1} não encontrado. [{2}]", prmObjeto.GetType().Name, metodo, prmObjeto.GetType().Assembly.GetName()));
-
-                    vlOk = false;
-
-                }
-
-            }
-
-            return (vlOk);
-
-        }
-        public void Pause(int prmSegundos)
-        { Thread.Sleep(TimeSpan.FromSeconds(prmSegundos)); }
-
-    }
 }

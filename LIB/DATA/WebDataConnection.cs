@@ -1,14 +1,18 @@
 ﻿using System.Diagnostics;
-using System.Data.SqlClient;
 using System.Data;
+using System.Data.OracleClient;
 using System.Collections.Generic;
 using System;
+using Dooggy.KERNEL;
+using Oracle.ManagedDataAccess.Client;
 using Dooggy.LIB;
 
 namespace Dooggy
 {
     public class DataPoolConnection
     {
+
+        public TestTraceDataBase Trace;
 
         private List<DataBaseConnection> Bases = new List<DataBaseConnection>();
         private List<DataViewConnection> Visoes = new List<DataViewConnection>();
@@ -18,15 +22,22 @@ namespace Dooggy
 
         public DataModelConnection DataModelCorrente;
         public DataVariantConnection DataVariantCorrente;
+       
+        public DataPoolConnection(TestTraceDataBase prmTrace)
+        {
+
+            Trace = prmTrace;
+
+        }
 
         public bool AddDataBase(string prmTag, string prmConexao)
         {
 
-            DataBaseCorrente = new DataBaseConnection(prmTag, prmConexao);
+            DataBaseCorrente = new DataBaseConnection(prmTag, prmConexao, Trace);
 
             Bases.Add(DataBaseCorrente);
 
-            return (DataBaseCorrente.IsOK());
+            return (DataBaseCorrente.IsOK);
 
         }
         public bool AddDataView(string prmTag, string prmSQL)
@@ -86,8 +97,6 @@ namespace Dooggy
 
             }
 
-            Debug.Assert(false);
-
             return (false);
 
         }
@@ -107,7 +116,7 @@ namespace Dooggy
 
             foreach (DataBaseConnection Base in Bases)
             {
-                if (!Base.IsOK())
+                if (!Base.IsOK)
                 { return (false); }
 
                 retorno = true;
@@ -120,9 +129,6 @@ namespace Dooggy
         {
 
             string memo = "";
-
-            foreach (DataBaseConnection Base in Bases)
-                memo += Base.memo() + Environment.NewLine;
 
             foreach (DataViewConnection Visao in Visoes)
                 memo += Visao.memo() + Environment.NewLine;
@@ -138,51 +144,66 @@ namespace Dooggy
 
         public string tag;
 
-        public SqlConnection conexao;
+        public TestTraceDataBase Trace;
+
+        public OracleConnection conexao;
 
         public Exception erro;
 
-        public DataBaseConnection(string prmTag, string prmConexao)
+        public DataBaseConnection(string prmTag, string prmConexao, TestTraceDataBase prmTrace)
         {
 
             tag = prmTag;
 
+            Trace = prmTrace;
+
             Abrir(prmConexao);
+
         }
 
+
+        public bool IsON { get => (conexao != null); }
+        public bool IsOK { get { if (IsON) return (conexao.State == ConnectionState.Open); return (false); } }
+
+        private bool Criar(string prmConexao)
+        {
+
+            try
+            {
+
+                conexao = new OracleConnection(prmConexao);
+
+                Trace.StatusConnection(tag, "CONECTADO");
+
+                return (true);
+
+            }
+
+            catch (Exception e)
+            { Trace.FailConnection(tag, prmConexao, e); erro = e; }
+
+            return (false);
+        }
         public bool Abrir(string prmConexao)
         {
 
-            conexao = new SqlConnection(prmConexao);
-
             try
-            { conexao.Open(); }
+            {
+
+                if (Criar(prmConexao))
+                    conexao.Open();
+
+                Trace.StatusConnection(tag, "ABERTO");
+
+                return (true);
+
+            }
 
             catch (Exception e)
-            { erro = e; }
+            { Trace.FailConnection(tag, prmConexao, e); erro = e; }
 
-            return (IsOK());
+            return (false);
         }
-
-        //public DataCursorConnection GetCursor(string prmTag, string prmSQL)
-        //{
-
-        //    return (new DataViewConnection(prmTag, prmSQL, this));
-
-        //}
-
-        //public DataViewConnection GetView(string prmTag)
-        //{
-
-        //    foreach (DataViewConnection Visao in Visoes)
-        //    {
-        //        if (Visao.tag == prmTag)
-        //        { return (Visao); }
-        //    }
-
-        //    return (null);
-
-        //}
 
         public void Fechar()
         {
@@ -193,10 +214,6 @@ namespace Dooggy
             { erro = e; }
 
         }
-
-        public bool IsOK() => (conexao.State == ConnectionState.Open);
-
-        public string memo() => (String.Format("BASE:[{0,25}] CONEXÃO: {1}", tag, conexao));
 
     }
     public class DataModelConnection
@@ -219,17 +236,13 @@ namespace Dooggy
 
         }
 
-        public string GetSQL(int prmQtde) => (GetSELECT(prmQtde) + " " + GetFROM());
-
-        private string GetSELECT(int prmQtde) => (string.Format("SELECT {0} {1}", GetLinhas(prmQtde), GetListaCampos()));
-
-        private string GetFROM() => (string.Format("FROM {0}", GetListaTabelas()));
+        public string GetSELECT(int prmQtde) => (string.Format("SELECT {0} FROM {1}", GetListaCampos() , GetListaTabelas()));
 
         private string GetListaTabelas() => (TratarSQL(JSON.GetValor("#ENTIDADES#")));
 
         private string GetListaCampos() => (TratarSQL(JSON.GetValor("#ATRIBUTOS#", prmPadrao: "*")));
 
-        private string GetLinhas(int prmQtde) => (string.Format("TOP {0}", prmQtde));
+        public string GetSQL(string prmSQL, int prmQtde) => (string.Format("SELECT * FROM ({0}) WHERE ROWNUM = {1}", prmSQL, prmQtde));
 
         private string TratarSQL(string prmLista) => new xMemo(prmLista, prmSeparador: "+").memo(", ");
 
@@ -262,12 +275,12 @@ namespace Dooggy
         public string CriarSQL(int prmQtde)
         {
 
-            string sql = Modelo.GetSQL(prmQtde);
+            string sql = Modelo.GetSELECT(prmQtde);
 
             if (IsRegraOK)
                 sql += " " + GetExtensaoSQL();
 
-            return (sql);
+            return (Modelo.GetSQL(sql,prmQtde));
             
         }
         private string GetExtensaoSQL()
@@ -304,7 +317,6 @@ namespace Dooggy
         public string sql { get => Cursor.sql; }
         public Exception erro { get => Cursor.erro; }
 
-
         public DataViewConnection(string prmTag, string prmSQL, DataBaseConnection prmDataBase)
         {
 
@@ -339,14 +351,16 @@ namespace Dooggy
 
         private DataBaseConnection DataBase;
 
-        private SqlDataReader reader;
+        private OracleDataReader reader;
 
         public Exception erro;
 
         private string _sql;
 
-        public string sql
-        { get => _sql; }
+        public string sql { get => _sql; }
+
+        public TestTraceDataBase Trace => DataBase.Trace;
+
 
         public DataCursorConnection(string prmSQL, DataBaseConnection prmDataBase)
         {
@@ -369,9 +383,12 @@ namespace Dooggy
                 reader = GetReader(sql);
 
                 Next();
+
             }
             catch (Exception e)
             {
+
+                Debug.Assert(false);
 
                 erro = e;
             }
@@ -379,18 +396,20 @@ namespace Dooggy
             return (IsOK());
 
         }
-        public SqlDataReader GetReader(string prmSQL)
+        public OracleDataReader GetReader(string prmSQL)
         {
 
             try
             {
-                SqlCommand vlSql = new SqlCommand(prmSQL, DataBase.conexao);
+                OracleCommand vlSql = new OracleCommand(prmSQL, DataBase.conexao);
+
+                Trace.SQLConnection(DataBase.tag, prmSQL);
 
                 return (vlSql.ExecuteReader());
 
             }
             catch (Exception e)
-            { erro = e; }
+            { Trace.FailSQLConnection(DataBase.tag, prmSQL, e); erro = e; }
 
             return (null);
 
@@ -408,7 +427,7 @@ namespace Dooggy
         public string GetValor(int prmIndice)
         {
 
-            return reader.GetSqlValue(prmIndice).ToString();
+            return reader.GetOracleValue(prmIndice).ToString();
 
         }
         public string GetValor(string prmNome)
@@ -501,6 +520,7 @@ namespace Dooggy
             return(Pool.memo());
         }
     }
+
     public class IDataLocalConnection
     {
 
@@ -521,6 +541,22 @@ namespace Dooggy
 
     }
 
+    public class DataBaseOracle
+    {
+
+        private string modelo = @"Data Source=(DESCRIPTION =(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(Host = {0})(PORT = {1})))(CONNECT_DATA =(SERVICE_NAME = {2})));User ID={3};Password={4}";
+
+        public string user = "desenvolvedor_sia";
+        public string password = "asdfg";
+
+        public string host = "10.250.1.35";
+        public string port = "1521";
+        public string service = "branch_1084.prod01.redelocal.oraclevcn.com";
+
+
+        public string GetString()  => String.Format(modelo, host, port, service, user, password);
+
+    }
     /*
 
 

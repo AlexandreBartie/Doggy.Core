@@ -19,8 +19,7 @@ namespace Dooggy.LIB
 
         public string fluxo { get => Controle.fluxo; }
 
-        public string memo { get => Controle.memo; }
-
+        public string log { get => Controle.log; }
         public xJSON()
         {
             Controle = new IJSONcontrol(this);
@@ -96,7 +95,7 @@ namespace Dooggy.LIB
         }
         public string fluxo { get => ("[ " + lista + " ]"); }
 
-        public string memo { get => ("JSON: " + fluxo); }
+        public string log { get => (String.Format( "Fluxo: {0}", lista)); }
 
         public void Add(string prmFluxo)
         {

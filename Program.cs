@@ -1,5 +1,4 @@
 using System;
-using System.Data.Entity;
 using System.Data.SqlClient;
 
 namespace Dooggy
@@ -9,7 +8,9 @@ namespace Dooggy
         static void Main()
         {
 
-            ProjetoPOC POC = new ProjetoPOC();
+            //POC_AutomacaoTestes POC = new POC_AutomacaoTestes();
+
+            POC_MassaDados POC = new POC_MassaDados();
 
         }
 

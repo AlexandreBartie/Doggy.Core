@@ -5,6 +5,7 @@ using System.Diagnostics;
 using OpenQA.Selenium;
 using System.Collections.ObjectModel;
 using Dooggy.LIB;
+using Dooggy.KERNEL;
 
 namespace Dooggy
 {
@@ -194,7 +195,7 @@ namespace Dooggy
         }
 
         public QA_WebRobot Robot { get => Page.Robot; }
-        public TestTrace Trace { get => Robot.Trace; }
+        public TestTraceAction Trace { get => Robot.Trace.Action; }
 
         public void SetDomain(string prmLista)
         {
@@ -431,7 +432,7 @@ namespace Dooggy
                     break;
 
                 default:
-                    Elemento.Trace.InternalError.TargetNotFound(prmTag);
+                    Elemento.Trace.TargetNotFound(prmTag);
                     break;
             }
         }

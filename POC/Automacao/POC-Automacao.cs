@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Dooggy
 {
-    public class ProjetoPOC : TestProject
+    public class POC_AutomacaoTestes : TestProject
     {
         public void DATA()
         {
@@ -28,7 +28,7 @@ namespace Dooggy
         public void BUILD()
         {
 
-            this.name = "POC - Automação de Testes";
+            this.Setup(prmName: "POC - Automação de Testes");
 
             this.AddSuite(new SuiteKatalon());
             //this.AddSuite(new SuiteGoogle());
