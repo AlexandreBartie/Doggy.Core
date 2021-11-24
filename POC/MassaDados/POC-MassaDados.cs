@@ -27,7 +27,7 @@ namespace Dooggy
 
             Dados.AddDataModel(prmTag: "Aluno", prmModelo: @"{'#ENTIDADES#':'sia.aluno_curso','#ATRIBUTOS#':'cod_matricula, nom_responsavel_pgto'}");
 
-            Dados.AddDataVariant(prmTag: "=Padrao",prmRegra: @"{'#REGRAS#': 'cod_situacao_aluno = '1''}");
+            Dados.AddDataVariant(prmTag: "=Padrao",prmRegra: @"{'#REGRAS#': 'cod_situacao_aluno = 1'}");
 
         }
         public void BUILD()

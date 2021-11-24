@@ -633,7 +633,7 @@ namespace Dooggy
             IsON = true;
 
             if (!JSON.Save())
-                { Trace.Log.Erro("ERRO{JSON:Save} " + JSON.fluxo); }
+                { Trace.Log.Erro("ERRO{JSON:Save} " + JSON.lista); }
 
             return (JSON.IsOK);
 

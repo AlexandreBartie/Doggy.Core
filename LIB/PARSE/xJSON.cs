@@ -17,6 +17,8 @@ namespace Dooggy.LIB
 
         public Exception Erro { get => Controle.erro; }
 
+        public string lista { get => Controle.lista; }
+
         public string fluxo { get => Controle.fluxo; }
 
         public string log { get => Controle.log; }

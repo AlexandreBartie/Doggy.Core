@@ -109,14 +109,14 @@ namespace Dooggy
             return ("");
 
         }
-        public bool IsOk()
+        public bool IsON()
         {
 
             bool retorno = false;
 
             foreach (DataBaseConnection Base in Bases)
             {
-                if (!Base.IsOK)
+                if (!Base.IsON)
                 { return (false); }
 
                 retorno = true;
@@ -180,7 +180,7 @@ namespace Dooggy
             }
 
             catch (Exception e)
-            { Trace.FailConnection(tag, prmConexao, e); erro = e; }
+            { Trace.FailDataConnection(tag, prmConexao, e); erro = e; }
 
             return (false);
         }
@@ -200,7 +200,7 @@ namespace Dooggy
             }
 
             catch (Exception e)
-            { Trace.FailConnection(tag, prmConexao, e); erro = e; }
+            { Trace.FailDataConnection(tag, prmConexao, e); erro = e; }
 
             return (false);
         }
@@ -225,14 +225,14 @@ namespace Dooggy
 
         public DataBaseConnection DataBase;
 
-        public DataModelConnection(string prmTag, string prmModelo, DataBaseConnection prmDataBase)
+        public DataModelConnection(string prmTag, string prmModel, DataBaseConnection prmDataBase)
         {
 
             tag = prmTag;
 
             DataBase = prmDataBase;
 
-            JSON = new xJSON(prmModelo);
+            JSON = new xJSON(prmModel);
 
         }
 
@@ -367,57 +367,32 @@ namespace Dooggy
 
             DataBase = prmDataBase;
 
-            _sql = prmSQL; 
-
-            Executar();
+            GetReader(prmSQL);
 
         }
 
-        private bool Executar()
+        public void GetReader(string prmSQL)
         {
 
-            erro = null;
-
-            try
-            {
-                reader = GetReader(sql);
-
-                Next();
-
-            }
-            catch (Exception e)
-            {
-
-                Debug.Assert(false);
-
-                erro = e;
-            }
-
-            return (IsOK());
-
-        }
-        public OracleDataReader GetReader(string prmSQL)
-        {
+            _sql = prmSQL;
 
             try
             {
                 OracleCommand vlSql = new OracleCommand(prmSQL, DataBase.conexao);
 
-                Trace.SQLConnection(DataBase.tag, prmSQL);
+                reader = (vlSql.ExecuteReader());
 
-                return (vlSql.ExecuteReader());
+                Start();
+
+                Trace.SQLExecution(DataBase.tag, prmSQL);
 
             }
             catch (Exception e)
             { Trace.FailSQLConnection(DataBase.tag, prmSQL, e); erro = e; }
 
-            return (null);
-
         }
-
-        public bool Next()
-        { return reader.Read(); }
-
+        private bool Start() => Next();
+        public bool Next() => reader.Read();
         public string GetName(int prmIndice)
         {
 
@@ -465,7 +440,7 @@ namespace Dooggy
         }
 
         public bool IsOK()
-        { return (erro == null); }
+            { return (erro == null); }
 
 
     }
@@ -520,7 +495,6 @@ namespace Dooggy
             return(Pool.memo());
         }
     }
-
     public class IDataLocalConnection
     {
 

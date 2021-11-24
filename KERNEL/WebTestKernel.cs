@@ -125,11 +125,10 @@ namespace Dooggy.KERNEL
         }
 
         public void StatusConnection(string prmTag, string prmStatus) { Log.SQL(string.Format("Banco de Dados {1}: tag[{0}]", prmTag, prmStatus)); }
-        public void SQLConnection(string prmTag, string prmSQL) => Log.SQL(string.Format("DataSet criado com sucesso: { tag[{0}] }", prmTag));
-
-        public void FailConnection(string prmTag, string prmStringConexao, Exception prmErro) => Log.Erro(String.Format("Falha na Conexão do Banco de Dados ... tag:[{0}] string: {1}", prmTag, prmStringConexao),prmErro);
-
-        public void FailSQLConnection(string prmTag, string prmSQL, Exception prmErro) => Log.Erro(String.Format("Falha no comando SQL ... tag:[{0}] string: {1}", prmTag, prmSQL), prmErro);
+        public void SQLExecution(string prmTag, string prmSQL) => Log.SQL(string.Format(@"SQL executado: tag:[{0}] sql: ""{1}""", prmTag, prmSQL));
+        public void FailDataConnection(string prmTag, string prmStringConexao, Exception prmErro) => FailConnection(prmMSG: "Conexão com Banco de Dados", prmVar: "string", prmTag, prmStringConexao, prmErro); 
+        public void FailSQLConnection(string prmTag, string prmSQL, Exception prmErro) => FailConnection(prmMSG: "Comando SQL", prmVar: "sql", prmTag, prmSQL, prmErro);
+        private void FailConnection(string prmMSG, string prmVar, string prmTag, string prmSQL, Exception prmErro) => Log.Erro(String.Format(@"{0} falhou >>> tag:[{2}] {1}: ""{3}""", prmMSG, prmVar, prmTag, prmSQL), prmErro);
 
     }
     public class TestTraceAction
@@ -188,12 +187,13 @@ namespace Dooggy.KERNEL
         public bool Interno(string prmErro) => Message("KERNEL", prmErro);
         public bool Trace(string prmTrace) => Message("TRACE", prmTrace);
         public bool SQL(string prmMensagem) => Message("SQL", prmMensagem);
+        public bool Cursor(string prmMensagem) => Message("CURSOR", prmMensagem);
         public bool Show(string prmMensagem) => Message("SHOW", prmMensagem);
         public bool Aviso(string prmAviso) => Message("AVISO", prmAviso);
         public bool Falha(string prmAviso) => Message("FALHA", prmAviso);
         public bool Erro(string prmErro) => Message("ERRO", prmErro);
         public bool Erro(Exception e) => Message("ERRO", e.Message);
-        public bool Erro(string prmErro, Exception e) => Message("ERRO", String.Format("{0} Error: {1}", prmErro, e.Message));
+        public bool Erro(string prmErro, Exception e) => Message("ERRO", String.Format("{0} >>> Error: [{1}]", prmErro, e.Message));
 
 
         private bool Message(string prmTipo, string prmMensagem)
