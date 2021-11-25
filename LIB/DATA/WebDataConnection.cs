@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System;
 using Dooggy.KERNEL;
 using Oracle.ManagedDataAccess.Client;
-using Dooggy.LIB;
+using Dooggy.LIB.PARSE;
 
 namespace Dooggy
 {
@@ -46,6 +46,16 @@ namespace Dooggy
             DataViewCorrente = new DataViewConnection(prmTag, prmSQL, DataBaseCorrente);
 
             Visoes.Add(DataViewCorrente);
+
+            return (DataViewCorrente.IsOK());
+
+        }    
+
+        public bool AddDataView(string prmTag, string prmSQL, string prmMask)
+        {
+
+            if (AddDataView(prmTag, prmSQL))
+                DataViewCorrente.SetMask(prmMask);
 
             return (DataViewCorrente.IsOK());
 
@@ -137,7 +147,21 @@ namespace Dooggy
             return (memo);
         
         }
+        public string fluxos()
+        {
 
+            string fluxos = ""; string separador = "";
+
+            foreach (DataViewConnection Visao in Visoes)
+            {
+
+                fluxos += separador + Visao.GetJSon(); separador = ", ";
+
+            }
+
+            return (fluxos);
+
+        }
     }
     public class DataBaseConnection
     {
@@ -328,6 +352,8 @@ namespace Dooggy
 
         }
 
+        public void SetMask(string prmMask) => Cursor.SetMask(prmMask);
+
         public bool Next() => Cursor.Next();
 
         public string GetName(int prmIndice) => Cursor.GetName(prmIndice);
@@ -353,11 +379,17 @@ namespace Dooggy
 
         private OracleDataReader reader;
 
+        private xMask Mask;
+
         public Exception erro;
 
         private string _sql;
 
         public string sql { get => _sql; }
+
+        public bool IsMask { get => (Mask != null); }
+
+        public bool IsResult;
 
         public TestTraceDataBase Trace => DataBase.Trace;
 
@@ -369,6 +401,10 @@ namespace Dooggy
 
             GetReader(prmSQL);
 
+        }
+        public void SetMask(string prmMask)
+        {
+            Mask = new xMask(prmMask);
         }
 
         public void GetReader(string prmSQL)
@@ -382,7 +418,7 @@ namespace Dooggy
 
                 reader = (vlSql.ExecuteReader());
 
-                Start();
+                IsResult = Start();
 
                 Trace.SQLExecution(DataBase.tag, prmSQL);
 
@@ -402,28 +438,49 @@ namespace Dooggy
         public string GetValor(int prmIndice)
         {
 
-            return reader.GetOracleValue(prmIndice).ToString();
+            string valor = reader.GetOracleValue(prmIndice).ToString();
+
+            return GetMask(valor, prmName: GetName(prmIndice));
 
         }
         public string GetValor(string prmNome)
         {
 
-            return reader.GetString(prmNome);
+            string valor = reader.GetString(prmNome);
+
+            return GetMask(valor, prmNome);
 
         }
+
+        private string GetMask(string prmValor, string prmName)
+        {
+
+            if (IsMask)
+                return Mask.GetValor(prmValor, prmName);
+
+            return (prmValor);
+
+        }
+
         public string GetJSON()
         {
             string memo = "";
             string separador = "";
 
-            for (int cont = 0; cont < reader.VisibleFieldCount; cont++)
+            if (IsResult)
             {
-                memo += separador + GetJSon(cont);
+                for (int cont = 0; cont < reader.VisibleFieldCount; cont++)
+                {
+                    memo += separador + GetJSon(cont);
 
-                separador = ", ";
+                    separador = ", ";
+                }
+
+                return ("{ " + memo + " }");
+
             }
 
-            return ("{ " + memo + " }");
+            return ("");
         }
         public string GetJSon(int prmIndice)
         {

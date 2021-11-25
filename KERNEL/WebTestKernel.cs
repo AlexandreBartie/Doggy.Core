@@ -175,6 +175,8 @@ namespace Dooggy.KERNEL
 
         }
 
+        public void ActionJSONFail(string prmComando, Exception e) => Log.Erro("ACTION FAIL: JSON." + prmComando, e);
+
         public void ActionFail(string prmComando, Exception e) => Log.Erro("ACTION FAIL: ROBOT." + prmComando, e);
 
         public void TargetNotFound(string prmTAG) => Log.Erro("TARGET NOT FOUND: " + prmTAG);

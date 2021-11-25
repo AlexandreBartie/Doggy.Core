@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace MyDooggy.LIB.FILES
+namespace MyDooggy.LIB.PARSE
 {
     public class xParseCSV : xMemo
     {

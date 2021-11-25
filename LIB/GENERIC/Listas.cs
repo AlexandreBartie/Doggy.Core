@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using Microsoft.VisualBasic.FileIO;
+using System.Linq;
+using Dooggy.LIB.PARSE;
 
 namespace Dooggy
 {
@@ -56,7 +58,7 @@ namespace Dooggy
         public string separador = ",";
 
         public xLista()
-        {}
+        { }
 
         public xLista(string prmLista, string prmSeparador)
         {
@@ -72,7 +74,7 @@ namespace Dooggy
         {
 
             separador = prmSeparador;
-            
+
             if (prmLista.Trim() != "")
                 foreach (string item in prmLista.Split(separador))
                 {
@@ -213,7 +215,30 @@ namespace Dooggy
         }
 
     }
+    public class xMask
+    {
+
+        private xJSON lista;
+
+        public bool IsOK { get => (lista.IsOK); }
+
+        public xMask(string prmMask)
+        {
+
+            lista = new xJSON(prmMask);
+
+        }
+
+        public string GetValor(string prmValor, string prmKey)
+        {
+
+            string mask = lista.GetValor(prmKey);
+
+            return xString.GetMask(prmValor, mask);
+
+        }
+
+    }
 
 }
-
 

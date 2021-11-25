@@ -2,7 +2,7 @@
 using System.Text.Json;
 using System.Diagnostics;
 
-namespace Dooggy.LIB
+namespace Dooggy.LIB.PARSE
 {
     public class xJSON
     {
@@ -17,11 +17,10 @@ namespace Dooggy.LIB
 
         public Exception Erro { get => Controle.erro; }
 
-        public string lista { get => Controle.lista; }
-
         public string fluxo { get => Controle.fluxo; }
 
         public string log { get => Controle.log; }
+
         public xJSON()
         {
             Controle = new IJSONcontrol(this);
@@ -32,18 +31,21 @@ namespace Dooggy.LIB
 
             Controle = new IJSONcontrol(this);
 
-            Save(prmFluxo);
+            Parse(prmFluxo);
 
         }
+
         public void Add(string prmFluxo)
         {
             Controle.Add(prmFluxo);
         }
+
         public void Add(string prmFluxo, string prmMestre)
         {
             Controle.AddCombine(prmFluxo, prmMestre);
         }
-        private bool Save(string prmFluxo)
+
+        public bool Parse(string prmFluxo)
         {
 
             Add(prmFluxo);
@@ -79,7 +81,7 @@ namespace Dooggy.LIB
 
         private JsonElement.ArrayEnumerator Corpo;
 
-        public string lista;
+        private string lista;
 
         public bool IsCombineFull;
 
@@ -95,7 +97,7 @@ namespace Dooggy.LIB
         {
             JSON = prmJSON;
         }
-        public string fluxo { get => ("[ " + lista + " ]"); }
+        public string fluxo { get { if (lista == "") return ("[ ]"); else return ("[ " + lista + " ]"); } }
 
         public string log { get => (String.Format( "Fluxo: {0}", lista)); }
 
@@ -176,11 +178,8 @@ namespace Dooggy.LIB
             }
 
             catch (Exception e)
-            { erro = e; }
+            { Debug.WriteLine("Erro na Formataçao de Dados JSON."); lista = ""; erro = e; return (false); }
 
-            Debug.Assert(false);
-
-            return (false);
         }
         public bool Next()
         {

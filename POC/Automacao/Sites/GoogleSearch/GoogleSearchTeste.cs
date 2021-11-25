@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
-
+using Dooggy.LIB.FILES;
 
 namespace Dooggy.GoogleSearch
 {
@@ -21,7 +21,7 @@ namespace Dooggy.GoogleSearch
 
                     if (true)
                     {
-                        foreach (LIB.xTestCaseJUnit teste in Massa.Fonte.FileJUnit.TestCases)
+                        foreach (xTestCaseJUnit teste in Massa.Fonte.FileJUnit.TestCases)
                         {
 
                             Debug.WriteLine("===============================================");

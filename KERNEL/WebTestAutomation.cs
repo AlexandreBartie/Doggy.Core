@@ -4,8 +4,9 @@ using System.Drawing;
 using System.Diagnostics;
 using OpenQA.Selenium;
 using System.Collections.ObjectModel;
-using Dooggy.LIB;
 using Dooggy.KERNEL;
+using Dooggy.LIB.PARSE;
+using Dooggy.LIB.FILES;
 
 namespace Dooggy
 {
@@ -580,7 +581,7 @@ namespace Dooggy
 
         private DataViewConnection DefaultView;
 
-        public xJSON JSON = new LIB.xJSON();
+        public xJSON JSON = new xJSON();
 
         private bool IsON;
 
@@ -633,7 +634,7 @@ namespace Dooggy
             IsON = true;
 
             if (!JSON.Save())
-                { Trace.Log.Erro("ERRO{JSON:Save} " + JSON.lista); }
+                { Trace.Log.Erro("ERRO{JSON:Save} " + JSON.fluxo); }
 
             return (JSON.IsOK);
 
