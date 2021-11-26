@@ -13,7 +13,7 @@ namespace Dooggy
 
             Dados.AddDataBase(prmTag: "RH", prmConexao: @"Data Source=PC-ENGENHARIA\SQLEXPRESS;Initial Catalog=QA_POC;Integrated Security=True; MultipleActiveResultSets = True");
 
-            Dados.AddDataModel(prmTag: "Candidato", prmModelo: @"{'#ENTIDADES#':'Candidatos','#ATRIBUTOS#':'nome + sobrenome + email + nascimento'}");
+            Dados.AddDataModel(prmTag: "Candidato", prmModelo: @"{'#TABELAS#':'Candidatos','#CAMPOS#':'nome + sobrenome + email + nascimento'}");
 
             Dados.AddDataVariant(prmTag: "=Padrao");
 
@@ -22,7 +22,7 @@ namespace Dooggy
             Dados.AddDataVariant(prmTag: "+Novo", prmRegra: @"{'#ORDEM#': 'nascimento DESC'}");
             Dados.AddDataVariant(prmTag: "+Velho", prmRegra: @"{'#ORDEM#': 'nascimento ASC'}");
 
-            Dados.AddDataVariant(prmTag: "-Email", prmRegra: @"{'#REGRAS#': 'email is null'}");
+            Dados.AddDataVariant(prmTag: "-Email", prmRegra: @"{'#CONDICAO#': 'email is null'}");
 
         }
         public void BUILD()
@@ -36,8 +36,6 @@ namespace Dooggy
         }
         public void CONFIG()
         {
-
-            this.Config.PathFileSources = @"C:\Users\alexa\OneDrive\Área de Trabalho\";
 
             this.Config.EncodedDataJUNIT = Encoding.UTF7;
 

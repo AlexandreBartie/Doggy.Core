@@ -619,11 +619,11 @@ namespace Dooggy
             if (IsSTATIC)
                JSON.Add(prmFluxo);
             else
-                AddCombine(prmFluxo, prmMestre:DefaultView.GetJSon());
+                AddCombine(prmFluxo, prmMestre:DefaultView.json());
         }
         public void Add(string prmFluxo, string prmView)
         {
-            AddCombine(prmFluxo, prmMestre: Pool.GetView(prmView));
+            AddCombine(prmFluxo, prmMestre: Pool.json(prmView));
         }
         private void AddCombine(string prmFluxo, string prmMestre)
         {

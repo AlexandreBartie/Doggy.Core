@@ -57,7 +57,7 @@ namespace Dooggy.KERNEL
     public class TestConfig
     {
 
-        public string PathFileSources;
+        public string PathDataFiles;
 
         public Encoding EncodedDataJUNIT;
 
@@ -126,9 +126,10 @@ namespace Dooggy.KERNEL
 
         public void StatusConnection(string prmTag, string prmStatus) { Log.SQL(string.Format("Banco de Dados {1}: tag[{0}]", prmTag, prmStatus)); }
         public void SQLExecution(string prmTag, string prmSQL) => Log.SQL(string.Format(@"SQL executado: tag:[{0}] sql: ""{1}""", prmTag, prmSQL));
-        public void FailDataConnection(string prmTag, string prmStringConexao, Exception prmErro) => FailConnection(prmMSG: "Conexão com Banco de Dados", prmVar: "string", prmTag, prmStringConexao, prmErro); 
-        public void FailSQLConnection(string prmTag, string prmSQL, Exception prmErro) => FailConnection(prmMSG: "Comando SQL", prmVar: "sql", prmTag, prmSQL, prmErro);
-        private void FailConnection(string prmMSG, string prmVar, string prmTag, string prmSQL, Exception prmErro) => Log.Erro(String.Format(@"{0} falhou >>> tag:[{2}] {1}: ""{3}""", prmMSG, prmVar, prmTag, prmSQL), prmErro);
+        public void FailDataConnection(string prmTag, string prmStringConexao, Exception prmErro) => FailConnection(prmMSG: "Conexão com Banco de Dados falhou", prmVar: "string", prmTag, prmStringConexao, prmErro);
+        public void FailSQLConnection(string prmTag, string prmSQL, Exception prmErro) => FailConnection(prmMSG: "Comando SQL falhou", prmVar: "sql", prmTag, prmSQL, prmErro);
+        public void FailSQLNoDataBaseConnection(string prmTag, string prmSQL, Exception prmErro) => FailConnection(prmMSG: "Banco de Dados não está aberto. SQL", prmVar: "sql", prmTag, prmSQL, prmErro);
+        private void FailConnection(string prmMSG, string prmVar, string prmTag, string prmSQL, Exception prmErro) => Log.Erro(String.Format(@"{0} >>> tag:[{2}] {1}: ""{3}""", prmMSG, prmVar, prmTag, prmSQL), prmErro);
 
     }
     public class TestTraceAction

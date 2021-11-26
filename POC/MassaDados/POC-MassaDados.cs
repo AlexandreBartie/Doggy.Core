@@ -25,9 +25,13 @@ namespace Dooggy
         public void DATA()
         {
 
-            Dados.AddDataModel(prmTag: "Aluno", prmModelo: @"{'#ENTIDADES#':'sia.aluno_curso','#ATRIBUTOS#':'cod_matricula, nom_responsavel_pgto'}");
+            Dados.AddDataModel(prmTag: "Aluno", prmModelo: @"{'#TABELAS#':'sia.aluno_curso','#CAMPOS#':'cod_matricula, nom_responsavel_pgto'}");
 
-            Dados.AddDataVariant(prmTag: "=Padrao",prmRegra: @"{'#REGRAS#': 'cod_situacao_aluno = 1'}");
+            Dados.AddDataVariant(prmTag: "=Padrao",prmRegra: @"{'#CONDICAO#': 'cod_situacao_aluno = 1'}");
+
+            Debug.Assert(false);
+
+            this.SaveCSV(Config.PathDataFiles, prmNome: "Texto");
 
         }
         public void BUILD()
@@ -35,13 +39,13 @@ namespace Dooggy
 
             this.Setup(prmName: "POC - Massa de Dados Dinâmica");
 
-            this.AddSuite(new SuiteAtendimento());
+//            this.AddSuite(new SuiteAtendimento());
 
         }
         public void CONFIG()
         {
 
-            this.Config.PathFileSources = @"C:\Users\alexa\OneDrive\Área de Trabalho\";
+            this.Config.PathDataFiles = @"C:\Users\alexa\OneDrive\Área de Trabalho\MassaTeste\";
 
             this.Config.EncodedDataJUNIT = Encoding.UTF7;
 
@@ -78,7 +82,7 @@ namespace Dooggy
 
             Massa.Save();
 
-            Trace.Log.SQL(Massa.JSON.log);
+
 
         }
 

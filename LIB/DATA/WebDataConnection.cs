@@ -6,6 +6,7 @@ using System;
 using Dooggy.KERNEL;
 using Oracle.ManagedDataAccess.Client;
 using Dooggy.LIB.PARSE;
+using System.IO;
 
 namespace Dooggy
 {
@@ -14,107 +15,57 @@ namespace Dooggy
 
         public TestTraceDataBase Trace;
 
-        private List<DataBaseConnection> Bases = new List<DataBaseConnection>();
-        private List<DataViewConnection> Visoes = new List<DataViewConnection>();
+        private DataBasesConnection Bases;
+        private DataViewsConnection Visoes;
+        private DataModelsConnection Modelos;
 
-        public DataBaseConnection DataBaseCorrente;
-        public DataViewConnection DataViewCorrente;
+        public DataBaseConnection DataBaseCorrente { get => (Bases.Corrente); }
+        public DataViewConnection DataViewCorrente { get => (Visoes.Corrente); }
+        public DataModelConnection DataModelCorrente { get => (Modelos.Corrente); }
 
-        public DataModelConnection DataModelCorrente;
-        public DataVariantConnection DataVariantCorrente;
-       
+        private bool IsBaseCorrente { get => (DataBaseCorrente != null) ; }
+        private bool IsModelCorrente { get => (DataModelCorrente != null); }
+
         public DataPoolConnection(TestTraceDataBase prmTrace)
         {
 
             Trace = prmTrace;
 
-        }
-
-        public bool AddDataBase(string prmTag, string prmConexao)
-        {
-
-            DataBaseCorrente = new DataBaseConnection(prmTag, prmConexao, Trace);
-
-            Bases.Add(DataBaseCorrente);
-
-            return (DataBaseCorrente.IsOK);
-
-        }
-        public bool AddDataView(string prmTag, string prmSQL)
-        {
-
-            DataViewCorrente = new DataViewConnection(prmTag, prmSQL, DataBaseCorrente);
-
-            Visoes.Add(DataViewCorrente);
-
-            return (DataViewCorrente.IsOK());
-
-        }    
-
-        public bool AddDataView(string prmTag, string prmSQL, string prmMask)
-        {
-
-            if (AddDataView(prmTag, prmSQL))
-                DataViewCorrente.SetMask(prmMask);
-
-            return (DataViewCorrente.IsOK());
-
-        }
-        public bool AddDataModel(string prmTag, string prmModel)
-        {
-
-            DataModelCorrente = new DataModelConnection(prmTag, prmModel, DataBaseCorrente);
-
-            return (DataBaseCorrente != null);
-
-        }
-        public bool AddDataVariant(string prmTag)
-        {
-
-            return (AddDataVariant(prmTag, prmRegra: "", prmQtde: 1));
-
-        }
-        public bool AddDataVariant(string prmTag, string prmRegra)
-        {
-
-            return (AddDataVariant(prmTag, prmRegra, prmQtde: 1));
-
-        }
-        public bool AddDataVariant(string prmTag, string prmRegra, int prmQtde)
-        {
-
-            DataVariantCorrente = new DataVariantConnection(prmTag, prmRegra, DataModelCorrente);
-
-            string ViewSQL = DataVariantCorrente.CriarSQL(prmQtde);
-
-            return (AddDataView(DataVariantCorrente.tag_extendida, prmSQL: ViewSQL));
-
-        }
-        public bool SetView(string prmTag)
-        {
-
-            foreach (DataViewConnection Visao in Visoes)
-            {
-
-                if (Visao.tag == prmTag)
-                {
-
-                    DataViewCorrente = Visao;
-
-                    return (true);
-
-                }
-
-            }
-
-            return (false);
+            Bases = new DataBasesConnection();
+            Visoes = new DataViewsConnection();
+            Modelos = new DataModelsConnection();
 
         }
 
-        public string GetView(string prmTag)
+        public bool AddDataBase(string prmTag, string prmConexao) => Bases.AddItem(prmTag, prmConexao, this);
+
+        public bool AddDataView(string prmTag, string prmSQL) => AddDataView(prmTag, prmSQL, prmMask: "");
+
+        public bool AddDataView(string prmTag, string prmSQL, string prmMask) => Visoes.AddItem(DataBaseCorrente.CreateView(prmTag, prmSQL, prmMask));
+
+        public bool AddDataModel(string prmTag, string prmModel) => AddDataModel(prmTag, prmModel, prmMask: "");
+
+        public bool AddDataModel(string prmTag, string prmModel, string prmMask)
+        {
+
+            if (IsBaseCorrente)
+                Modelos.AddItem(DataBaseCorrente.CreateModel(prmTag, prmModel, prmMask));
+
+            return (IsBaseCorrente);
+
+        }
+        public bool AddDataVariant(string prmTag) => AddDataVariant(prmTag, prmRegra: "");
+
+        public bool AddDataVariant(string prmTag, string prmRegra) => AddDataVariant(prmTag, prmRegra, prmQtde: 1);
+
+        public bool AddDataVariant(string prmTag, string prmRegra, int prmQtde) => DataModelCorrente.CriarVariacao(prmTag, prmRegra, prmQtde);
+
+        public bool SetView(string prmTag) => Visoes.SetView(prmTag);
+
+        public string json(string prmTag)
         {
             if (SetView(prmTag))
-                return DataViewCorrente.GetJSon();
+                return DataViewCorrente.json();
 
             return ("");
 
@@ -135,59 +86,44 @@ namespace Dooggy
             return (retorno);
 
         }
-        public string memo()
-        {
 
-            string memo = "";
+        public string csv() => Visoes.csv();
+        public string json() => Visoes.json();
 
-            foreach (DataViewConnection Visao in Visoes)
-                memo += Visao.memo() + Environment.NewLine;
+        public string Export(string prmCabecalho) => Export(prmCabecalho, prmColunaExtra: true);
+        public string Export(string prmCabecalho, bool prmColunaExtra) => Export(prmCabecalho, prmColunaExtra, prmSeparador: ",");
+        public string Export(string prmCabecalho, bool prmColunaExtra, string prmSeparador) => Visoes.Export(prmCabecalho, prmColunaExtra, prmSeparador);
 
-            
-            return (memo);
-        
-        }
-        public string fluxos()
-        {
-
-            string fluxos = ""; string separador = "";
-
-            foreach (DataViewConnection Visao in Visoes)
-            {
-
-                fluxos += separador + Visao.GetJSon(); separador = ", ";
-
-            }
-
-            return (fluxos);
-
-        }
     }
     public class DataBaseConnection
     {
 
-        public string tag;
+        public DataPoolConnection Pool;
 
-        public TestTraceDataBase Trace;
+        public string tag;
 
         public OracleConnection conexao;
 
         public Exception erro;
 
-        public DataBaseConnection(string prmTag, string prmConexao, TestTraceDataBase prmTrace)
+        public DataBaseConnection(string prmTag, string prmConexao, DataPoolConnection prmPool)
         {
 
             tag = prmTag;
 
-            Trace = prmTrace;
+            Pool = prmPool;
 
             Abrir(prmConexao);
 
         }
 
-
+        public TestTraceDataBase Trace { get => (Pool.Trace); }
         public bool IsON { get => (conexao != null); }
         public bool IsOK { get { if (IsON) return (conexao.State == ConnectionState.Open); return (false); } }
+
+        public DataViewConnection CreateView(string prmTag, string prmSQL, string prmMask) => new DataViewConnection(prmTag, prmSQL, prmMask, this);
+
+        public DataModelConnection CreateModel(string prmTag, string prmModel, string prmMask) => new DataModelConnection(prmTag, prmModel, prmMask, this);
 
         private bool Criar(string prmConexao)
         {
@@ -245,89 +181,100 @@ namespace Dooggy
 
         public string tag;
 
-        public xJSON JSON;
+        private string mask;
+
+        public xJSON Parametros;
 
         public DataBaseConnection DataBase;
 
-        public DataModelConnection(string prmTag, string prmModel, DataBaseConnection prmDataBase)
+        private DataViewsConnection Visoes = new DataViewsConnection();
+
+        private DataVariantConnection Variacao;
+
+        public DataPoolConnection Pool { get => DataBase.Pool; }
+
+        public DataModelConnection(string prmTag, string prmModel, string prmMask, DataBaseConnection prmDataBase)
         {
 
             tag = prmTag;
 
+            mask = prmMask;
+
+            Parametros = new xJSON(prmModel);
+
             DataBase = prmDataBase;
 
-            JSON = new xJSON(prmModel);
+            Variacao = new DataVariantConnection(this);
 
         }
 
-        public string GetSELECT(int prmQtde) => (string.Format("SELECT {0} FROM {1}", GetListaCampos() , GetListaTabelas()));
+        public bool CriarView(string prmTag, string prmSQL)
+        {
 
-        private string GetListaTabelas() => (TratarSQL(JSON.GetValor("#ENTIDADES#")));
+            if (Pool.AddDataView(prmTag, prmSQL, mask))
+                { Visoes.Add(Pool.DataViewCorrente); return (true); }
 
-        private string GetListaCampos() => (TratarSQL(JSON.GetValor("#ATRIBUTOS#", prmPadrao: "*")));
+            return (false);
 
-        public string GetSQL(string prmSQL, int prmQtde) => (string.Format("SELECT * FROM ({0}) WHERE ROWNUM = {1}", prmSQL, prmQtde));
+        }
+        public bool CriarVariacao(string prmTag, string prmRegras, int prmQtde) => Variacao.Criar(prmTag, prmRegras, prmQtde);
 
-        private string TratarSQL(string prmLista) => new xMemo(prmLista, prmSeparador: "+").memo(", ");
+        public string GetListaTabelas() => (TratarParametros(Parametros.GetValor("#TABELAS#")));
+
+        public string GetListaCampos() => (TratarParametros(Parametros.GetValor("#CAMPOS#", prmPadrao: "*")));
+
+        private string TratarParametros(string prmLista) => new xMemo(prmLista, prmSeparador: "+").memo(", ");
 
     }
     public class DataVariantConnection
     {
 
-        public string tag;
-
-        private xJSON JSON;
-
-        private string regra;
+        private xJSON Regras;
 
         public DataModelConnection Modelo;
 
-        public DataVariantConnection(string prmTag, string prmRegra, DataModelConnection prmModelo)
-        {
+        private string GetTagExtendida(string prmTag) => Modelo.tag + prmTag;
 
-            tag = prmTag;
+        private bool IsRegraOK { get => (Regras.IsOK); }
+
+        public DataVariantConnection(DataModelConnection prmModelo)
+        {
 
             Modelo = prmModelo;
 
-            if (prmRegra.Trim() != "")
-                JSON = new xJSON(prmRegra);
-
         }
-        public string tag_extendida { get => Modelo.tag + tag; }    
-        public bool IsRegraOK { get => JSON != null; }
 
-        public string CriarSQL(int prmQtde)
+        public bool Criar(string prmTag, string prmRegras, int prmQtde)
         {
 
-            string sql = Modelo.GetSELECT(prmQtde);
+            Regras = new xJSON(prmRegras);
+
+            return (Modelo.CriarView(GetTagExtendida(prmTag), prmSQL: GetSQL(prmQtde)));
+
+        }
+        
+        private string GetSQL(int prmQtde)
+        {
+
+            string sql = MontaSELECT(prmQtde);
 
             if (IsRegraOK)
-                sql += " " + GetExtensaoSQL();
+                sql += " " + MontaEXTENSAO();
 
-            return (Modelo.GetSQL(sql,prmQtde));
+            return (MontaSQL(sql,prmQtde));
             
         }
-        private string GetExtensaoSQL()
-        {
-            return (string.Format("{0} {1}", GetWHERE(), GetORDERBY()).Trim());
-        }
-        private string GetWHERE()
-        {
-            return (GetRegras("WHERE {0}"));
-        }
-        private string GetORDERBY()
-        {
-            return (GetOrdenacao("ORDER BY {0}"));
-        }
-        private string GetRegras(string prmFormato)
-        {
-           
-            return (JSON.FindValor("#REGRAS#", prmFormato));
-        }
-        private string GetOrdenacao(string prmFormato)
-        {
-            return (JSON.FindValor("#ORDEM#", prmFormato));
-        }
+
+        private string MontaSQL(string prmSQL, int prmQtde) => (string.Format("SELECT * FROM ({0}) WHERE ROWNUM = {1}", prmSQL, prmQtde));
+
+        private string MontaSELECT(int prmQtde) => (string.Format("SELECT {0} FROM {1}", Modelo.GetListaCampos(), Modelo.GetListaTabelas()));
+
+        private string MontaEXTENSAO() => (string.Format("{0} {1}", MontaWHERE(), MontaORDERBY()).Trim());
+  
+        private string MontaWHERE() => (Regras.FindValor("#CONDICAO#", "WHERE {0}"));
+
+        private string MontaORDERBY() => (Regras.FindValor("#ORDEM#", "ORDER BY {0}"));
+
     }
     public class DataViewConnection
     {
@@ -338,21 +285,22 @@ namespace Dooggy
 
         public DataCursorConnection Cursor;
 
+        public bool IsOK { get => Cursor.IsOK(); }
         public string sql { get => Cursor.sql; }
         public Exception erro { get => Cursor.erro; }
 
-        public DataViewConnection(string prmTag, string prmSQL, DataBaseConnection prmDataBase)
+
+
+        public DataViewConnection(string prmTag, string prmSQL, string prmMask, DataBaseConnection prmDataBase)
         {
 
             tag = prmTag;
 
             DataBase = prmDataBase;
 
-            Cursor = new DataCursorConnection(prmSQL, prmDataBase);
+            Cursor = new DataCursorConnection(prmSQL, prmMask, prmDataBase);
 
         }
-
-        public void SetMask(string prmMask) => Cursor.SetMask(prmMask);
 
         public bool Next() => Cursor.Next();
 
@@ -362,14 +310,14 @@ namespace Dooggy
 
         public string GetValor(string prmNome) => Cursor.GetValor(prmNome);
 
-        public string GetJSon() => Cursor.GetJSON();
+        public string csv(string prmSeparador) => Cursor.GetCSV(prmSeparador);
+        public string csv() => Cursor.GetCSV();
+        public string json() => Cursor.GetJSON();
 
         public bool Fechar() => Cursor.Fechar();
 
-        public bool IsOK() => Cursor.IsOK();
-
-        public string memo() => String.Format("VIEW:[{0,25}] SQL: {1}", tag, sql);
-        public string data() => String.Format("DATA:[{0,25}] Fluxo: {1}", tag, GetJSon());
+        public string log_sql() => String.Format("VIEW:[{0,25}] SQL: {1}", tag, sql);
+        public string log_data() => String.Format("DATA:[{0,25}] Fluxo: {1}", tag, json());
 
     }
     public class DataCursorConnection
@@ -394,17 +342,22 @@ namespace Dooggy
         public TestTraceDataBase Trace => DataBase.Trace;
 
 
-        public DataCursorConnection(string prmSQL, DataBaseConnection prmDataBase)
+        public DataCursorConnection(string prmSQL, string prmMask, DataBaseConnection prmDataBase)
         {
 
             DataBase = prmDataBase;
 
-            GetReader(prmSQL);
-
+            if (DataBase.IsOK)
+            {
+                GetReader(prmSQL); SetMask(prmMask);
+            }
+            else
+                { Trace.FailSQLNoDataBaseConnection(DataBase.tag, prmSQL, DataBase.erro); erro = DataBase.erro; }
         }
-        public void SetMask(string prmMask)
+        private void SetMask(string prmMask)
         {
-            Mask = new xMask(prmMask);
+            if (prmMask != "")
+                Mask = new xMask(prmMask);
         }
 
         public void GetReader(string prmSQL)
@@ -429,6 +382,12 @@ namespace Dooggy
         }
         private bool Start() => Next();
         public bool Next() => reader.Read();
+        public bool IsDBNull(int prmIndice)
+        {
+
+            return reader.IsDBNull(prmIndice);
+
+        }
         public string GetName(int prmIndice)
         {
 
@@ -462,6 +421,32 @@ namespace Dooggy
 
         }
 
+        public string GetCSV() => GetCSV(prmSeparador: ",");
+        public string GetCSV(string prmSeparador)
+        {
+            string memo = "";
+            string texto = "";
+            string separador = "";
+
+            if (IsResult)
+            {
+                for (int cont = 0; cont < reader.VisibleFieldCount; cont++)
+                {
+                    if (IsDBNull(cont))
+                        texto = "";
+                    else
+                        texto = GetValor(cont);
+
+                    memo += separador + texto;
+
+                    separador = prmSeparador;
+
+                }
+
+            }
+
+            return (memo);
+        }
         public string GetJSON()
         {
             string memo = "";
@@ -471,23 +456,24 @@ namespace Dooggy
             {
                 for (int cont = 0; cont < reader.VisibleFieldCount; cont++)
                 {
-                    memo += separador + GetJSon(cont);
+                    if (!IsDBNull(cont))
+                    {
 
-                    separador = ", ";
+                        memo += separador + GetTupla(cont);
+
+                        separador = ", ";
+
+                    }
+
                 }
 
                 return ("{ " + memo + " }");
-
             }
 
-            return ("");
+            return ("{ }");
         }
-        public string GetJSon(int prmIndice)
-        {
+        public string GetTupla(int prmIndice) => string.Format("'{0}': '{1}'", GetName(prmIndice), GetValor(prmIndice));
 
-            return string.Format("'{0}': '{1}'", GetName(prmIndice), GetValor(prmIndice));
-
-        }
         public bool Fechar()
         {
             if (IsOK())
@@ -545,11 +531,16 @@ namespace Dooggy
         }
         public string GetView(string prmTag)
         {
-            return (Pool.GetView(prmTag));
+            return (Pool.json(prmTag));
         }
-        public string memo()
+        public string csv()
         {
-            return(Pool.memo());
+            return(Pool.csv());
+        }
+
+        public string json()
+        {
+            return (Pool.json());
         }
     }
     public class IDataLocalConnection
@@ -570,8 +561,30 @@ namespace Dooggy
 
         }
 
-    }
+        public bool SaveJSON(string prmPath, string prmNome) => Save(prmPath, prmNome, prmConteudo: Dados.json(), prmExtensao: "json");
 
+        public bool SaveCSV(string prmPath, string prmNome) => SaveCSV(prmPath, prmNome, prmConteudo: Dados.csv());
+
+        public bool SaveCSV(string prmPath, string prmNome, string prmConteudo) => Save(prmPath, prmNome, prmConteudo, prmExtensao: "csv");
+
+        private bool Save(string prmPath, string prmNome, string prmConteudo, string prmExtensao)
+        {
+
+            string nome_completo = String.Format("{0}{1}.{2}", prmPath, prmNome, prmExtensao);
+
+            try
+            {
+                File.WriteAllText("WriteLines.txt", prmConteudo);
+
+                return (true);
+            }
+            catch 
+            { }
+
+            return (false);
+        }
+
+    }
     public class DataBaseOracle
     {
 
@@ -588,82 +601,151 @@ namespace Dooggy
         public string GetString()  => String.Format(modelo, host, port, service, user, password);
 
     }
-    /*
 
+    public class DataBasesConnection : List<DataBaseConnection>
+    {
 
-        public class DataRowConnection
+        public DataBaseConnection Corrente;
+
+        public bool AddItem(string prmTag, string prmConexao, DataPoolConnection prmPool)
         {
 
-    *//*        public bool Ler()
-            { return reader.Read(); }
+            Corrente = new DataBaseConnection(prmTag, prmConexao, prmPool);
 
-            public string GetName(int prmIndice)
+            Add(Corrente);
+
+            return (Corrente.IsOK);
+
+        }
+
+    }
+    public class DataViewsConnection : List<DataViewConnection>
+    {
+
+        public DataViewConnection Corrente;
+
+        public bool AddItem(DataViewConnection prmView)
+        {
+
+            Corrente = prmView;
+
+            Add(Corrente);
+
+            return (prmView.IsOK);
+
+        }
+
+        public bool SetView(string prmTag)
+        {
+
+            foreach (DataViewConnection Visao in this)
             {
 
-                return reader.GetName(prmIndice);
+                if (Visao.tag == prmTag)
+                {
+
+                    Corrente = Visao;
+
+                    return (true);
+
+                }
 
             }
-            public string GetValor(int prmIndice)
+
+            return (false);
+
+        }
+        public string Export(string prmCabecalho, bool prmColunaExtra, string prmSeparador)
+        {
+
+            string txt = prmCabecalho + Environment.NewLine;
+
+            string linha; string extra = "";
+
+            if (prmColunaExtra)
+                extra = prmSeparador;
+
+            foreach (DataViewConnection Visao in this)
             {
 
-                return reader.GetSqlValue(prmIndice).ToString();
+                linha = Visao.csv(prmSeparador);
+
+                if (linha != "")
+                    txt += extra + linha;
+
+                txt += Environment.NewLine;
 
             }
-            public string GetValor(string prmNome)
+
+            return (txt);
+
+        }
+        public string csv()
+        {
+
+            string csv = "";
+
+            foreach (DataViewConnection Visao in this)
+                csv += Visao.csv() + Environment.NewLine;
+
+
+            return (csv);
+
+        }
+        public string json()
+        {
+
+            string json = ""; string separador = "";
+
+            foreach (DataViewConnection Visao in this)
             {
 
-                return reader.GetString(prmNome);
+                json += separador + Visao.json(); separador = ", ";
 
             }
-            public string GetJSon(int prmIndice)
+
+            return (json);
+
+        }
+
+    }
+
+    public class DataModelsConnection : List<DataModelConnection>
+    {
+
+        public DataModelConnection Corrente;
+
+        public void AddItem(DataModelConnection prmModel)
+        {
+
+            Corrente = prmModel;
+
+            Add(prmModel);
+
+        }
+
+        public bool SetModel(string prmTag)
+        {
+
+            foreach (DataModelConnection Model in this)
             {
 
-                return string.Format("'{0}': '{1}'", GetName(prmIndice), GetValor(prmIndice));
+                if (Model.tag == prmTag)
+                {
 
-            }*//*
-        }*/
+                    Corrente = Model;
 
-    //private CursorDados _cursor;
+                    return (true);
 
-    //    private _cursor As CursorDados
-    //        private _tabelas As colTabelaGenerica
-    //        Private ReadOnly Property Tabelas As colTabelaGenerica
-    //            Get
-    //                If IsNothing(_tabelas) Then
-    //                    _tabelas = New colTabelaGenerica(Me)
-    //                End If
-    //                Return _tabelas
-    //            End Get
-    //        End Property
-    //    public CursorDados Cursor;
-    //    {
-    //        get
-    //        {
-    //            if(_cursor == null)
-    //                { _cursor = New CursorDados(conexao);
-    //}
-    //             return _cursor;
-    //        }
-    //    }
+                }
 
+            }
 
-    //private _schema As CursorSchema;
+            return (false);
 
-    //            public ReadOnly Property Schema As CursorSchema
-    //    Get
-    //        If IsNothing(_schema) Then
-    //            _schema = New CursorSchema(Me)
-    //        End If
-    //        Return _schema
-    //    End Get
-    //End Property
-    //Public ReadOnly Property erro As Exception
-    //    Get
-    //        erro = _erro
-    //    End Get
-    //End Property
-    //
-    //
+        }
+
+    }
 
 }
 

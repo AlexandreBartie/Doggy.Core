@@ -9,10 +9,10 @@ namespace Dooggy.LIB.PARSE
 
         public IJSONcontrol Controle;
 
-        public bool _IsOK;
-        public bool _IsON;
+        private bool _IsOK;
 
         public bool IsOK { get => _IsOK; }
+
         public bool IsCurrent { get => Controle.IsCurrent; }
 
         public Exception Erro { get => Controle.erro; }
