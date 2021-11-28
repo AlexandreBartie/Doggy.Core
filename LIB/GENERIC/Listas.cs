@@ -4,9 +4,9 @@ using System.Diagnostics;
 using System.Text;
 using Microsoft.VisualBasic.FileIO;
 using System.Linq;
-using Dooggy.LIB.PARSE;
+using Dooggy.Lib.Parse;
 
-namespace Dooggy
+namespace Dooggy.Lib.Generic
 {
     public class xTupla
     {

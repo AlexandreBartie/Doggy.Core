@@ -6,40 +6,41 @@ using System;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using System.Text;
-using Dooggy.KERNEL;
+using Dooggy.Factory.Data;
+using Dooggy.Factory.Trace;
 
-namespace Dooggy
+namespace Dooggy.Factory.Robot
 {
     public enum eTipoDriver : int
     {
         ChromeDriver = 0,
         EdgeDriver = 1
     }
-    public class TestProject : IDataLocalConnection
+    public class TestProject : ITestDataLocal
     {
 
-        public DataPoolConnection Pool;
-
+        public TestFactory Factory;
+        
         public List<TestSuite> Suites = new List<TestSuite>();
-
-        public TestKernel Kernel = new TestKernel();
 
         private string _name;
 
         public TestProject()
         {
 
-            Pool = new DataPoolConnection(Kernel.Trace.DataBase);
+            Factory = new TestFactory();
 
             Dados.Setup(this, Pool);
 
-            Kernel.Call(this, Kernel.GetProjectBlockCode());
+            Factory.Call(this, Factory.Parameters.GetProjectBlockCode());
 
         }
 
-        public TestConfig Config { get => Kernel.Config; }
+        public TestDataPool Pool { get => Factory.Pool; }
 
-        public TestTraceAction Trace { get => Kernel.Trace.Action; }
+        public TestConfig Config { get => Factory.Config; }
+
+        public TestTraceAction Trace { get => Factory.Trace.Action; }
 
         public string name { get => _name; }
 
@@ -67,10 +68,10 @@ namespace Dooggy
 
         }
         public void Pause(int prmSegundos)
-        { Kernel.Pause(prmSegundos); }
+        { Factory.Pause(prmSegundos); }
 
     }
-    public class TestSuite : IDataLocalConnection
+    public class TestSuite : ITestDataLocal
     {
 
         public TestProject Projeto;
@@ -87,7 +88,7 @@ namespace Dooggy
 
         public TestTraceAction Trace { get => Projeto.Trace; }
 
-        public DataPoolConnection Pool => Projeto.Pool;
+        public TestDataPool Pool => Projeto.Pool;
 
         public void Setup(TestProject prmProjeto)
         {
@@ -135,7 +136,7 @@ namespace Dooggy
         }
 
     }
-    public class TestScript : IDataLocalConnection
+    public class TestScript : ITestDataLocal
     {
 
         public string nome;
@@ -148,13 +149,11 @@ namespace Dooggy
 
         public TestSuite Suite => Motor.Suite;
 
-        public TestConfig Config => Suite.Config;
-
-        public TestKernel Kernel => Robot.Kernel;
+        public TestFactory Factory => Robot.Factory;
 
         public TestTraceAction Trace => Suite.Trace;
 
-        private void Metodo(string prmMetodo) => Robot.Kernel.Call(this, prmMetodo);
+        private void Metodo(string prmMetodo) => Robot.Factory.Call(this, prmMetodo);
 
         public void Executar(TestMotor prmMotor)
         {
@@ -175,7 +174,7 @@ namespace Dooggy
 
                 }
 
-                Robot.Pause(prmSegundos: Config.PauseAfterTestCase);
+                Robot.Pause(prmSegundos: Factory.Config.PauseAfterTestCase);
 
             }
 
@@ -199,7 +198,7 @@ namespace Dooggy
         private void MetodoEXECUCAO()
         {
 
-            string blockCode = Kernel.GetScriptBlockCode();
+            string blockCode = Factory.Parameters.GetScriptBlockCode();
 
 
             if (Trace.ActionMassaOnLine(Massa.IsONLINE))

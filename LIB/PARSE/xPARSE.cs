@@ -1,9 +1,10 @@
 ﻿using Dooggy;
+using Dooggy.Lib.Generic;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace MyDooggy.LIB.PARSE
+namespace Dooggy.Lib.Parse
 {
     public class xParseCSV : xMemo
     {

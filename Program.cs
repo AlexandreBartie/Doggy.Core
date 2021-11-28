@@ -1,3 +1,4 @@
+using Dooggy.Factory;
 using System;
 using System.Data.SqlClient;
 
@@ -10,7 +11,7 @@ namespace Dooggy
 
             //POC_AutomacaoTestes POC = new POC_AutomacaoTestes();
 
-            POC_MassaDados POC = new POC_MassaDados();
+            POC_MassaTestes POC = new POC_MassaTestes();
 
         }
 

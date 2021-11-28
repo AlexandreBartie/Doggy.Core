@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Text.Json;
 using System.Diagnostics;
+using Dooggy.Lib.Generic;
 
-namespace Dooggy.LIB.PARSE
+namespace Dooggy.Lib.Parse
 {
     public class xJSON
     {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Dooggy.Factory.Robot;
 using OpenQA.Selenium;
 
 namespace Dooggy.WebTestes

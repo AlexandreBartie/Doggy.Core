@@ -2,10 +2,12 @@
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Text;
+using Dooggy.Factory.Robot;
+using Dooggy.Lib.Data;
 
 namespace Dooggy
 {
-    public class POC_MassaDados : TestProject
+    public class POC_MassaTestes : TestProject
     {
         public void BASE()
         {
@@ -29,9 +31,7 @@ namespace Dooggy
 
             Dados.AddDataVariant(prmTag: "=Padrao",prmRegra: @"{'#CONDICAO#': 'cod_situacao_aluno = 1'}");
 
-            Debug.Assert(false);
-
-            this.SaveCSV(Config.PathDataFiles, prmNome: "Texto");
+            Dados.Export.SaveCSV(Config.PathDataFiles, prmNome: "Texto");
 
         }
         public void BUILD()

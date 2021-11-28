@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
-using MyDooggy.LIB.PARSE;
+using Dooggy.Lib.Parse;
+using Dooggy.Lib.Generic;
 
-namespace Dooggy.LIB.FILES
+namespace Dooggy.Lib.Files
 {
     public class xFileJUnit : xFileTXT
     {

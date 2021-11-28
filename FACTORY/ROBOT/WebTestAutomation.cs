@@ -4,11 +4,13 @@ using System.Drawing;
 using System.Diagnostics;
 using OpenQA.Selenium;
 using System.Collections.ObjectModel;
-using Dooggy.KERNEL;
-using Dooggy.LIB.PARSE;
-using Dooggy.LIB.FILES;
+using Dooggy.Lib.Parse;
+using Dooggy.Lib.Files;
+using Dooggy.Lib.Generic;
+using Dooggy.Factory.Data;
+using Dooggy.Factory.Trace;
 
-namespace Dooggy
+namespace Dooggy.Factory.Robot
 {
     public enum eTipoElemento : int
     {
@@ -59,8 +61,6 @@ namespace Dooggy
                 if (TemLastControl())
                 {
                     LastControl.Submit();
-                    
-
 
                     return (true);
                 }
@@ -196,6 +196,7 @@ namespace Dooggy
         }
 
         public QA_WebRobot Robot { get => Page.Robot; }
+        public TestFactory Factory { get => Robot.Factory; }
         public TestTraceAction Trace { get => Robot.Trace.Action; }
 
         public void SetDomain(string prmLista)
@@ -304,7 +305,7 @@ namespace Dooggy
 
         public QA_WebRobot Robot { get => Elemento.Robot; }
 
-        public TestKernel Kernel { get => Robot.Kernel; }
+        public TestFactory Factory { get => Robot.Factory; }
 
         public QA_WebDominio(QA_WebElemento prmElemento)
         {
@@ -325,7 +326,7 @@ namespace Dooggy
             if (GetElementos())
             {
 
-                xLista fluxo = new xLista(Kernel.GetAdicaoElementos(), prmValor);
+                xLista fluxo = new xLista(Factory.Parameters.GetAdicaoElementos(), prmValor);
 
                 foreach (string item in fluxo)
                 {
@@ -369,7 +370,7 @@ namespace Dooggy
         }
         private string GetXPath()
         {
-            string raiz_elemento = Kernel.GetXPathBuscaRaizElementos();
+            string raiz_elemento = Factory.Parameters.GetXPathBuscaRaizElementos();
 
             if (filtro == null)
                 return (string.Format(raiz_elemento, Chave.tag, Chave.valor));
@@ -482,12 +483,8 @@ namespace Dooggy
 
         }
         public TestProject Projeto { get => Motor.Suite.Projeto; }
-
-        public TestProject Dado { get => Projeto; }
-
-        public TestKernel Kernel { get => Projeto.Kernel; }
-            
-        public TestTrace Trace { get  => Kernel.Trace; }
+        public TestFactory Factory { get => Projeto.Factory; }
+        public TestTrace Trace { get  => Factory.Trace; }
 
         public IWebDriver driver  { get => Motor.driver; }
 
@@ -521,7 +518,7 @@ namespace Dooggy
         public void Quit()
         { driver.Quit(); }
 
-        public void Pause(int prmSegundos) { Kernel.Pause(prmSegundos); }
+        public void Pause(int prmSegundos) { Factory.Pause(prmSegundos); }
 
         public IWebElement GetElementBy(By prmTupla)
         {
@@ -579,7 +576,7 @@ namespace Dooggy
 
         public QA_FonteDados Fonte;
 
-        private DataViewConnection DefaultView;
+        private TestDataView DefaultView;
 
         public xJSON JSON = new xJSON();
 
@@ -596,7 +593,7 @@ namespace Dooggy
 
         public TestProject Project { get => Robot.Projeto; }
         private TestTrace Trace { get => Robot.Trace; }
-        private DataPoolConnection Pool { get => Project.Pool; }
+        private TestDataPool Pool { get => Project.Pool; }
 
         public bool IsONLINE { get => IsON; }
         private bool IsSTATIC => (DefaultView == null);
@@ -650,7 +647,6 @@ namespace Dooggy
         }
 
     }
-
     public class QA_FonteDados
     {
 

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using Dooggy.Factory.Robot;
+using System.Diagnostics;
 
 namespace Dooggy.Katalon
 {

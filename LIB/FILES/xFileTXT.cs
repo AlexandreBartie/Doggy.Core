@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Windows.Forms;
 using System.Text;
 
-namespace Dooggy.LIB.FILES
+namespace Dooggy.Lib.Files
 {
     public class xFileTXT
     {

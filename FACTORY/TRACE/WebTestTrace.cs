@@ -1,80 +1,14 @@
-﻿using Dooggy;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Diagnostics;
+using System.Collections.Generic;
 using System.Text;
-using System.Threading;
 
-namespace Dooggy.KERNEL
+namespace Dooggy.Factory.Trace
 {
-    public class TestKernel
-    {
-
-        public TestTrace Trace = new TestTrace();
-
-        public TestConfig Config = new TestConfig();
-
-        public string GetProjectBlockCode() => ("BASE, DATA, BUILD, CONFIG");
-        public string GetScriptBlockCode() => ("PLAY, CHECK, CLEANUP");
-        public string GetAdicaoElementos() => ("+");
-
-        public string GetXPathBuscaRaizElementos() => "//*[@{0}='{1}']";
-
-        public bool Call(Object prmObjeto, string prmMetodo)
-        {
-
-            bool vlOk = true;
-
-            xLista lista = new xLista();
-
-            lista.Parse(prmMetodo, prmSeparador: ",");
-
-            foreach (string metodo in lista)
-            {
-                try
-                {
-                    prmObjeto.GetType().GetMethod(metodo).Invoke(prmObjeto, null);
-                }
-
-                catch
-                {
-
-                    Trace.Log.Aviso(string.Format("Método [{0}.{1}] não encontrado. [ error: {2} ]", prmObjeto.GetType().Name, metodo, prmObjeto.GetType().FullName));
-
-                    vlOk = false;
-
-                }
-
-            }
-
-            return (vlOk);
-
-        }
-        public void Pause(int prmSegundos)
-        { Thread.Sleep(TimeSpan.FromSeconds(prmSegundos)); }
-
-    }
-    public class TestConfig
-    {
-
-        public string PathDataFiles;
-
-        public Encoding EncodedDataJUNIT;
-
-        public bool OnlyDATA;
-
-        public int PauseAfterTestCase;
-
-        public int PauseAfterTestScript;
-
-        public int PauseAfterTestSuite;
-
-    }
-
     public class TestTrace
     {
 
-        public TestLog Log;
+        public TestTraceLog Log;
 
         public TestTraceDataBase DataBase;
 
@@ -83,7 +17,7 @@ namespace Dooggy.KERNEL
         public TestTrace()
         {
 
-            Log = new TestLog();
+            Log = new TestTraceLog();
 
             DataBase = new TestTraceDataBase(this);
 
@@ -91,31 +25,13 @@ namespace Dooggy.KERNEL
 
         }
 
-
-
-
-
-        // public bool ActionFail(string prmErro, string prmDestaque) => (Log.Erro(String.Format("{0} ... [{1}]", prmErro, prmDestaque)));
-
-
-        //public void NoFindMetodh(string prmAcao, string prmElemento, string prmValor)
-
-        //Log.Aviso(string.Format("Método {0}.{1} não encontrado. [{2}]
-
-
-
-
-
-        //
-
     }
-
     public class TestTraceDataBase
     {
 
         private TestTrace Trace;
 
-        public TestLog Log { get => Trace.Log; }
+        public TestTraceLog Log { get => Trace.Log; }
 
         public TestTraceDataBase(TestTrace prmTrace)
         {
@@ -137,7 +53,7 @@ namespace Dooggy.KERNEL
 
         private TestTrace Trace;
 
-        public TestLog Log { get => Trace.Log; }
+        public TestTraceLog Log { get => Trace.Log; }
 
         public TestTraceAction(TestTrace prmTrace)
         {
@@ -183,11 +99,10 @@ namespace Dooggy.KERNEL
         public void TargetNotFound(string prmTAG) => Log.Erro("TARGET NOT FOUND: " + prmTAG);
 
     }
-
-    public class TestLog
+    public class TestTraceLog
     {
 
-        public bool Interno(string prmErro) => Message("KERNEL", prmErro);
+        public bool Interno(string prmErro) => Message("Factory", prmErro);
         public bool Trace(string prmTrace) => Message("TRACE", prmTrace);
         public bool SQL(string prmMensagem) => Message("SQL", prmMensagem);
         public bool Cursor(string prmMensagem) => Message("CURSOR", prmMensagem);
@@ -206,5 +121,4 @@ namespace Dooggy.KERNEL
         }
 
     }
-
 }
