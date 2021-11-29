@@ -196,7 +196,7 @@ namespace Dooggy.Factory.Data
         public bool SaveCSV(string prmNome, string prmSubPath) => Export.Save(prmNome, prmSubPath, prmConteudo: Dados.csv(), prmExtensao: "csv");
 
         public bool SaveCSV2(string prmNome, string prmCabecalho) => SaveCSV2(prmNome, prmCabecalho, prmSubPath: "");
-        public bool SaveCSV2(string prmNome, string prmCabecalho, string prmSubPath) => Export.Save(prmNome, prmSubPath, prmConteudo: Dados.txt(prmCabecalho, prmColunaExtra: true), prmExtensao: "txt");
+        public bool SaveCSV2(string prmNome, string prmCabecalho, string prmSubPath) => Export.Save(prmNome, prmSubPath, prmConteudo: Dados.txt(prmCabecalho, prmColunaExtra: true), prmExtensao: "csv");
 
 
         public string OpenTXT(string prmNome) => OpenTXT(prmNome, prmSubPath: "");

@@ -20,12 +20,12 @@ namespace Dooggy.POC.MassaTestes
                 prmTag: "Aluno",
                 prmSQL: "SELECT * FROM (SELECT cod_matricula as matricula, nom_aluno as getNomeAluno FROM sia.aluno, sia.aluno_curso WHERE sia.aluno.num_seq_aluno = '4495769' and cod_matricula = '201903371619') WHERE ROWNUM = 1",
                 prmMask: "{ 'matricula': '####.##.#####-#' }");
-
-            Dados.File.SaveCSV(prmNome: "ArqDadosAtendimentoAoAluno");
+            
+            //Dados.File.SaveCSV(prmNome: "ArqDadosAtendimentoAoAluno");
 
             Dados.File.SaveCSV2(prmNome: "ArqDadosAtendimentoAoAluno", prmCabecalho: "test01_ValidarInformacoesDoAluno,matricula,getNomeAluno");
 
-            Dados.File.SaveJSON(prmNome: "ArqDadosAtendimentoAoAluno");
+           // Dados.File.SaveJSON(prmNome: "ArqDadosAtendimentoAoAluno");
 
         }
         public void CONFIG()
