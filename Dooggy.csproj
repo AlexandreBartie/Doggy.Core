@@ -9,7 +9,7 @@
     <Authors>Alexandre Bartie</Authors>
     <Product>DOOGGY FRAMEWORK</Product>
     <AssemblyName>MyDooggy</AssemblyName>
-    <RootNamespace>MyDooggy</RootNamespace>
+    <RootNamespace>Dooggy</RootNamespace>
     <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
   </PropertyGroup>
 

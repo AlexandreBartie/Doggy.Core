@@ -7,7 +7,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using System.Text;
 using Dooggy.Factory.Data;
-using Dooggy.Factory.Trace;
+using Dooggy.Factory;
 
 namespace Dooggy.Factory.Robot
 {
@@ -16,81 +16,71 @@ namespace Dooggy.Factory.Robot
         ChromeDriver = 0,
         EdgeDriver = 1
     }
-    public class TestProject : ITestDataLocal
+    public class TestRobotProject : TestFactory
     {
-
-        public TestFactory Factory;
         
-        public List<TestSuite> Suites = new List<TestSuite>();
+        public string name;
 
-        private string _name;
+        public List<TestRobotSuite> Suites = new List<TestRobotSuite>();
 
-        public TestProject()
+        public void Start(eTipoDriver prmTipoDriver)
         {
 
-            Factory = new TestFactory();
+            Trace.Action.ActionArea("Projeto de Teste", name);
 
-            Dados.Setup(this, Pool);
+            BuildSuites();
 
-            Factory.Call(this, Factory.Parameters.GetProjectBlockCode());
+            PlaySuites(prmTipoDriver);
 
         }
 
-        public TestDataPool Pool { get => Factory.Pool; }
-
-        public TestConfig Config { get => Factory.Config; }
-
-        public TestTraceAction Trace { get => Factory.Trace.Action; }
-
-        public string name { get => _name; }
-
-        public void Setup(string prmName)
+        private void BuildSuites()
         {
 
-            _name = prmName;
+            Call(this, Parameters.GetRobotFactoryBlockCode());
 
-            Trace.ActionArea("Projeto de Teste", name);
+        }
+        
+        private void PlaySuites(eTipoDriver prmTipoDriver)
+        {
+
+            foreach (TestRobotSuite Suite in Suites)
+                Suite.Executar(prmTipoDriver);
 
         }
 
-        public void AddSuite(TestSuite prmSuite)
+        public void AddSuite(TestRobotSuite prmSuite)
         {
 
             prmSuite.Setup(this);
 
             Suites.Add(prmSuite);
         }
-        public void Executar(eTipoDriver prmTipoDriver)
-        {
 
-            foreach (TestSuite Suite in Suites)
-                Suite.Executar(prmTipoDriver);
-
-        }
         public void Pause(int prmSegundos)
-        { Factory.Pause(prmSegundos); }
+        { Thread.Sleep(TimeSpan.FromSeconds(prmSegundos)); }
 
     }
-    public class TestSuite : ITestDataLocal
+    public class TestRobotSuite : ITestDataLocal
     {
 
-        public TestProject Projeto;
+        public TestRobotProject Projeto;
 
-        private TestMotor Motor;
+        private QA_WebMotor Motor;
 
         public eTipoDriver tipoDriver;
 
-        public List<TestScript> Scripts = new List<TestScript>();
+        public List<TestRobotScript> Scripts = new List<TestRobotScript>();
 
         public string nome { get => this.GetType().Name; }
 
         public TestConfig Config { get => Projeto.Config; }
 
-        public TestTraceAction Trace { get => Projeto.Trace; }
+        public TestRobotTrace Trace { get => Projeto.Trace.Action; }
 
         public TestDataPool Pool => Projeto.Pool;
 
-        public void Setup(TestProject prmProjeto)
+        public void Setup(TestRobotProject prmProjeto)
         {
             
             Projeto = prmProjeto;
@@ -99,7 +89,7 @@ namespace Dooggy.Factory.Robot
 
         }
 
-        public void AddScript(TestScript prmScript)
+        public void AddScript(TestRobotScript prmScript)
         {
             Scripts.Add(prmScript);
         }
@@ -109,11 +99,11 @@ namespace Dooggy.Factory.Robot
 
             tipoDriver = prmTipoDriver;
 
-            Motor = new TestMotor(this);
+            Motor = new QA_WebMotor(this);
 
             Trace.ActionArea("Suite de Teste", this.nome);
 
-            foreach (TestScript Script in Scripts)
+            foreach (TestRobotScript Script in Scripts)
             {
                 Script.Executar(Motor);
             }
@@ -125,10 +115,10 @@ namespace Dooggy.Factory.Robot
         private void Encerrar()
         {
 
-            if (!Config.OnlyDATA)
+            if (!Config.onlyDATA)
             {
 
-                Projeto.Pause(Config.PauseAfterTestSuite);
+                Projeto.Pause(Config.pauseAfterTestRobotSuite);
 
                 Motor.Encerrar();
             }
@@ -136,26 +126,26 @@ namespace Dooggy.Factory.Robot
         }
 
     }
-    public class TestScript : ITestDataLocal
+    public class TestRobotScript : ITestDataLocal
     {
 
         public string nome;
 
-        public TestMotor Motor;
+        public QA_WebMotor Motor;
 
         public QA_WebRobot Robot => Motor.Robot;
 
         public QA_MassaDados Massa => Robot.Massa;
 
-        public TestSuite Suite => Motor.Suite;
+        public TestRobotSuite Suite => Motor.Suite;
 
-        public TestFactory Factory => Robot.Factory;
+        public TestRobotProject Projeto => Robot.Projeto;
 
-        public TestTraceAction Trace => Suite.Trace;
+        public TestRobotTrace Trace => Suite.Trace;
 
-        private void Metodo(string prmMetodo) => Robot.Factory.Call(this, prmMetodo);
+        private void Metodo(string prmMetodo) => Projeto.Call(this, prmMetodo);
 
-        public void Executar(TestMotor prmMotor)
+        public void Executar(QA_WebMotor prmMotor)
         {
 
             this.nome = this.GetType().Name;
@@ -174,7 +164,7 @@ namespace Dooggy.Factory.Robot
 
                 }
 
-                Robot.Pause(prmSegundos: Factory.Config.PauseAfterTestCase);
+                Robot.Pause(prmSegundos: Projeto.Config.pauseAfterTestCase);
 
             }
 
@@ -198,7 +188,7 @@ namespace Dooggy.Factory.Robot
         private void MetodoEXECUCAO()
         {
 
-            string blockCode = Factory.Parameters.GetScriptBlockCode();
+            string blockCode = Projeto.Parameters.GetScriptBlockCode();
 
 
             if (Trace.ActionMassaOnLine(Massa.IsONLINE))
@@ -217,57 +207,6 @@ namespace Dooggy.Factory.Robot
                 Metodo(prmMetodo: blockCode);
         }
     }
-    public class TestMotor
-    {
 
-        public TestSuite Suite;
-
-        private QA_WebRobot _robot;
-
-        private IWebDriver _driver;
-
-        public TestMotor(TestSuite prmSuite)
-        { Suite = prmSuite; }
-
-
-        public QA_WebRobot Robot
-        {
-            get
-            {
-                if (_robot == null)
-                    { _robot = new QA_WebRobot(this); }
-                return _robot;
-            }
-        }
-        public IWebDriver driver
-        {
-            get
-            {
-                if (_driver == null)
-                {
-
-                    switch (Suite.tipoDriver)
-                    {
-
-                        case eTipoDriver.EdgeDriver:
-                            //_driver = new EdgeDriver();
-                            break;
-
-                        default:
-                            _driver = new ChromeDriver();
-                            break;
-
-                    }
-
-                }
-                return _driver;
-            }
-        }
-
-        public void Refresh() => Robot.Page.Refresh();
-
-        public void Encerrar() => Robot.Quit();
-
-    }
 
 }

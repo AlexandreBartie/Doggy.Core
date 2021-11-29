@@ -4,10 +4,11 @@ using System.Diagnostics;
 using System.Windows.Forms;
 using System.Text;
 using Dooggy.Factory.Robot;
+using Dooggy.Factory;
 
-namespace Dooggy
+namespace Dooggy.POC.AutomacaoTestes
 {
-    public class POC_AutomacaoTestes : TestProject
+    public class POC_AutomacaoTestes : TestRobotProject
     {
         public void DATA()
         {
@@ -29,26 +30,24 @@ namespace Dooggy
         public void BUILD()
         {
 
-            this.Setup(prmName: "POC - Automação de Testes");
+            this.name = "POC - Automação de Testes";
 
             this.AddSuite(new SuiteKatalon());
-            //this.AddSuite(new SuiteGoogle());
+            //Projeto.AddSuite(new SuiteGoogle());
 
         }
         public void CONFIG()
         {
 
-            this.Config.EncodedDataJUNIT = Encoding.UTF7;
+            Config.EncodedDataJUNIT = Encoding.UTF7;
 
-            this.Config.OnlyDATA = false;
+            Config.onlyDATA = false;
 
-            this.Config.PauseAfterTestCase = 0;
-
-            this.Executar(prmTipoDriver: eTipoDriver.ChromeDriver);
+            Config.pauseAfterTestCase = 0;
 
         }
     }
-   public class SuiteKatalon : TestSuite
+   public class SuiteKatalon : TestRobotSuite
    {
         public SuiteKatalon()
         {
@@ -56,7 +55,7 @@ namespace Dooggy
         }
 
     }
-    public class SuiteGoogle : TestSuite
+    public class SuiteGoogle : TestRobotSuite
     {
         public SuiteGoogle()
         {

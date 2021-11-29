@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace Dooggy.Katalon
 {
-    public class KatalonTeste : TestScript
+    public class KatalonTeste : TestRobotScript
     {
         public void DATA()
         {

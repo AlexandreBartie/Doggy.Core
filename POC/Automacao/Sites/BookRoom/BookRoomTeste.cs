@@ -6,7 +6,7 @@ using System.Text;
 namespace Dooggy.BookRoom
 {
 
-    public class BookRoomTeste : TestScript
+    public class BookRoomTeste : TestRobotScript
     {
         private void Executar()
         {

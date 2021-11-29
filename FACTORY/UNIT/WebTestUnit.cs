@@ -5,7 +5,7 @@ namespace Dooggy
 {
     public class TestCase
     {
-        private String selector;
+        //private String selector;
 
         //public TestCase(String selector)
         //{
@@ -33,18 +33,18 @@ namespace Dooggy
         }*/
     }
     
-/*    public class TestSuite
+/*    public class TestRobotSuite
     {
         public string name;
 
         private List<TestCase> testCases = new List<TestCase>();
 
-    public TestSuite(String name)
+    public TestRobotSuite(String name)
         {
             this.name = name;
         }
 
-        public TestSuite addTestCase(TestCase testCase)
+        public TestRobotSuite addTestCase(TestCase testCase)
         {
             testCases.Add(testCase);
             return this;

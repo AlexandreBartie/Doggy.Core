@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Windows.Forms;
 using System.Text;
+using System.IO;
 
 namespace Dooggy.Lib.Files
 {
@@ -10,19 +11,19 @@ namespace Dooggy.Lib.Files
 
         public string[] lines;
 
+        private xDiretorio _diretorio;
+
         private Encoding encoding = null;
 
         private bool _IsOK;
 
         public bool IsOK { get => _IsOK; }
 
-        public void SetEncoding(Encoding prmEncoding)
-        {
+        public void SetEncoding(Encoding prmEncoding) => encoding = prmEncoding;
 
-            encoding = prmEncoding;
+        public xDiretorio Diretorio { get { if (_diretorio == null) _diretorio = new xDiretorio(); return _diretorio; } }
 
-        }
-
+        public virtual bool Open(string prmPath, string prmName, string prmExtensao) => Open(prmPath, prmName + "." + prmExtensao);
         public virtual bool Open(string prmPath, string prmName)
         {
 
@@ -52,7 +53,31 @@ namespace Dooggy.Lib.Files
 
         }
 
-        public string memo()
+        public bool Save(string prmPath, string prmName, string prmConteudo) => Save(prmPath, prmName, prmConteudo, prmExtensao: "txt");
+        public bool Save (string prmPath, string prmName, string prmConteudo, string prmExtensao)
+        {
+
+            string nome_completo = GetNomeCompleto(prmPath, prmName, prmExtensao);
+
+            if (Diretorio.Criar(prmPath))
+            {
+
+                try
+                {
+                    File.WriteAllText(nome_completo, prmConteudo);
+
+                    return (true);
+                }
+                catch
+                { }
+
+            }
+
+            return (false);
+
+        }
+
+        public string txt()
         {
             string text = "";
 
@@ -69,6 +94,8 @@ namespace Dooggy.Lib.Files
             return (text);
 
         }
+
+        private string GetNomeCompleto(string prmPath, string prmNome, string prmExtensao) => String.Format("{0}{1}.{2}", prmPath, prmNome, prmExtensao);
 
     }
 }

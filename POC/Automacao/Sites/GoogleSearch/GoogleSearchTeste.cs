@@ -8,7 +8,7 @@ using Dooggy.Lib.Generic;
 
 namespace Dooggy.GoogleSearch
 {
-    public class GoogleSearchTextoTeste : TestScript
+    public class GoogleSearchTextoTeste : TestRobotScript
     {
         public void DATA()
         {
@@ -81,7 +81,7 @@ namespace Dooggy.GoogleSearch
 
     }
 
-    public class GoogleSearchImagemTeste : TestScript
+    public class GoogleSearchImagemTeste : TestRobotScript
     {
 
         public void SETUP()

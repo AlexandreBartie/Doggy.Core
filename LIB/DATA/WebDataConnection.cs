@@ -9,7 +9,6 @@ using Dooggy.Factory.Data;
 using Dooggy.Lib.Generic;
 using Dooggy.Lib.Parse;
 using Dooggy.Factory;
-using Dooggy.Factory.Trace;
 
 namespace Dooggy.Lib.Data
 {
@@ -35,13 +34,9 @@ namespace Dooggy.Lib.Data
 
         }
 
-        public TestTraceDataBase Trace { get => (Pool.Trace); }
+        public TestDataTrace Trace { get => (Pool.Trace); }
         public bool IsON { get => (conexao != null); }
         public bool IsOK { get { if (IsON) return (conexao.State == ConnectionState.Open); return (false); } }
-
-        public TestDataView CreateView(string prmTag, string prmSQL, string prmMask) => new TestDataView(prmTag, prmSQL, prmMask, this);
-
-        public TestDataModel CreateModel(string prmTag, string prmModel, string prmMask) => new TestDataModel(prmTag, prmModel, prmMask, this);
 
         private bool Criar(string prmConexao)
         {
@@ -113,7 +108,7 @@ namespace Dooggy.Lib.Data
 
         public bool IsResult;
 
-        public TestTraceDataBase Trace => DataBase.Trace;
+        public TestDataTrace Trace => DataBase.Trace;
 
 
         public DataCursorConnection(string prmSQL, string prmMask, DataBaseConnection prmDataBase)
@@ -261,23 +256,6 @@ namespace Dooggy.Lib.Data
 
 
     }
-    public class DataBaseOracle
-    {
-
-        private string modelo = @"Data Source=(DESCRIPTION =(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(Host = {0})(PORT = {1})))(CONNECT_DATA =(SERVICE_NAME = {2})));User ID={3};Password={4}";
-
-        public string user = "desenvolvedor_sia";
-        public string password = "asdfg";
-
-        public string host = "10.250.1.35";
-        public string port = "1521";
-        public string service = "branch_1084.prod01.redelocal.oraclevcn.com";
-
-
-        public string GetString()  => String.Format(modelo, host, port, service, user, password);
-
-    }
-
     public class DataBasesConnection : List<DataBaseConnection>
     {
 

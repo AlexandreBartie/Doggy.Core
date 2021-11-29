@@ -1,7 +1,7 @@
 ﻿using Dooggy;
 using Dooggy.Factory.Data;
+using Dooggy.Factory.Robot;
 using Dooggy.Lib.Generic;
-using Dooggy.Factory.Trace;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,10 +10,10 @@ using System.Threading;
 
 namespace Dooggy.Factory
 {
-    public class TestFactory
+    public class TestFactory : ITestDataLocal
     {
 
-        public TestDataPool Pool;
+        public TestDataPool Pool = new TestDataPool();
 
         public TestTrace Trace = new TestTrace();
 
@@ -24,7 +24,7 @@ namespace Dooggy.Factory
         public TestFactory()
         {
 
-            Pool = new TestDataPool(Trace.DataBase);
+            Dados.Setup(this, Pool);
 
         }
 
@@ -47,7 +47,7 @@ namespace Dooggy.Factory
                 catch
                 {
 
-                    Trace.Log.Aviso(string.Format("Método [{0}.{1}] não encontrado. [ error: {2} ]", prmObjeto.GetType().Name, metodo, prmObjeto.GetType().FullName));
+                    Trace.LogAviso(string.Format("Método [{0}.{1}] não encontrado. [ error: {2} ]", prmObjeto.GetType().Name, metodo, prmObjeto.GetType().FullName));
 
                     vlOk = false;
 
@@ -59,24 +59,32 @@ namespace Dooggy.Factory
 
         }
 
-        public void Pause(int prmSegundos)
-        { Thread.Sleep(TimeSpan.FromSeconds(prmSegundos)); }
-
     }
     public class TestConfig
     {
+        //
+        // Parâmetros da Massa de Testes
+        //
 
-        public string PathDataFiles;
+
+        public bool onlyDATA;
 
         public Encoding EncodedDataJUNIT;
 
-        public bool OnlyDATA;
 
-        public int PauseAfterTestCase;
+        //
+        // Pausa na Automação (em segundos)
+        //
 
-        public int PauseAfterTestScript;
+        public int pauseAfterTestCase;
 
-        public int PauseAfterTestSuite;
+        public int pauseAfterTestRobotScript;
+
+        public int pauseAfterTestRobotSuite;
+
+        //
+        // Parâmetros da Arquitetura de Testes
+        //
 
         public string GetProjectBlockCode() => ("BASE, DATA, BUILD, CONFIG");
         public string GetScriptBlockCode() => ("PLAY, CHECK, CLEANUP");
@@ -85,14 +93,12 @@ namespace Dooggy.Factory
         public string GetXPathBuscaRaizElementos() => "//*[@{0}='{1}']";
 
     }
-
     public class TestParameters
     {
-
-        public string GetProjectBlockCode() => ("BASE, DATA, BUILD, CONFIG");
+        public string GetDataFactoryBlockCode() => ("CONFIG, BASE, DATA");
+        public string GetRobotFactoryBlockCode() => ("BASE, DATA, BUILD, CONFIG");
         public string GetScriptBlockCode() => ("PLAY, CHECK, CLEANUP");
         public string GetAdicaoElementos() => ("+");
-
         public string GetXPathBuscaRaizElementos() => "//*[@{0}='{1}']";
 
     }

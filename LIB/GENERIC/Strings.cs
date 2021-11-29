@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Dooggy.Lib.Generic
+namespace Dooggy
 {
     public static class xString
     {
@@ -92,4 +92,5 @@ namespace Dooggy.Lib.Generic
 
 
     }
+
 }

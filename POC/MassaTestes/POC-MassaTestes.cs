@@ -3,86 +3,48 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using System.Text;
 using Dooggy.Factory.Robot;
-using Dooggy.Lib.Data;
+using Dooggy.Factory;
+using Dooggy.Factory.Data;
 
-namespace Dooggy
+namespace Dooggy.POC.MassaTestes
 {
-    public class POC_MassaTestes : TestProject
+    public class POC_MassaTestes : TestDataProject
     {
-        public void BASE()
-        {
-
-            DataBaseOracle db = new DataBaseOracle();
-
-            db.user = "desenvolvedor_sia";
-            db.password = "asdfg";
-
-            db.host = "10.250.1.35";
-            db.port = "1521";
-            db.service = "branch_1084.prod01.redelocal.oraclevcn.com";
-
-            Dados.AddDataBase(prmTag: "SIA", prmConexao: db.GetString());
-
-        }
         public void DATA()
         {
 
-            Dados.AddDataModel(prmTag: "Aluno", prmModelo: @"{'#TABELAS#':'sia.aluno_curso','#CAMPOS#':'cod_matricula, nom_responsavel_pgto'}");
+            //Dados.AddDataModel(prmTag: "Aluno", prmModelo: @"{'#TABELAS#':'sia.aluno_curso','#CAMPOS#':'cod_matricula, nom_responsavel_pgto'}");
+            //Dados.AddDataVariant(prmTag: "=Padrao",prmRegra: @"{'#CONDICAO#': 'cod_matricula = 201903371619'}");
 
-            Dados.AddDataVariant(prmTag: "=Padrao",prmRegra: @"{'#CONDICAO#': 'cod_situacao_aluno = 1'}");
+            Dados.AddDataView(
+                prmTag: "Aluno",
+                prmSQL: "SELECT * FROM (SELECT cod_matricula as matricula, nom_aluno as getNomeAluno FROM sia.aluno, sia.aluno_curso WHERE sia.aluno.num_seq_aluno = '4495769' and cod_matricula = '201903371619') WHERE ROWNUM = 1",
+                prmMask: "{ 'matricula': '####.##.#####-#' }");
 
-            Dados.Export.SaveCSV(Config.PathDataFiles, prmNome: "Texto");
+            Dados.File.SaveCSV(prmNome: "ArqDadosAtendimentoAoAluno");
 
-        }
-        public void BUILD()
-        {
+            Dados.File.SaveCSV2(prmNome: "ArqDadosAtendimentoAoAluno", prmCabecalho: "test01_ValidarInformacoesDoAluno,matricula,getNomeAluno");
 
-            this.Setup(prmName: "POC - Massa de Dados Dinâmica");
-
-//            this.AddSuite(new SuiteAtendimento());
+            Dados.File.SaveJSON(prmNome: "ArqDadosAtendimentoAoAluno");
 
         }
         public void CONFIG()
         {
 
-            this.Config.PathDataFiles = @"C:\Users\alexa\OneDrive\Área de Trabalho\MassaTeste\";
-
-            this.Config.EncodedDataJUNIT = Encoding.UTF7;
-
-            this.Config.OnlyDATA = true;
-
-            this.Config.PauseAfterTestCase = 0;
-
-            this.Executar(prmTipoDriver: eTipoDriver.ChromeDriver);
+            //Dados.File.SetPathDestino(prmPath: @"C:\Users\alexa\OneDrive\Área de Trabalho\MassaTeste\");
 
         }
-    }
-    public class SuiteAtendimento : TestSuite
-    {
-        public SuiteAtendimento()
+        public void BASE()
         {
 
+            Connect.Oracle.user = "desenvolvedor_sia";
+            Connect.Oracle.password = "asdfg";
 
-            AddScript(new AtendimentoAluno_Teste());
+            Connect.Oracle.host = "10.250.1.35";
+            Connect.Oracle.port = "1521";
+            Connect.Oracle.service = "branch_1084.prod01.redelocal.oraclevcn.com";
 
-        }
-
-    }
-
-    public class AtendimentoAluno_Teste : TestScript
-    {
-
-
-        public void DATA()
-        {
-
-            Massa.SetView(prmTag: "Aluno=Padrao");
-
-            Massa.Add(prmFluxo: @"{ 'COD_MATRICULA': 'Alexandre', 'NOM_RESPONSAVEL_PGTO': 'alexandre_bartie@hotmail.com' }");
-
-            Massa.Save();
-
-
+            Connect.Oracle.Add(prmTag: "SIA");
 
         }
 

@@ -1,24 +1,46 @@
 ﻿using Dooggy;
 using Dooggy.Factory;
-using Dooggy.Factory.Trace;
 using Dooggy.Lib.Data;
+using Dooggy.Lib.Files;
 using Dooggy.Lib.Generic;
 using Dooggy.Lib.Parse;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 
 namespace Dooggy.Factory.Data
 {
+
+    public class TestDataProject : TestFactory
+    {
+
+        public TestDataConnect Connect { get => Pool.Connect; }
+
+        public void Start(string prmPathDataFiles)
+        {
+
+            Pool.SetPathDestino(prmPathDataFiles);
+
+            Call(this, Parameters.GetDataFactoryBlockCode());
+
+        }
+
+    }
+
     public class TestDataPool
     {
 
-        public TestTraceDataBase Trace;
+        public TestDataTrace Trace;
+
+        public TestDataConnect Connect;
 
         private DataBasesConnection Bases;
         private TestDataViews Visoes;
         private TestDataModels Modelos;
+
+        private string pathDataFiles;
 
         public DataBaseConnection DataBaseCorrente { get => (Bases.Corrente); }
 
@@ -28,36 +50,25 @@ namespace Dooggy.Factory.Data
         private bool IsBaseCorrente { get => (DataBaseCorrente != null); }
         private bool IsModelCorrente { get => (DataModelCorrente != null); }
 
-        public TestDataPool(TestTraceDataBase prmTrace)
+        public TestDataPool()
         {
 
-            Trace = prmTrace;
+            Trace = new TestDataTrace();
 
             Bases = new DataBasesConnection();
 
             Visoes = new TestDataViews();
             Modelos = new TestDataModels();
 
+            Connect = new TestDataConnect(this);
+
         }
 
         public bool AddDataBase(string prmTag, string prmConexao) => Bases.AddItem(prmTag, prmConexao, this);
 
-        public bool AddDataView(string prmTag, string prmSQL) => AddDataView(prmTag, prmSQL, prmMask: "");
+        public bool AddDataView(string prmTag, string prmSQL, string prmMask) => Visoes.AddItem(prmTag, prmSQL, prmMask, DataBaseCorrente);
 
-        public bool AddDataView(string prmTag, string prmSQL, string prmMask) => Visoes.AddItem(DataBaseCorrente.CreateView(prmTag, prmSQL, prmMask));
-
-        public bool AddDataModel(string prmTag, string prmModel) => AddDataModel(prmTag, prmModel, prmMask: "");
-
-        public bool AddDataModel(string prmTag, string prmModel, string prmMask)
-        {
-
-            if (IsBaseCorrente)
-                Modelos.AddItem(DataBaseCorrente.CreateModel(prmTag, prmModel, prmMask));
-
-            return (IsBaseCorrente);
-
-        }
-        public bool AddDataVariant(string prmTag) => AddDataVariant(prmTag, prmRegra: "");
+        public bool AddDataModel(string prmTag, string prmModelo, string prmMask) => Modelos.AddItem(prmTag, prmModelo, prmMask, DataBaseCorrente);
 
         public bool AddDataVariant(string prmTag, string prmRegra) => AddDataVariant(prmTag, prmRegra, prmQtde: 1);
 
@@ -65,14 +76,6 @@ namespace Dooggy.Factory.Data
 
         public bool SetView(string prmTag) => Visoes.SetView(prmTag);
 
-        public string json(string prmTag)
-        {
-            if (SetView(prmTag))
-                return DataViewCorrente.json();
-
-            return ("");
-
-        }
         public bool IsON()
         {
 
@@ -90,12 +93,35 @@ namespace Dooggy.Factory.Data
 
         }
 
+        public void SetPathDestino(string prmPath)
+        {
+
+            pathDataFiles = prmPath;
+
+            Trace.SetPath(prmTitulo: "MassaTestes", prmPath);
+
+        }
+
+        public string GetPath(string prmSubPath)
+        {
+            if (prmSubPath != "")
+                return (pathDataFiles + @"\" + prmSubPath + @"\"); 
+
+            return (pathDataFiles);
+        }
+
+        public string json(string prmTag)
+        {
+            if (SetView(prmTag))
+                return DataViewCorrente.json();
+
+            return ("");
+
+        }
+
         public string csv() => Visoes.csv();
         public string json() => Visoes.json();
-
-        public string Export(string prmCabecalho) => Export(prmCabecalho, prmColunaExtra: true);
-        public string Export(string prmCabecalho, bool prmColunaExtra) => Export(prmCabecalho, prmColunaExtra, prmSeparador: ",");
-        public string Export(string prmCabecalho, bool prmColunaExtra, string prmSeparador) => Visoes.Export(prmCabecalho, prmColunaExtra, prmSeparador);
+        public string txt(string prmCabecalho, string prmSeparador, bool prmColunaExtra) => Visoes.Export(prmCabecalho, prmSeparador, prmColunaExtra);
 
     }
     public class TestDataLocal
@@ -105,10 +131,16 @@ namespace Dooggy.Factory.Data
 
         public TestDataPool Pool;
 
-        public TestDataExport Export;
+        public TestDataFile File;
 
-        public TestDataView View
-        { get => Pool.DataViewCorrente; }
+        public TestDataView View { get => Pool.DataViewCorrente; }
+
+         public TestDataLocal()
+        {
+
+            File = new TestDataFile(this);
+
+        }
 
         public void Setup(Object prmOrigem, TestDataPool prmPool)
         {
@@ -117,64 +149,111 @@ namespace Dooggy.Factory.Data
 
             Pool = prmPool;
 
-            Export = new TestDataExport(this);
+        }
+        public bool AddDataBase(string prmTag, string prmConexao) => (Pool.AddDataBase(prmTag, prmConexao));
 
-        }
-        public bool AddDataBase(string prmTag, string prmConexao)
-        {
-            return (Pool.AddDataBase(prmTag, prmConexao));
-        }
-        public bool AddDataView(string prmTag, string prmSQL)
-        {
-            return (Pool.AddDataView(prmTag, prmSQL));
-        }
-        public void AddDataModel(string prmTag, string prmModelo)
-        {
-            Pool.AddDataModel(prmTag, prmModelo);
-        }
-        public void AddDataVariant(string prmTag)
-        {
-            Pool.AddDataVariant(prmTag);
-        }
-        public void AddDataVariant(string prmTag, string prmRegra)
-        {
-            Pool.AddDataVariant(prmTag, prmRegra);
-        }
-        public bool SetView(string prmTag)
-        {
-            return (Pool.SetView(prmTag));
-        }
-        public string GetView(string prmTag)
-        {
-            return (Pool.json(prmTag));
-        }
-        public string csv()
-        {
-            return (Pool.csv());
-        }
-        public string json()
-        {
-            return (Pool.json());
-        }
+        public bool AddDataView(string prmTag, string prmSQL) => (Pool.AddDataView(prmTag, prmSQL, prmMask: ""));
+        public bool AddDataView(string prmTag, string prmSQL, string prmMask) => (Pool.AddDataView(prmTag, prmSQL, prmMask));
+
+        public void AddDataModel(string prmTag, string prmModelo) => AddDataModel(prmTag, prmModelo, prmMask: "");
+        public void AddDataModel(string prmTag, string prmModelo, string prmMask) => Pool.AddDataModel(prmTag, prmModelo, prmMask);
+
+        public void AddDataVariant(string prmTag) => AddDataVariant(prmTag, prmRegra: "");
+        public void AddDataVariant(string prmTag, string prmRegra) => Pool.AddDataVariant(prmTag, prmRegra);
+
+        public string csv() => (Pool.csv());
+        public string json() => (Pool.json());
+        public string json(string prmTag) => (Pool.json(prmTag));
+
+        public string txt(string prmCabecalho) => txt(prmCabecalho, prmColunaExtra: true);
+        public string txt(string prmCabecalho, bool prmColunaExtra) => txt(prmCabecalho, prmSeparador: ",", prmColunaExtra);
+        public string txt(string prmCabecalho, string prmSeparador, bool prmColunaExtra) => Pool.txt(prmCabecalho, prmSeparador, prmColunaExtra);
 
     }
-    public class ITestDataLocal
+    public class TestDataFile
     {
 
-        private TestDataLocal _Dados;
+        private TestDataLocal Dados;
 
-        public TestDataLocal Dados
+        private TestDataExport Export;
+
+        public TestDataPool Pool { get => Dados.Pool; }
+        public TestDataTrace Trace { get => Pool.Trace ; }
+
+        public TestDataFile(TestDataLocal prmDados)
         {
-            get
-            {
-                if (_Dados == null)
-                    _Dados = new TestDataLocal();
 
-                return _Dados;
+            Dados = prmDados;
+
+            Export = new TestDataExport(Dados);
+
+        }
+
+        public bool SaveJSON(string prmNome) => SaveJSON(prmNome, prmSubPath: "");
+        public bool SaveJSON(string prmNome, string prmSubPath) => Export.Save(prmNome, prmSubPath, prmConteudo: Dados.json(), prmExtensao: "json");
+
+        public bool SaveCSV(string prmNome) => SaveCSV(prmNome, prmSubPath: "");
+        public bool SaveCSV(string prmNome, string prmSubPath) => Export.Save(prmNome, prmSubPath, prmConteudo: Dados.csv(), prmExtensao: "csv");
+
+        public bool SaveCSV2(string prmNome, string prmCabecalho) => SaveCSV2(prmNome, prmCabecalho, prmSubPath: "");
+        public bool SaveCSV2(string prmNome, string prmCabecalho, string prmSubPath) => Export.Save(prmNome, prmSubPath, prmConteudo: Dados.txt(prmCabecalho, prmColunaExtra: true), prmExtensao: "txt");
+
+
+        public string OpenTXT(string prmNome) => OpenTXT(prmNome, prmSubPath: "");
+        public string OpenTXT(string prmNome, string prmSubPath) => Export.Open(prmNome, prmSubPath, prmExtensao: "csv");
+
+        public void SetPathDestino(string prmPath) => Pool.SetPathDestino(prmPath);
+
+    }
+    public class TestDataExport
+    {
+
+        private TestDataLocal Dados;
+
+        private xFileTXT File = new xFileTXT();
+
+        public TestDataTrace Trace { get => Dados.Pool.Trace; }
+
+        public TestDataExport(TestDataLocal prmDados)
+        {
+
+            Dados = prmDados;
+
+        }
+
+        public string Open(string prmNome, string prmSubPath, string prmExtensao)
+        {
+
+            string path = GetPath(prmSubPath);
+
+            if (File.Open(path, prmNome, prmExtensao))
+                return File.txt();
+
+            return ("");
+
+        }
+
+        public bool Save(string prmNome, string prmSubPath, string prmConteudo, string prmExtensao)
+        {
+
+            string path = GetPath(prmSubPath);
+
+
+            if (File.Save(path, prmNome, prmConteudo, prmExtensao))
+            {
+
+                Trace.DataFileExport(prmNome, prmSubPath, prmExtensao);
+
+                return (true);
 
             }
 
+            Trace.FailDataFileExport(path, prmNome, prmExtensao);
+
+            return (false);
         }
+
+        public string GetPath(string prmSubPath) => Dados.Pool.GetPath(prmSubPath);
 
     }
     public class TestDataModel
@@ -326,14 +405,20 @@ namespace Dooggy.Factory.Data
 
         public TestDataView Corrente;
 
-        public bool AddItem(TestDataView prmView)
+        public bool AddItem(string prmTag, string prmSQL, string prmMask, DataBaseConnection prmDataBase)
         {
 
-            Corrente = prmView;
+            if (prmDataBase != null)
+            {
 
-            Add(Corrente);
+                Corrente = new TestDataView(prmTag, prmSQL, prmMask, prmDataBase);
 
-            return (prmView.IsOK);
+                Add(Corrente);
+
+                return (true);
+            }
+
+            return (false);
 
         }
 
@@ -357,7 +442,7 @@ namespace Dooggy.Factory.Data
             return (false);
 
         }
-        public string Export(string prmCabecalho, bool prmColunaExtra, string prmSeparador)
+        public string Export(string prmCabecalho, string prmSeparador, bool prmColunaExtra)
         {
 
             string txt = prmCabecalho + Environment.NewLine;
@@ -416,12 +501,20 @@ namespace Dooggy.Factory.Data
 
         public TestDataModel Corrente;
 
-        public void AddItem(TestDataModel prmModel)
+        public bool AddItem(string prmTag, string prmModel, string prmMask, DataBaseConnection prmDataBase)
         {
 
-            Corrente = prmModel;
+            if (prmDataBase != null)
+            {
 
-            Add(prmModel);
+                Corrente = new TestDataModel(prmTag, prmModel, prmMask, prmDataBase);
+
+                Add(Corrente);
+
+                return (true);
+            }
+
+            return (false);
 
         }
 
@@ -447,41 +540,73 @@ namespace Dooggy.Factory.Data
         }
 
     }
-    public class TestDataExport
+    public class TestDataConnect
     {
 
-        private TestDataLocal Dados;
+        private TestDataPool Pool;
 
-        public TestDataExport(TestDataLocal prmDados)
+        private DataBaseOracle _Oracle;
+
+        public DataBaseOracle Oracle { get { if (_Oracle == null) _Oracle = new DataBaseOracle(Pool); return _Oracle; } }
+
+        public TestDataConnect(TestDataPool prmPool)
         {
 
-            Dados = prmDados;
+            Pool = prmPool;
 
         }
 
-        public bool SaveJSON(string prmPath, string prmNome) => Save(prmPath, prmNome, prmConteudo: Dados.json(), prmExtensao: "json");
 
-        public bool SaveCSV(string prmPath, string prmNome) => SaveCSV(prmPath, prmNome, prmConteudo: Dados.csv());
+    }
 
-        public bool SaveCSV(string prmPath, string prmNome, string prmConteudo) => Save(prmPath, prmNome, prmConteudo, prmExtensao: "csv");
+    public class DataBaseOracle
+    {
 
-        private bool Save(string prmPath, string prmNome, string prmConteudo, string prmExtensao)
+        private TestDataPool Pool;
+
+        private string model = @"Data Source=(DESCRIPTION =(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(Host = {0})(PORT = {1})))(CONNECT_DATA =(SERVICE_NAME = {2})));User ID={3};Password={4}";
+
+        public string user;// = "desenvolvedor_sia";
+        public string password;// = "asdfg";
+
+        public string host;// = "10.250.1.35";
+        public string port;// = "1521";
+        public string service;// = "branch_1084.prod01.redelocal.oraclevcn.com";
+
+        public DataBaseOracle(TestDataPool prmPool)
         {
 
-            string nome_completo = String.Format("{0}{1}.{2}", prmPath, prmNome, prmExtensao);
+            Pool = prmPool;
 
-            try
+        }
+
+        public DataBaseOracle()
+        {
+        }
+
+        public bool Add(string prmTag) => Pool.AddDataBase(prmTag, GetString());
+
+        private string GetString() => String.Format(model, host, port, service, user, password);
+
+    }
+
+    public class ITestDataLocal
+    {
+
+        private TestDataLocal _Dados;
+
+        public TestDataLocal Dados
+        {
+            get
             {
-                File.WriteAllText("WriteLines.txt", prmConteudo);
+                if (_Dados == null)
+                    _Dados = new TestDataLocal();
 
-                return (true);
+                return _Dados;
+
             }
-            catch
-            { }
 
-            return (false);
         }
-
 
     }
 }

@@ -5,7 +5,7 @@ using OpenQA.Selenium;
 
 namespace Dooggy.WebTestes
 {
-    public class FindElementTeste : TestScript
+    public class FindElementTeste : TestRobotScript
     {
 
         public void SETUP()
@@ -33,7 +33,7 @@ namespace Dooggy.WebTestes
                 }
                 catch (Exception e)
                 {
-                    Robot.Trace.Log.Erro(e);
+                    Robot.Trace.LogErro(e);
                    }
             }
 
