@@ -31,8 +31,7 @@ steps:
   inputs:
     command: 'pack'
     packagesToPack: '**/*.csproj'
-    versioningScheme: 'byBuildNumber'
-    allowPackageConflicts: 
+    versioningScheme: 'off'
 
 - task: NuGetCommand@2
   inputs:
