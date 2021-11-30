@@ -40,12 +40,10 @@ namespace Dooggy.Lib.Files
                 _IsOK = true;
 
             }
-            catch (Exception e)
+            catch
             {
 
                 _IsOK = false;
-
-                Debug.Assert(false);
 
             }
 

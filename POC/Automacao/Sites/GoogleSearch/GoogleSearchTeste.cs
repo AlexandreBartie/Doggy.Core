@@ -13,42 +13,42 @@ namespace Dooggy.GoogleSearch
         public void DATA()
         {
 
-            if (false)
-            {
+            //string arquivo = @"ArqDadosBaixaManualTesteNegativo.csv";
 
-                string arquivo = "ArqDadosBaixaManualTesteNegativo.csv";
+            //if (false)
+            //{
 
-                if (Massa.Fonte.FileJUnit.Open(prmPath: @"C:\Users\alexa\OneDrive\Área de Trabalho\", prmName: arquivo))
-                {
+            //    if (Massa.Fonte.FileJUnit.Open(prmPath: @"C:\Users\alexa\OneDrive\Área de Trabalho\", prmName: arquivo))
+            //    {
 
-                    if (true)
-                    {
-                        foreach (xTestCaseJUnit teste in Massa.Fonte.FileJUnit.TestCases)
-                        {
+            //        if (true)
+            //        {
+            //            foreach (xTestCaseJUnit teste in Massa.Fonte.FileJUnit.TestCases)
+            //            {
 
-                            Debug.WriteLine("===============================================");
-                            Debug.WriteLine(teste.nome);
-                            Debug.WriteLine("===============================================");
-                            Debug.WriteLine(teste.Parametros.memo());
-                            Debug.WriteLine(teste.Fluxos.memo());
-                            Debug.WriteLine("===============================================");
+            //                Debug.WriteLine("===============================================");
+            //                Debug.WriteLine(teste.nome);
+            //                Debug.WriteLine("===============================================");
+            //                Debug.WriteLine(teste.Parametros.memo());
+            //                Debug.WriteLine(teste.Fluxos.memo());
+            //                Debug.WriteLine("===============================================");
 
-                        }
-                    }
-                    else
-                    {
+            //            }
+            //        }
+            //        else
+            //        {
 
-                        foreach (xMemo fluxo in Massa.Fonte.FileJUnit.JSON.Dados)
-                        {
+            //            foreach (xMemo fluxo in Massa.Fonte.FileJUnit.JSON.Dados)
+            //            {
 
-                            Debug.WriteLine(fluxo.memo());
+            //                Debug.WriteLine(fluxo.memo());
 
-                            Debug.Assert(false);
+            //                Debug.Assert(false);
 
-                        }
-                    }
-                }
-            }
+            //            }
+            //        }
+            //    }
+            //}
 
             Massa.Add(prmFluxo: @"{'Nome':'Alexandre Bartie'}");
             Massa.Add(prmFluxo: @"{'Nome':'Teste de Software'}");
