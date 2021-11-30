@@ -21,11 +21,12 @@ steps:
   inputs:
     restoreSolution: '$(solution)'
 
-- task: VSBuild@1
+- task: MSBuild@1
   inputs:
-    solution: '$(solution)'
+    solution: '**/*.sln'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+
 - task: NuGetCommand@2
   inputs:
     command: 'pack'
