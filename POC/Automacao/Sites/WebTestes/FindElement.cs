@@ -37,15 +37,15 @@ namespace Dooggy.WebTestes
                    }
             }
 
-            int cont = 0;
+            //int cont = 0;
 
-            foreach (IWebElement item in teste.FindElements(By.XPath(filtro)))
-            {
-                cont++;
+            //foreach (IWebElement item in teste.FindElements(By.XPath(filtro)))
+            //{
+            //    cont++;
 
-                item.Click();
+            //    item.Click();
 
-            }
+            //}
 
         }
         public void PLAY()

@@ -11,8 +11,8 @@
     <AssemblyName>MyDooggy</AssemblyName>
     <RootNamespace>Dooggy</RootNamespace>
     <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
-    <Version>1.0.1</Version>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.0.2</Version>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageProjectUrl></PackageProjectUrl>
     <PackageIcon>MyDooggy.jpg</PackageIcon>
     <PackageIconUrl />
