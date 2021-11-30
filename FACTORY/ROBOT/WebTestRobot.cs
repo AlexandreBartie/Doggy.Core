@@ -399,7 +399,9 @@ namespace Dooggy.Factory.Robot
 
             }
 
-            return Trace.LogErro(prmErro: "AÇÃO não encontrada" + tipo.ToString());
+            Trace.LogErro(prmErro: "AÇÃO não encontrada" + tipo.ToString());
+
+            return (false);
 
         }
 

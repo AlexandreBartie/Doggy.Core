@@ -75,22 +75,33 @@ namespace Dooggy.Factory
     public class TestTraceLog
     {
 
-        public bool LogTrace(string prmTrace) => Message("TRACE", prmTrace);
-        public bool LogSQL(string prmMensagem) => Message("SQL", prmMensagem);
-        public bool LogCursor(string prmMensagem) => Message("CURSOR", prmMensagem);
-        public bool LogFile(string prmMensagem) => Message("FILE", prmMensagem);
-        public bool LogShow(string prmMensagem) => Message("SHOW", prmMensagem);
-        public bool LogAviso(string prmAviso) => Message("AVISO", prmAviso);
-        public bool LogFalha(string prmAviso) => Message("FALHA", prmAviso);
-        public bool LogErro(string prmErro) => Message("ERRO", prmErro);
-        public bool LogErro(Exception e) => Message("ERRO", e.Message);
-        public bool LogErro(string prmErro, Exception e) => Message("ERRO", String.Format("{0} >>> Error: [{1}]", prmErro, e.Message));
+        public void LogTrace(string prmTrace) => Message("TRACE", prmTrace);
+        public void LogSQL(string prmMensagem) => Message("SQL", prmMensagem);
+        public void LogCursor(string prmMensagem) => Message("CURSOR", prmMensagem);
+        public void LogFile(string prmMensagem) => Message("FILE", prmMensagem);
+        public void LogShow(string prmMensagem) => Message("SHOW", prmMensagem);
+        public void LogAviso(string prmAviso) => Message("AVISO", prmAviso);
+        public void LogFalha(string prmAviso) => Message("FALHA", prmAviso);
+        public void LogErro(string prmErro) => Message("ERRO", prmErro);
+        public void LogErro(Exception e) => Message("ERRO", e.Message);
+        public void LogErro(string prmErro, Exception e) => Message("ERRO", String.Format("{0} >>> Error: [{1}]", prmErro, e.Message));
 
 
-        private bool Message(string prmTipo, string prmMensagem)
+        private void Message(string prmTipo, string prmMensagem)
         {
-            Debug.WriteLine(String.Format("[{0,5}]: {1} ", prmTipo, prmMensagem));
-            return false;
+
+            String texto = String.Format("[{0,5}]: {1} ", prmTipo, prmMensagem);
+        
+#if DEBUG
+
+            Debug.WriteLine(texto);
+
+#else
+
+            Console.WriteLine(texto);
+
+#endif
+
         }
 
     }
