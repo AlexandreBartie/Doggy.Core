@@ -13,7 +13,7 @@ namespace Dooggy
 
             GerarMassaTeste();
 
-            //ExecutarAutomacaoTeste();
+            //ExecutarAutomacaoTeste();//
 
         }
 
