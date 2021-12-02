@@ -5,14 +5,14 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon>MyDooggy.ico</ApplicationIcon>
-    <StartupObject>Dooggy.Program</StartupObject>
+    <StartupObject></StartupObject>
     <Authors>Alexandre Bartie</Authors>
     <Product>DOOGGY FRAMEWORK</Product>
     <AssemblyName>MyDooggy</AssemblyName>
     <RootNamespace>Dooggy</RootNamespace>
     <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
     <Version>1.0.2</Version>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageProjectUrl></PackageProjectUrl>
     <PackageIcon>MyDooggy.jpg</PackageIcon>
     <PackageIconUrl />
@@ -37,7 +37,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\..\..\Downloads\MyDooggy.jpg">
+    <None Include="MyDooggy.jpg">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
