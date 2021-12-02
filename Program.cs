@@ -11,18 +11,19 @@ namespace Dooggy
         static void Main()
         {
 
-            GerarMassaTeste();
+
+            GerarMassaTeste(prmPath: @"c:\MassaTestes\");
 
             //ExecutarAutomacaoTeste();//
 
         }
 
-        static void GerarMassaTeste()
+        static void GerarMassaTeste(string prmPath)
         {
 
             POC_MassaTestes POC = new POC_MassaTestes();
 
-            POC.Start(prmPathDataFiles: @"C:\Users\alexa\OneDrive\Área de Trabalho\MassaTeste\");
+            POC.Start(prmPath,  prmParametros: @"{ 'path': 'c:\MassaTestes\', 'branch': '1084', 'porta': '1521' }");
 
         }
 

@@ -91,7 +91,7 @@ namespace Dooggy.Factory
         {
 
             String texto = String.Format("[{0,5}]: {1} ", prmTipo, prmMensagem);
-        
+
 #if DEBUG
 
             Debug.WriteLine(texto);

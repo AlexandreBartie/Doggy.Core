@@ -16,19 +16,24 @@ namespace Dooggy.Factory.Data
     public class TestDataProject : TestFactory
     {
 
+        public xJSON parametros = new xJSON();
+
         public TestDataConnect Connect { get => Pool.Connect; }
 
-        public void Start(string prmPathDataFiles)
+        public void Start(string prmPath) => Start(prmPath, prmParametros: "");
+
+        public void Start(string prmPath, string prmParametros)
         {
 
-            Pool.SetPathDestino(prmPathDataFiles);
+            parametros.Parse(prmParametros);
+
+            Pool.SetPathDestino(prmPath);
 
             Call(this, Parameters.GetDataFactoryBlockCode());
 
         }
 
     }
-
     public class TestDataPool
     {
 
@@ -566,12 +571,12 @@ namespace Dooggy.Factory.Data
 
         private string model = @"Data Source=(DESCRIPTION =(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(Host = {0})(PORT = {1})))(CONNECT_DATA =(SERVICE_NAME = {2})));User ID={3};Password={4}";
 
-        public string user;// = "desenvolvedor_sia";
-        public string password;// = "asdfg";
+        public string user;
+        public string password;
 
-        public string host;// = "10.250.1.35";
-        public string port;// = "1521";
-        public string service;// = "branch_1084.prod01.redelocal.oraclevcn.com";
+        public string host;
+        public string port;
+        public string service;
 
         public DataBaseOracle(TestDataPool prmPool)
         {

@@ -105,7 +105,10 @@ namespace Dooggy.Lib.Parse
         public void Add(string prmFluxo)
         {
 
-            string fluxo = @prmFluxo.Replace("'", "\"");
+            string fluxo = @prmFluxo;
+
+            fluxo = fluxo.Replace("\"", "/");
+            fluxo = fluxo.Replace("'", "\"");
 
             if (lista == null)
                 lista = fluxo;
