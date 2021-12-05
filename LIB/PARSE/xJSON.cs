@@ -16,7 +16,7 @@ namespace Dooggy.Lib.Parse
 
         public bool IsCurrent { get => Controle.IsCurrent; }
 
-        public Exception Erro { get => Controle.erro; }
+         public Exception Erro { get => Controle.erro; }
 
         public string fluxo { get => Controle.fluxo; }
 
@@ -71,6 +71,8 @@ namespace Dooggy.Lib.Parse
         public string GetValor(string prmKey, string prmPadrao) => Controle.GetValor(prmKey, prmPadrao);
 
         public JsonProperty GetProperty (string prmKey) => Controle.GetProperty(prmKey);
+
+        public bool IsErro() => (Erro != null);
 
     }
     public class IJSONcontrol

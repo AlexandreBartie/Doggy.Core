@@ -139,7 +139,7 @@ namespace Dooggy.Factory.Robot
             }
             catch (Exception e)
             {
-                Trace.LogErro(e);
+                Trace.LogGeneric.msgErro(e);
             }
             return (null);
         }
@@ -151,7 +151,7 @@ namespace Dooggy.Factory.Robot
             }
             catch (Exception e)
             {
-                Trace.LogErro(e);
+                Trace.LogRobot.msgErro(e);
             }
             return (null);
         }
@@ -163,7 +163,7 @@ namespace Dooggy.Factory.Robot
             }
             catch (Exception e)
             {
-                Trace.LogErro(e);
+                Trace.LogRobot.msgErro(e);
             }
             return (null);
         }
@@ -175,7 +175,7 @@ namespace Dooggy.Factory.Robot
             }
             catch (Exception e)
             {
-                Trace.LogErro(e);
+                Trace.LogRobot.msgErro(e);
             }
             return (null);
         }
@@ -230,7 +230,7 @@ namespace Dooggy.Factory.Robot
             }
 
             catch (Exception e)
-            { Trace.LogErro(e.Message); }
+            { Trace.LogRobot.msgErro(e.Message); }
 
             return (false);
         }
@@ -360,7 +360,7 @@ namespace Dooggy.Factory.Robot
 
         public QA_WebRobot Robot { get => Page.Robot; }
         public TestRobotProject Projeto { get => Robot.Projeto; }
-        public TestRobotTrace Trace { get => Robot.Trace.Action; }
+        public TestTrace Trace { get => Robot.Trace; }
 
         public void SetDomain(string prmLista)
         {
@@ -399,7 +399,7 @@ namespace Dooggy.Factory.Robot
 
             }
 
-            Trace.LogErro(prmErro: "AÇÃO não encontrada" + tipo.ToString());
+            Trace.LogGeneric.msgErro(prmTexto: "AÇÃO não encontrada" + tipo.ToString());
 
             return (false);
 
@@ -427,14 +427,14 @@ namespace Dooggy.Factory.Robot
                 control.Click();
 
                 if (!prmFake )
-                    Trace.ActionElement("Click", key);
+                    Trace.LogRobot.ActionElement("Click", key);
 
                 return (true); 
             
             }
 
             catch (Exception e)
-            { Trace.ActionFail("Click", e); }
+            { Trace.LogRobot.ActionFail("Click", e); }
 
             return (false);
         }
@@ -444,14 +444,14 @@ namespace Dooggy.Factory.Robot
             { 
                 control.SendKeys(prmTexto);
 
-                Trace.ActionElement("Input", key, prmTexto); 
+                Trace.LogRobot.ActionElement("Input", key, prmTexto); 
                 
                 return (true); 
             
             }
 
             catch (Exception e)
-            { Trace.ActionFail("SendKeys", e); }
+            { Trace.LogRobot.ActionFail("SendKeys", e); }
 
             return (false);
         }
@@ -469,8 +469,8 @@ namespace Dooggy.Factory.Robot
         public xTupla Chave { get => Elemento.Chave; }
 
         public QA_WebRobot Robot { get => Elemento.Robot; }
-
         public TestRobotProject Projeto { get => Robot.Projeto; }
+        public TestTrace Trace { get => Robot.Trace; }
 
         public QA_WebDominio(QA_WebElemento prmElemento)
         {
@@ -496,12 +496,12 @@ namespace Dooggy.Factory.Robot
                 foreach (string item in fluxo)
                 {
                     if (!SetFluxo(item))
-                        Robot.Trace.LogErro("Domínio não encontrado na lista ... " + item);
+                        Trace.msgErro("Domínio não encontrado na lista ... " + item);
                 }
 
             }
             else
-                Robot.Trace.LogErro("Busca de Domínios falhou ... " + GetXPath());
+                Trace.msgErro("Busca de Domínios falhou ... " + GetXPath());
 
             return (false);
         }
@@ -599,7 +599,7 @@ namespace Dooggy.Factory.Robot
                     break;
 
                 default:
-                    Elemento.Trace.TargetNotFound(prmTag);
+                    Elemento.Trace.LogRobot.TargetNotFound(prmTag);
                     break;
             }
         }
@@ -691,7 +691,7 @@ namespace Dooggy.Factory.Robot
 
         public xJSON JSON = new xJSON();
 
-        private bool IsON;
+        public bool IsON;
 
         public QA_MassaDados(QA_WebRobot prmRobot)
         {
@@ -706,11 +706,11 @@ namespace Dooggy.Factory.Robot
         private TestTrace Trace { get => Robot.Trace; }
         private TestDataPool Pool { get => Project.Pool; }
 
-        public bool IsONLINE { get => IsON; }
         private bool IsSTATIC => (DefaultView == null);
         public bool IsOK { get => JSON.IsOK; }
         public bool IsCurrent { get => JSON.IsCurrent; }
 
+        public string tipo { get { if (IsON) return ("ON-LINE"); return ("OFF-LINE"); } }
         public bool SetView(string prmTag)
         {
 
@@ -742,7 +742,7 @@ namespace Dooggy.Factory.Robot
             IsON = true;
 
             if (!JSON.Save())
-            { Trace.LogErro("ERRO{JSON:Save} " + JSON.fluxo); }
+            { Trace.msgErro("ERRO{JSON:Save} " + JSON.fluxo); }
 
             return (JSON.IsOK);
 

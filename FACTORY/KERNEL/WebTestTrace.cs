@@ -5,89 +5,118 @@ using System.Text;
 
 namespace Dooggy.Factory
 {
-    public class TestTrace : TestTraceLog
+    public class TestTrace : TestTraceErro
     {
 
-        public TestDataTrace DataBase = new TestDataTrace();
+        public TestTraceLog LogGeneric;
 
-        public TestRobotTrace Action = new TestRobotTrace();
+        public TestTraceLogApp LogApp;
 
-    }
-    public class TestDataTrace : TestTraceLog
-    {
+        public TestTraceLogData LogData;
 
-        public void StatusConnection(string prmTag, string prmStatus) { LogSQL(string.Format("Banco de Dados {1}: tag[{0}]", prmTag, prmStatus)); }
-        public void SQLExecution(string prmTag, string prmSQL) => LogSQL(string.Format(@"SQL executado: tag:[{0}] sql: ""{1}""", prmTag, prmSQL));
+        public TestTraceLogFile LogFile;
 
-        public void SetPath(string prmTitulo, string prmPath) => LogFile(String.Format(@"Path Definido: tag[{0}] path: ""{1}""", prmTitulo, prmPath));
-        public void DataFileExport(string prmNome, string prmSubPath, string prmExtensao) => LogFile(String.Format(@"Arquivo {0}.{1} gerado com sucesso. path: ""..\{2}""", prmNome, prmExtensao, prmSubPath));
+        public TestTraceLogRobot LogRobot;
 
-
-        public void FailDataConnection(string prmTag, string prmStringConexao, Exception prmErro) => FailConnection(prmMSG: "Conexão com Banco de Dados falhou", prmVar: "string", prmTag, prmStringConexao, prmErro);
-        public void FailSQLConnection(string prmTag, string prmSQL, Exception prmErro) => FailConnection(prmMSG: "Comando SQL falhou", prmVar: "sql", prmTag, prmSQL, prmErro);
-        public void FailSQLNoDataBaseConnection(string prmTag, string prmSQL, Exception prmErro) => FailConnection(prmMSG: "Banco de Dados não está aberto. SQL", prmVar: "sql", prmTag, prmSQL, prmErro);
-        private void FailConnection(string prmMSG, string prmVar, string prmTag, string prmSQL, Exception prmErro) => LogErro(String.Format(@"{0} >>> tag:[{2}] {1}: ""{3}""", prmMSG, prmVar, prmTag, prmSQL), prmErro);
-
-        public void FailDataFileExport(string prmPath, string prmNome, string prmExtensao) => LogErro(String.Format("Criação do arquivo falhou ... file:[{1}.{2}] path:[{0}]",prmPath, prmNome, prmExtensao));
-
-    }
-    public class TestRobotTrace : TestTraceLog
-    {
-
-        public void ActionArea(string prmArea, string prmName) => LogTrace(String.Format("{0,20}: [{1}]", prmArea, prmName));
-
-        public bool ActionMassaOnLine(bool prmMassaOnLine)
+         public TestTrace()
         {
 
-            string texto;
+            LogGeneric = new TestTraceLog();
 
-            if (prmMassaOnLine)
-                texto = "ON-LINE";
-            else
-                texto = "OFF-LINE";
+            LogApp = new TestTraceLogApp();
 
-            LogTrace(String.Format("Massa de Testes '{0}'", texto));
+            LogData = new TestTraceLogData();
 
-            return (prmMassaOnLine);
+            LogFile = new TestTraceLogFile();
+
+            LogRobot = new TestTraceLogRobot();
 
         }
+
+    }
+    public class TestTraceLogApp: TestTraceLog
+    {
+        
+        public void ExeRunning(string prmNome, string prmVersao) { msgStart(string.Format("App: {0} - Versão: {1}", prmNome, prmVersao)); }
+
+    }
+    public class TestTraceLogData : TestTraceLog
+    {
+
+       
+        public void DBConnection(string prmTag, string prmStatus) => msgSQL(string.Format("Banco de Dados {1}: tag[{0}]", prmTag, prmStatus)); 
+        public void SQLExecution(string prmTag, string prmSQL) => msgSQL(string.Format(@"SQL executado: tag:[{0}] sql: ""{1}""", prmTag, prmSQL));
+
+        public void FailDBConnection(string prmTag, string prmStringConexao, Exception prmErro) => FailConnection(prmMSG: "Conexão com Banco de Dados falhou", prmVar: "string", prmTag, prmStringConexao, prmErro);
+        public void FailSQLConnection(string prmTag, string prmSQL, Exception prmErro) => FailConnection(prmMSG: "Comando SQL falhou", prmVar: "sql", prmTag, prmSQL, prmErro);
+        public void FailSQLNoDataBaseConnection(string prmTag, string prmSQL, Exception prmErro) => FailConnection(prmMSG: "Banco de Dados não está aberto. SQL", prmVar: "sql", prmTag, prmSQL, prmErro);
+        
+        private void FailConnection(string prmMSG, string prmVar, string prmTag, string prmSQL, Exception prmErro) => msgErro(String.Format(@"{0} >>> tag:[{2}] {1}: ""{3}""", prmMSG, prmVar, prmTag, prmSQL), prmErro);
+
+    }
+
+    public class TestTraceLogFile : TestTraceLog
+    {
+
+        public void SetPath(string prmTitulo, string prmPath) => msgFile(String.Format(@"Path Definido: tag[{0}] path: ""{1}""", prmTitulo, prmPath));
+        public void DataFileExport(string prmNome, string prmSubPath, string prmExtensao) => msgFile(String.Format(@"Arquivo {0}.{1} gerado com sucesso. path: ""..\{2}""", prmNome, prmExtensao, prmSubPath));
+
+        public void FailDataFileExport(string prmPath, string prmNome, string prmExtensao) => msgErro(String.Format("Criação do arquivo falhou ... file:[{1}.{2}] path:[{0}]", prmPath, prmNome, prmExtensao));
+        public void FailJSONFormat(string prmContexto, string prmFluxo, Exception prmErro) => msgErro(prmTexto: String.Format(@"Fluxo JSON: [invalid format] ... contexto: {0} fluxo: {1}", prmContexto, prmFluxo));
+  
+    }
+    public class TestTraceLogRobot : TestTraceLog
+    {
+
+        public void ActionTag(string prmTag, string prmConteudo) => msgTrace(String.Format("{0,7} <{1}>", prmTag, prmConteudo));
 
         public void ActionElement(string prmAcao, string prmElemento) => ActionElement(prmAcao, prmElemento, prmValor: null);
         public void ActionElement(string prmAcao, string prmElemento, string prmValor)
         {
 
-            string msg = String.Format("ACTION: {0} {1,15} := {1}", prmAcao, prmElemento);
+            string msg = String.Format("#{0} {1,15}", prmAcao, prmElemento);
 
             if (prmValor != null)
                 msg += " := " + prmValor;
 
-            LogTrace(msg);
+            ActionTag(prmTag: "Comando", msg);
 
         }
 
-        public void ActionJSONFail(string prmComando, Exception e) => LogErro("ACTION FAIL: JSON." + prmComando, e);
+        public void ActionFail(string prmComando, Exception e) => msgErro("ACTION FAIL: ROBOT." + prmComando, e);
 
-        public void ActionFail(string prmComando, Exception e) => LogErro("ACTION FAIL: ROBOT." + prmComando, e);
+        public void ActionFailFormatJSON(string prmComando, Exception e) => msgErro("ACTION FAIL: JSON invalid format." + prmComando, e);
 
-        public void TargetNotFound(string prmTAG) => LogErro("TARGET NOT FOUND: " + prmTAG);
+        public void TargetNotFound(string prmTAG) => msgErro("TARGET NOT FOUND: " + prmTAG);
 
     }
-    public class TestTraceLog
+    public class TestTraceLog : TestTraceErro
     {
 
-        public void LogTrace(string prmTrace) => Message("TRACE", prmTrace);
-        public void LogSQL(string prmMensagem) => Message("SQL", prmMensagem);
-        public void LogCursor(string prmMensagem) => Message("CURSOR", prmMensagem);
-        public void LogFile(string prmMensagem) => Message("FILE", prmMensagem);
-        public void LogShow(string prmMensagem) => Message("SHOW", prmMensagem);
-        public void LogAviso(string prmAviso) => Message("AVISO", prmAviso);
-        public void LogFalha(string prmAviso) => Message("FALHA", prmAviso);
-        public void LogErro(string prmErro) => Message("ERRO", prmErro);
-        public void LogErro(Exception e) => Message("ERRO", e.Message);
-        public void LogErro(string prmErro, Exception e) => Message("ERRO", String.Format("{0} >>> Error: [{1}]", prmErro, e.Message));
+        public void msgStart(string prmTrace) => Message(prmTipo: "START", prmTrace);
+        public void msgTrace(string prmTrace) => Message(prmTipo: "TRACE", prmTrace);
+        public void msgSQL(string prmMensagem) => Message(prmTipo: "SQL", prmMensagem);
+        public void msgCursor(string prmMensagem) => Message(prmTipo: "CURSOR", prmMensagem);
+        public void msgFile(string prmMensagem) => Message(prmTipo: "FILE", prmMensagem);
+        public void msgShow(string prmMensagem) => Message(prmTipo: "SHOW", prmMensagem);
+        public void msgAviso(string prmAviso) => Message(prmTipo: "AVISO", prmAviso);
+        public void msgFalha(string prmAviso) => Message(prmTipo: "FALHA", prmAviso);
 
+    }
 
-        private void Message(string prmTipo, string prmMensagem)
+    public class TestTraceErro : TestTraceMsg
+    {
+
+        public void msgErro(string prmTexto) => Message(prmTipo: "ERRO", prmTexto);
+        public void msgErro(Exception e) => Message(prmTipo: "ERRO", e.Message);
+        public void msgErro(string prmTexto, Exception e) => Message(prmTipo: "ERRO", String.Format("{0} >>> Error: [{1}]", prmTexto, e.Message));
+
+    }
+
+    public class TestTraceMsg
+    {
+
+        public void Message(string prmTipo, string prmMensagem)
         {
 
             String texto = String.Format("[{0,5}]: {1} ", prmTipo, prmMensagem);

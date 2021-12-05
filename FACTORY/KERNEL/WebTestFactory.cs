@@ -2,16 +2,20 @@
 using Dooggy.Factory.Data;
 using Dooggy.Factory.Robot;
 using Dooggy.Lib.Generic;
+using Dooggy.Lib.Parse;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace Dooggy.Factory
 {
     public class TestFactory : ITestDataLocal
     {
+
+        public xJSON args = new xJSON();
 
         public TestDataPool Pool = new TestDataPool();
 
@@ -25,6 +29,28 @@ namespace Dooggy.Factory
         {
 
             Dados.Setup(this, Pool);
+
+        }
+
+        public bool Setup(string prmParametros, string prmNomeApp, string prmVersaoApp)
+        {
+
+            Trace.LogApp.ExeRunning(prmNome: Application.ProductName, prmVersao: Application.ProductVersion);
+
+            return(Setup(prmParametros));
+
+        }
+
+        public bool Setup(string prmParametros)
+        {
+
+
+            if (args.Parse(prmParametros))
+                return (true);
+
+            Trace.LogFile.FailJSONFormat(prmContexto: "Parâmetros do Projeto", prmFluxo: prmParametros, prmErro: args.Erro);
+
+            return (false);
 
         }
 
@@ -47,7 +73,7 @@ namespace Dooggy.Factory
                 catch
                 {
 
-                    Trace.LogAviso(string.Format("Método [{0}.{1}] não encontrado. [ error: {2} ]", prmObjeto.GetType().Name, metodo, prmObjeto.GetType().FullName));
+                    Trace.LogGeneric.msgAviso(string.Format("Método [{0}.{1}] não encontrado. [ error: {2} ]", prmObjeto.GetType().Name, metodo, prmObjeto.GetType().FullName));
 
                     vlOk = false;
 

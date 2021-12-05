@@ -26,7 +26,9 @@ namespace Dooggy.Factory.Robot
         public void Start(eTipoDriver prmTipoDriver)
         {
 
-            Trace.Action.ActionArea("Projeto de Teste", name);
+            Trace.LogRobot.ActionTag(prmTag: "Projeto", name);
+
+            //Trace.LogRobot.ActionMassaOnLine(Massa.IsONLINE);
 
             BuildSuites();
 
@@ -76,7 +78,7 @@ namespace Dooggy.Factory.Robot
 
         public TestConfig Config { get => Projeto.Config; }
 
-        public TestRobotTrace Trace { get => Projeto.Trace.Action; }
+        public TestTraceLogRobot Log { get => Projeto.Trace.LogRobot; }
 
         public TestDataPool Pool => Projeto.Pool;
 
@@ -101,7 +103,7 @@ namespace Dooggy.Factory.Robot
 
             Motor = new QA_WebMotor(this);
 
-            Trace.ActionArea("Suite de Teste", this.nome);
+            Log.ActionTag(prmTag: "Suite", this.nome);
 
             foreach (TestRobotScript Script in Scripts)
             {
@@ -141,7 +143,7 @@ namespace Dooggy.Factory.Robot
 
         public TestRobotProject Projeto => Robot.Projeto;
 
-        public TestRobotTrace Trace => Suite.Trace;
+        public TestTraceLogRobot Trace => Suite.Log;
 
         private void Metodo(string prmMetodo) => Projeto.Call(this, prmMetodo);
 
@@ -151,7 +153,7 @@ namespace Dooggy.Factory.Robot
             this.nome = this.GetType().Name;
             this.Motor = prmMotor;
 
-            Trace.ActionArea("Script de Teste", this.nome);
+            Trace.ActionTag(prmTag: "Script", this.nome);
 
             Dados.Setup(this, Suite.Pool);
 
@@ -191,11 +193,17 @@ namespace Dooggy.Factory.Robot
             string blockCode = Projeto.Parameters.GetScriptBlockCode();
 
 
-            if (Trace.ActionMassaOnLine(Massa.IsONLINE))
+            if (Massa.IsON)
             {
+
+                int cont = 0;
+                
                 // Massa ON-LINE
-                while (Massa.IsCurrent)
+                 while (Massa.IsCurrent)
                 {
+
+                    Trace.ActionTag(prmTag: "Teste", string.Format("#{0}", cont++));
+
                     Metodo(prmMetodo: blockCode);
                     Motor.Refresh();
 

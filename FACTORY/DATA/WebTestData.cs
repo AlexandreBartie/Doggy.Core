@@ -16,16 +16,10 @@ namespace Dooggy.Factory.Data
     public class TestDataProject : TestFactory
     {
 
-        public xJSON parametros = new xJSON();
-
         public TestDataConnect Connect { get => Pool.Connect; }
 
-        public void Start(string prmPath) => Start(prmPath, prmParametros: "");
-
-        public void Start(string prmPath, string prmParametros)
+        public void Start(string prmPath)
         {
-
-            parametros.Parse(prmParametros);
 
             Pool.SetPathDestino(prmPath);
 
@@ -37,7 +31,7 @@ namespace Dooggy.Factory.Data
     public class TestDataPool
     {
 
-        public TestDataTrace Trace;
+        public TestTrace Trace;
 
         public TestDataConnect Connect;
 
@@ -52,13 +46,16 @@ namespace Dooggy.Factory.Data
         public TestDataView DataViewCorrente { get => (Visoes.Corrente); }
         public TestDataModel DataModelCorrente { get => (Modelos.Corrente); }
 
+        public TestTraceLogData LogData { get => (Trace.LogData); }
+        public TestTraceLogFile LogFile { get => (Trace.LogFile); }
+
         private bool IsBaseCorrente { get => (DataBaseCorrente != null); }
         private bool IsModelCorrente { get => (DataModelCorrente != null); }
 
         public TestDataPool()
         {
 
-            Trace = new TestDataTrace();
+            Trace = new TestTrace();
 
             Bases = new DataBasesConnection();
 
@@ -103,7 +100,7 @@ namespace Dooggy.Factory.Data
 
             pathDataFiles = prmPath;
 
-            Trace.SetPath(prmTitulo: "MassaTestes", prmPath);
+            LogFile.SetPath(prmTitulo: "MassaTestes", prmPath);
 
         }
 
@@ -183,7 +180,6 @@ namespace Dooggy.Factory.Data
         private TestDataExport Export;
 
         public TestDataPool Pool { get => Dados.Pool; }
-        public TestDataTrace Trace { get => Pool.Trace ; }
 
         public TestDataFile(TestDataLocal prmDados)
         {
@@ -217,7 +213,7 @@ namespace Dooggy.Factory.Data
 
         private xFileTXT File = new xFileTXT();
 
-        public TestDataTrace Trace { get => Dados.Pool.Trace; }
+        public TestTraceLogFile Log { get => Dados.Pool.LogFile; }
 
         public TestDataExport(TestDataLocal prmDados)
         {
@@ -247,13 +243,13 @@ namespace Dooggy.Factory.Data
             if (File.Save(path, prmNome, prmConteudo, prmExtensao))
             {
 
-                Trace.DataFileExport(prmNome, prmSubPath, prmExtensao);
+                Log.DataFileExport(prmNome, prmSubPath, prmExtensao);
 
                 return (true);
 
             }
 
-            Trace.FailDataFileExport(path, prmNome, prmExtensao);
+            Log.FailDataFileExport(path, prmNome, prmExtensao);
 
             return (false);
         }
@@ -591,7 +587,7 @@ namespace Dooggy.Factory.Data
 
         public bool Add(string prmTag) => Pool.AddDataBase(prmTag, GetString());
 
-        private string GetString() => String.Format(model, host, port, service, user, password);
+        public string GetString() => String.Format(model, host, port, service, user, password);
 
     }
 

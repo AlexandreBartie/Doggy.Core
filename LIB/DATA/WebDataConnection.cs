@@ -34,7 +34,7 @@ namespace Dooggy.Lib.Data
 
         }
 
-        public TestDataTrace Trace { get => (Pool.Trace); }
+        public TestTrace Trace { get => (Pool.Trace); }
         public bool IsON { get => (conexao != null); }
         public bool IsOK { get { if (IsON) return (conexao.State == ConnectionState.Open); return (false); } }
 
@@ -46,14 +46,14 @@ namespace Dooggy.Lib.Data
 
                 conexao = new OracleConnection(prmConexao);
 
-                Trace.StatusConnection(tag, "CONECTADO");
+                Trace.LogData.DBConnection(tag, "CONECTADO");
 
                 return (true);
 
             }
 
             catch (Exception e)
-            { Trace.FailDataConnection(tag, prmConexao, e); erro = e; }
+            { Trace.LogData.FailDBConnection(tag, prmConexao, e); erro = e; }
 
             return (false);
         }
@@ -66,14 +66,14 @@ namespace Dooggy.Lib.Data
                 if (Criar(prmConexao))
                     conexao.Open();
 
-                Trace.StatusConnection(tag, "ABERTO");
+                Trace.LogData.DBConnection(tag, "ABERTO");
 
                 return (true);
 
             }
 
             catch (Exception e)
-            { Trace.FailDataConnection(tag, prmConexao, e); erro = e; }
+            { Trace.LogData.FailDBConnection(tag, prmConexao, e); erro = e; }
 
             return (false);
         }
@@ -108,7 +108,7 @@ namespace Dooggy.Lib.Data
 
         public bool IsResult;
 
-        public TestDataTrace Trace => DataBase.Trace;
+        public TestTrace Trace => DataBase.Trace;
 
 
         public DataCursorConnection(string prmSQL, string prmMask, DataBaseConnection prmDataBase)
@@ -121,7 +121,7 @@ namespace Dooggy.Lib.Data
                 GetReader(prmSQL); SetMask(prmMask);
             }
             else
-                { Trace.FailSQLNoDataBaseConnection(DataBase.tag, prmSQL, DataBase.erro); erro = DataBase.erro; }
+                { Trace.LogData.FailSQLNoDataBaseConnection(DataBase.tag, prmSQL, DataBase.erro); erro = DataBase.erro; }
         }
         private void SetMask(string prmMask)
         {
@@ -142,11 +142,11 @@ namespace Dooggy.Lib.Data
 
                 IsResult = Start();
 
-                Trace.SQLExecution(DataBase.tag, prmSQL);
+                Trace.LogData.SQLExecution(DataBase.tag, prmSQL);
 
             }
             catch (Exception e)
-            { Trace.FailSQLConnection(DataBase.tag, prmSQL, e); erro = e; }
+            { Trace.LogData.FailSQLConnection(DataBase.tag, prmSQL, e); erro = e; }
 
         }
         private bool Start() => Next();

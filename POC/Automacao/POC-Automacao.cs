@@ -10,21 +10,28 @@ namespace Dooggy.POC.AutomacaoTestes
 {
     public class POC_AutomacaoTestes : TestRobotProject
     {
+
+        public void BASE()
+        {
+
+            //Dados.AddDataBase(prmTag: "RH", prmConexao: @"Data Source=PC-ENGENHARIA\SQLEXPRESS;Initial Catalog=QA_POC;Integrated Security=True; MultipleActiveResultSets = True");
+
+        }
+
         public void DATA()
         {
 
-            Dados.AddDataBase(prmTag: "RH", prmConexao: @"Data Source=PC-ENGENHARIA\SQLEXPRESS;Initial Catalog=QA_POC;Integrated Security=True; MultipleActiveResultSets = True");
+  
+            //Dados.AddDataModel(prmTag: "Candidato", prmModelo: @"{'#TABELAS#':'Candidatos','#CAMPOS#':'nome + sobrenome + email + nascimento'}");
 
-            Dados.AddDataModel(prmTag: "Candidato", prmModelo: @"{'#TABELAS#':'Candidatos','#CAMPOS#':'nome + sobrenome + email + nascimento'}");
+            //Dados.AddDataVariant(prmTag: "=Padrao");
 
-            Dados.AddDataVariant(prmTag: "=Padrao");
+            //Dados.AddDataVariant(prmTag: "=Primeiro", prmRegra: @"{'#ORDEM#': 'nome ASC'}");
+            //Dados.AddDataVariant(prmTag: "=Ultimo", prmRegra: @"{'#ORDEM#': 'nome DESC'}");
+            //Dados.AddDataVariant(prmTag: "+Novo", prmRegra: @"{'#ORDEM#': 'nascimento DESC'}");
+            //Dados.AddDataVariant(prmTag: "+Velho", prmRegra: @"{'#ORDEM#': 'nascimento ASC'}");
 
-            Dados.AddDataVariant(prmTag: "=Primeiro", prmRegra: @"{'#ORDEM#': 'nome ASC'}");
-            Dados.AddDataVariant(prmTag: "=Ultimo", prmRegra: @"{'#ORDEM#': 'nome DESC'}");
-            Dados.AddDataVariant(prmTag: "+Novo", prmRegra: @"{'#ORDEM#': 'nascimento DESC'}");
-            Dados.AddDataVariant(prmTag: "+Velho", prmRegra: @"{'#ORDEM#': 'nascimento ASC'}");
-
-            Dados.AddDataVariant(prmTag: "-Email", prmRegra: @"{'#CONDICAO#': 'email is null'}");
+            //Dados.AddDataVariant(prmTag: "-Email", prmRegra: @"{'#CONDICAO#': 'email is null'}");
 
         }
         public void BUILD()

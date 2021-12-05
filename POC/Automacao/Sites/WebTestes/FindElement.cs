@@ -33,7 +33,7 @@ namespace Dooggy.WebTestes
                 }
                 catch (Exception e)
                 {
-                    Robot.Trace.LogErro(e);
+                    Robot.Trace.msgErro(e);
                    }
             }
 

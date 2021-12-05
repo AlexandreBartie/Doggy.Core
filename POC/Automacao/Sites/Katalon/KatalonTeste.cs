@@ -8,19 +8,20 @@ namespace Dooggy.Katalon
         public void DATA()
         {
  
-            Massa.SetView(prmTag: "Candidato=Padrao");
+            //Massa.SetView(prmTag: "Candidato=Padrao");
 
-            Massa.Add(prmFluxo: @"{ }");
-            Massa.Add(prmFluxo: @"{ }", prmView: "Candidato=Primeiro");
-            Massa.Add(prmFluxo: @"{ }", prmView: "Candidato=Ultimo");
-            Massa.Add(prmFluxo: @"{ }", prmView: "Candidato+Novo");
-            Massa.Add(prmFluxo: @"{ }", prmView: "Candidato+Velho");
+            //Massa.Add(prmFluxo: @"{ }");
+            //Massa.Add(prmFluxo: @"{ }", prmView: "Candidato=Primeiro");
+            //Massa.Add(prmFluxo: @"{ }", prmView: "Candidato=Ultimo");
+            //Massa.Add(prmFluxo: @"{ }", prmView: "Candidato+Novo");
+            //Massa.Add(prmFluxo: @"{ }", prmView: "Candidato+Velho");
 
-            //Massa.Add(prmFluxo: @"{ 'Nome': 'Alexandre', 'email': 'alexandre_bartie@hotmail.com' }");
-            //Massa.Add(prmFluxo: @"{ 'Nome': 'Alexandre', 'Sobrenome': 'Bartie', 'email': 'alexandre.bartie@gmail.com' }");
-            //Massa.Add(prmFluxo: @"{ 'Nome': 'Lisia', 'Sobrenome': 'Amantos', 'sexo': 'Mulher', 'email': 'lisia.amantos@gmail.com' }");
-            //Massa.Add(prmFluxo: @"{ 'Expectativa':'Salário + Desafio' }");
-            //Massa.Add(prmFluxo: @"{ 'Expectativa':'Liderança + Ambiente + Equipe' }");
+            Massa.Add(prmFluxo: @"{ 'Nome': 'Alexandre', 'email': 'alexandre_bartie@hotmail.com' }");
+            Massa.Add(prmFluxo: @"{ 'Nome': 'Daniel', 'Sobrenome': 'Campinho', 'email': 'alexandre.bartie@gmail.com' }");
+            Massa.Add(prmFluxo: @"{ 'Nome': 'Luana', 'Sobrenome': 'Gonçalves', 'email': 'alexandre.bartie@gmail.com' }");
+            Massa.Add(prmFluxo: @"{ 'Nome': 'Lisia', 'Sobrenome': 'Amantos', 'sexo': 'Mulher', 'email': 'lisia.amantos@gmail.com' }");
+            Massa.Add(prmFluxo: @"{ 'Expectativa':'Salário + Desafio' }");
+            Massa.Add(prmFluxo: @"{ 'Expectativa':'Liderança + Ambiente + Equipe' }");
 
             Massa.Save();
 
@@ -59,8 +60,6 @@ namespace Dooggy.Katalon
             Robot.Input("Expectativa", "Ambiente + Desafio");
             Robot.Input("Aprendizado", "Livros + Eventos + Blogs");
             Robot.Input("Observacao", "Maravilhoso ...");
-
-            Robot.Pause(5);
 
         }
         public void CHECK()

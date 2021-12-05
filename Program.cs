@@ -3,36 +3,52 @@ using Dooggy.POC.AutomacaoTestes;
 using Dooggy.POC.MassaTestes;
 using System;
 using System.Data.SqlClient;
+using System.Windows.Forms;
 
 namespace Dooggy
 {
     static class Program
     {
+
+        static POC_MassaTestes MassaTestes;
+
+        static POC_AutomacaoTestes AutomacaoTestes;
+
         static void Main()
         {
 
 
-            GerarMassaTeste(prmPath: @"c:\MassaTestes\");
+            //GerarMassaTeste();
 
-            //ExecutarAutomacaoTeste();//
+            ExecutarAutomacaoTeste();
 
         }
 
-        static void GerarMassaTeste(string prmPath)
+        static void GerarMassaTeste()
         {
 
-            POC_MassaTestes POC = new POC_MassaTestes();
+            MassaTestes = new POC_MassaTestes();
 
-            POC.Start(prmPath,  prmParametros: @"{ 'path': 'c:\MassaTestes\', 'branch': '1084', 'porta': '1521' }");
+            string path = @"c:\MassaTestes\";
+            string parametros = @"{ 'branch': '1085', 'port': '1521' }";
+
+            //    Console.WriteLine("Por favor, informe o path + parâmetros do banco de dados (branch, porta) no formato json ...");
+            //    Console.WriteLine("Siga o exemplo abaixo ...");
+
+            //    Console.WriteLine(Application.ProductName + " <path_massa_testes> " + @"{ 'branch': '1085', 'port': '1521' }");
+
+            MassaTestes.Setup(parametros,prmNomeApp: Application.ProductName, prmVersaoApp: Application.ProductVersion);
+
+            MassaTestes.Start(path);
 
         }
 
         static void ExecutarAutomacaoTeste()
         {
 
-            POC_AutomacaoTestes POC = new POC_AutomacaoTestes();
+            POC_AutomacaoTestes Automacao = new POC_AutomacaoTestes();
 
-            POC.Start(prmTipoDriver: eTipoDriver.ChromeDriver);
+            Automacao.Start(prmTipoDriver: eTipoDriver.ChromeDriver);
 
     }
 
