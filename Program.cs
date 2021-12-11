@@ -17,10 +17,10 @@ namespace Dooggy
         static void Main()
         {
 
-
-            //GerarMassaTeste();
-
-            ExecutarAutomacaoTeste();
+            if (true)
+                GerarMassaTeste();
+            else
+                ExecutarAutomacaoTeste();
 
         }
 

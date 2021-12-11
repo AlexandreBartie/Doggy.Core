@@ -7,7 +7,61 @@ namespace Dooggy
 {
     public static class xString
     {
+        public static string GetBloco(string prmTexto, string prmDelimitador) => GetBloco(prmTexto, prmDelimitador, prmDelimitador);
+        public static string GetBloco(string prmTexto, string prmDelimitador, bool prmPreservar) => GetBloco(prmTexto, prmDelimitador, prmDelimitador, prmPreservar);
+        public static string GetBloco(string prmTexto, string prmDelimitadorInicial, string prmDelimitadorFinal) => GetBloco(prmTexto, prmDelimitadorInicial, prmDelimitadorFinal, prmPreservar: false);
+        public static string GetBloco(string prmTexto, string prmDelimitadorInicial, string prmDelimitadorFinal, bool prmPreservar)
+        {
 
+            string retorno = "";
+
+            if (prmTexto != null)
+            {
+
+                int inicio = prmTexto.IndexOf(prmDelimitadorInicial);
+
+                int limite = inicio + prmDelimitadorInicial.Length;
+
+                int final = prmTexto.IndexOf(prmDelimitadorFinal, limite);
+
+                if ((inicio >= 0) & (final >= inicio))
+                    retorno = (prmTexto.Substring(limite, final - limite));
+
+            }
+
+            if (prmPreservar)
+                retorno = prmDelimitadorInicial + retorno + prmDelimitadorFinal;
+
+            return (retorno);
+
+        }
+
+        public static string GetTroca(string prmTexto, string prmDelimitador, string prmDelimitadorNovo) => GetTroca(prmTexto, prmDelimitador, prmDelimitador, prmDelimitadorNovo);
+        public static string GetTroca(string prmTexto, string prmDelimitadorInicial, string prmDelimitadorFinal, string prmDelimitadorNovo) => GetTroca(prmTexto, prmDelimitadorInicial, prmDelimitadorFinal, prmDelimitadorNovo, prmDelimitadorNovo);
+        public static string GetTroca(string prmTexto, string prmDelimitadorInicial, string prmDelimitadorFinal, string prmDelimitadorInicialNovo, string prmDelimitadorFinalNovo)
+        {
+
+            string texto = prmTexto;
+
+            while (true) 
+            {
+
+                string bloco = GetBloco(texto, prmDelimitadorInicial, prmDelimitadorFinal);
+
+                if (bloco == "")
+                    break;
+
+                string trecho_velho = prmDelimitadorInicial + bloco + prmDelimitadorFinal;
+
+                string trecho_novo = prmDelimitadorInicialNovo + bloco + prmDelimitadorFinalNovo;
+
+                texto = texto.Replace(trecho_velho, trecho_novo);
+
+            }
+
+            return (texto);
+
+        }
         public static string GetSubstring(string prmValor, int prmIndice)
         {
 
@@ -26,7 +80,6 @@ namespace Dooggy
 
             return ("");
         }
-
         public static string GetMask(string prmValor, string prmMask)
         {
             

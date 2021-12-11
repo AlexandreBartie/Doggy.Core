@@ -43,25 +43,49 @@ namespace Dooggy.Factory
     public class TestTraceLogData : TestTraceLog
     {
 
-       
+        //
+        // Sucess
+        //
         public void DBConnection(string prmTag, string prmStatus) => msgSQL(string.Format("Banco de Dados {1}: tag[{0}]", prmTag, prmStatus)); 
         public void SQLExecution(string prmTag, string prmSQL) => msgSQL(string.Format(@"SQL executado: tag:[{0}] sql: ""{1}""", prmTag, prmSQL));
 
+        //
+        // Sucess or Warning 
+        //
+        public void ViewsSelection(string prmTag, int prmQtde)
+        {
+
+            if (prmQtde > 0)
+                msgData(string.Format(@"Views selecionadas: tag:[{0}] views: {1}", prmTag, prmQtde));
+            else
+                msgAviso(string.Format(@"Nenhuma View foi encontrada: tag:[{0}]", prmTag));
+
+        }
+        //
+        // Fails
+        //
         public void FailDBConnection(string prmTag, string prmStringConexao, Exception prmErro) => FailConnection(prmMSG: "Conexão com Banco de Dados falhou", prmVar: "string", prmTag, prmStringConexao, prmErro);
         public void FailSQLConnection(string prmTag, string prmSQL, Exception prmErro) => FailConnection(prmMSG: "Comando SQL falhou", prmVar: "sql", prmTag, prmSQL, prmErro);
         public void FailSQLNoDataBaseConnection(string prmTag, string prmSQL, Exception prmErro) => FailConnection(prmMSG: "Banco de Dados não está aberto. SQL", prmVar: "sql", prmTag, prmSQL, prmErro);
-        
+
+        public void FailSQLNoDataModelConnection(string prmTag, string prmModel, Exception prmErro) => FailConnection(prmMSG: "Model View não foi criado adquadamente.", prmTag, prmModel, prmErro);
+
+        private void FailConnection(string prmMSG, string prmTag, string prmFluxo, Exception prmErro) => msgErro(String.Format(@"{0} >>> tag:[{1}] {2}:", prmMSG, prmTag, prmFluxo), prmErro);
         private void FailConnection(string prmMSG, string prmVar, string prmTag, string prmSQL, Exception prmErro) => msgErro(String.Format(@"{0} >>> tag:[{2}] {1}: ""{3}""", prmMSG, prmVar, prmTag, prmSQL), prmErro);
+
+
+
+
 
     }
 
     public class TestTraceLogFile : TestTraceLog
     {
 
-        public void SetPath(string prmTitulo, string prmPath) => msgFile(String.Format(@"Path Definido: tag[{0}] path: ""{1}""", prmTitulo, prmPath));
-        public void DataFileExport(string prmNome, string prmSubPath, string prmExtensao) => msgFile(String.Format(@"Arquivo {0}.{1} gerado com sucesso. path: ""..\{2}""", prmNome, prmExtensao, prmSubPath));
+        public void SetPath(string prmContexto, string prmPath) => msgFile(String.Format(@"Path Definido: ""{0}"" tag[{1}]", prmPath, prmContexto));
+        public void DataFileExport(string prmNome, string prmSubPath, string prmExtensao) => msgFile(String.Format(@"Arquivo [{0}.{1}] gerado com sucesso. path: ""..\{2}""", prmNome, prmExtensao, prmSubPath));
 
-        public void FailDataFileExport(string prmPath, string prmNome, string prmExtensao) => msgErro(String.Format("Criação do arquivo falhou ... file:[{1}.{2}] path:[{0}]", prmPath, prmNome, prmExtensao));
+        public void FailDataFileExport(string prmPath, string prmNome, string prmExtensao) => msgErro(String.Format("Criação do arquivo falhou ... file:[{0}.{1}] path:[{2}]", prmNome, prmExtensao, prmPath));
         public void FailJSONFormat(string prmContexto, string prmFluxo, Exception prmErro) => msgErro(prmTexto: String.Format(@"Fluxo JSON: [invalid format] ... contexto: {0} fluxo: {1}", prmContexto, prmFluxo));
   
     }
@@ -96,7 +120,7 @@ namespace Dooggy.Factory
         public void msgStart(string prmTrace) => Message(prmTipo: "START", prmTrace);
         public void msgTrace(string prmTrace) => Message(prmTipo: "TRACE", prmTrace);
         public void msgSQL(string prmMensagem) => Message(prmTipo: "SQL", prmMensagem);
-        public void msgCursor(string prmMensagem) => Message(prmTipo: "CURSOR", prmMensagem);
+        public void msgData(string prmMensagem) => Message(prmTipo: "DATA", prmMensagem);
         public void msgFile(string prmMensagem) => Message(prmTipo: "FILE", prmMensagem);
         public void msgShow(string prmMensagem) => Message(prmTipo: "SHOW", prmMensagem);
         public void msgAviso(string prmAviso) => Message(prmTipo: "AVISO", prmAviso);

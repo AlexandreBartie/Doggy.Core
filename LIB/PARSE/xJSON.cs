@@ -8,29 +8,29 @@ namespace Dooggy.Lib.Parse
     public class xJSON
     {
 
-        public IJSONcontrol Controle;
+        public xJSON_Control Controle;
 
         private bool _IsOK;
 
         public bool IsOK { get => _IsOK; }
-
+        public bool IsErro { get => (Erro != null); }
         public bool IsCurrent { get => Controle.IsCurrent; }
 
          public Exception Erro { get => Controle.erro; }
 
         public string fluxo { get => Controle.fluxo; }
 
-        public string log { get => Controle.log; }
+        public string tuplas { get => Controle.tuplas; }
 
         public xJSON()
         {
-            Controle = new IJSONcontrol(this);
+            Controle = new xJSON_Control(this);
 
         }
         public xJSON(string prmFluxo)
         {
 
-            Controle = new IJSONcontrol(this);
+            Controle = new xJSON_Control(this);
 
             Parse(prmFluxo);
 
@@ -69,13 +69,10 @@ namespace Dooggy.Lib.Parse
         public string FindValor(string prmKey, string prmFormato) => Controle.FindValor(prmKey, prmFormato);
         public string GetValor(string prmKey) => Controle.GetValor(prmKey);
         public string GetValor(string prmKey, string prmPadrao) => Controle.GetValor(prmKey, prmPadrao);
-
         public JsonProperty GetProperty (string prmKey) => Controle.GetProperty(prmKey);
 
-        public bool IsErro() => (Erro != null);
-
     }
-    public class IJSONcontrol
+    public class xJSON_Control
     {
 
         private xJSON JSON;
@@ -84,38 +81,52 @@ namespace Dooggy.Lib.Parse
 
         private JsonElement.ArrayEnumerator Corpo;
 
-        private string lista;
-
         public bool IsCombineFull;
 
         public bool IsCurrent;
 
         public Exception erro;
 
+        private xJSON_Fluxos Fluxos;
+
         private JsonElement root { get => doc.RootElement; }
+
+        //private JsonElement.ArrayEnumerator Corpo { get => root.EnumerateArray(); }
+
+
         private JsonElement item { get => Corpo.Current; }
         private JsonElement.ObjectEnumerator Propriedades { get => item.EnumerateObject(); }
 
-        public IJSONcontrol(xJSON prmJSON)
-        {
-            JSON = prmJSON;
-        }
-        public string fluxo { get { if (lista == "") return ("[ ]"); else return ("[ " + lista + " ]"); } }
 
-        public string log { get => (String.Format( "Fluxo: {0}", lista)); }
+        public xJSON_Control(xJSON prmJSON)
+        {
+            
+            JSON = prmJSON;
+
+            Setup();
+
+        }
+
+        private void Setup()
+        {
+
+            Fluxos = new xJSON_Fluxos(JSON);
+
+        }
+
+        public string fluxo { get => (Fluxos.txt); } 
+
+        public string tuplas { get => (GetTuplas()); }
 
         public void Add(string prmFluxo)
         {
 
-            string fluxo = @prmFluxo;
+            string linha = @prmFluxo;
 
-            fluxo = fluxo.Replace("\"", "/");
-            fluxo = fluxo.Replace("'", "\"");
+            //fluxo = fluxo.Replace(@"\'", @"#""");
+            linha = linha.Replace(@"'", "\"");
 
-            if (lista == null)
-                lista = fluxo;
-            else
-                lista += ", " + fluxo;
+            Fluxos.Add(linha);
 
         }
 
@@ -164,7 +175,6 @@ namespace Dooggy.Lib.Parse
 
             }
 
-
             return ("{ " + Memo.memo(", ") + " }");
 
         }
@@ -173,7 +183,7 @@ namespace Dooggy.Lib.Parse
             try
             {
 
-                doc = JsonDocument.Parse(fluxo);
+                doc = JsonDocument.Parse(Fluxos.txt);
 
                 Corpo = root.EnumerateArray();
 
@@ -184,7 +194,12 @@ namespace Dooggy.Lib.Parse
             }
 
             catch (Exception e)
-            { Debug.WriteLine("Erro na Formataçao de Dados JSON."); lista = ""; erro = e; return (false); }
+            { 
+                
+                Debug.WriteLine("Fluxo JSON: " + fluxo);
+                Debug.WriteLine("Erro  JSON: " + e.Message);
+
+                Setup();  erro = e; return (false); }
 
         }
         public bool Next()
@@ -202,6 +217,7 @@ namespace Dooggy.Lib.Parse
 
             try
             { string x = prop.Name; return (true); }
+
             catch 
             {  }
 
@@ -248,6 +264,58 @@ namespace Dooggy.Lib.Parse
 
             return(new JsonProperty());
         }
+        private string GetTuplas()
+        {
+
+            xMemo linhas = new xMemo();
+
+            foreach (JsonElement item in Corpo)
+
+                foreach (JsonProperty propriedade in item.EnumerateObject())
+
+                {
+
+                    string parametro = propriedade.Name;
+
+                    string linha = string.Format("[{0}]: '{1}'", parametro, GetValor(parametro));
+
+                    linhas.Add(linha);
+
+                }
+
+            return (linhas.csv);
+
+        }
+
+    }
+
+    public class xJSON_Fluxos : xMemo
+    {
+
+        private xJSON JSON;
+
+        public xJSON_Fluxos(xJSON prmJSON)
+        {
+
+            JSON = prmJSON;
+
+        }
+
+        public string txt
+        {
+            get
+
+            {
+
+                if (IsVazio)
+                    return ("[ ]");
+                else
+                    return ("[ " + csv + " ]");
+
+            }
+
+        }
+
     }
 
 }

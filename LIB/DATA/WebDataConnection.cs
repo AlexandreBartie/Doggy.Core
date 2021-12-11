@@ -46,7 +46,7 @@ namespace Dooggy.Lib.Data
 
                 conexao = new OracleConnection(prmConexao);
 
-                Trace.LogData.DBConnection(tag, "CONECTADO");
+                Trace.LogData.DBConnection(tag, "INICIADO");
 
                 return (true);
 
@@ -66,7 +66,7 @@ namespace Dooggy.Lib.Data
                 if (Criar(prmConexao))
                     conexao.Open();
 
-                Trace.LogData.DBConnection(tag, "ABERTO");
+                Trace.LogData.DBConnection(tag, "CONECTADO");
 
                 return (true);
 
@@ -116,12 +116,14 @@ namespace Dooggy.Lib.Data
 
             DataBase = prmDataBase;
 
+            string sql = GetTratarSQL(prmSQL);
+
             if (DataBase.IsOK)
             {
-                GetReader(prmSQL); SetMask(prmMask);
+                GetReader(sql); SetMask(prmMask);
             }
             else
-                { Trace.LogData.FailSQLNoDataBaseConnection(DataBase.tag, prmSQL, DataBase.erro); erro = DataBase.erro; }
+                { Trace.LogData.FailSQLNoDataBaseConnection(DataBase.tag, sql, DataBase.erro); erro = DataBase.erro; }
         }
         private void SetMask(string prmMask)
         {
@@ -129,7 +131,7 @@ namespace Dooggy.Lib.Data
                 Mask = new xMask(prmMask);
         }
 
-        public void GetReader(string prmSQL)
+        private void GetReader(string prmSQL)
         {
 
             _sql = prmSQL;
@@ -180,6 +182,14 @@ namespace Dooggy.Lib.Data
 
         }
 
+        private string GetTratarSQL(string prmSQL)
+        {
+
+            string sql = xString.GetTroca(prmSQL, prmDelimitadorInicial: "<##>", prmDelimitadorFinal: "<##>", prmDelimitadorNovo: "'");
+            
+            return (sql); 
+
+        }
         private string GetMask(string prmValor, string prmName)
         {
 

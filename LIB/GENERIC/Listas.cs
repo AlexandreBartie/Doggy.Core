@@ -58,7 +58,14 @@ namespace Dooggy.Lib.Generic
         public string separador = ",";
 
         public xLista()
-        { }
+        {
+
+        }
+        
+        public xLista(string prmLista)
+        { 
+            Parse(prmLista); 
+        }
 
         public xLista(string prmLista, string prmSeparador)
         {
@@ -84,9 +91,9 @@ namespace Dooggy.Lib.Generic
         }
         public int qtde { get => this.Count; }
 
-        public bool vazio { get => (qtde == 0); }
+        public bool IsVazio { get => (qtde == 0); }
 
-        public bool IsOK { get => !vazio; }
+        public bool IsOK { get => !IsVazio; }
 
         public string First { get => Item(1); }
 
@@ -111,10 +118,22 @@ namespace Dooggy.Lib.Generic
         }
         public string Item(int prmIndice)
         {
-            if (!vazio)
+            if (!IsVazio)
                 return (this[prmIndice - 1]);
             else
                 return ("");
+        }
+
+        public bool IsContem(string prmItem)
+        {
+
+            foreach (string item in this)
+            {
+                if (prmItem.ToLower().Contains(item.ToLower()))
+                    return true;
+            }
+
+            return (false);
         }
 
         public string GetRemove() => GetRemove(prmIndice: 1);
@@ -192,7 +211,7 @@ namespace Dooggy.Lib.Generic
         public xMemo(string prmTexto, string prmSeparador)
         { separador = prmSeparador; Parse(prmTexto); }
 
-        public string csv { get => memo(); }
+        public string csv { get => memo(", "); }
 
         public string memo() => memo(separador);
 
