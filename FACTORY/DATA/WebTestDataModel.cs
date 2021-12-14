@@ -59,12 +59,10 @@ namespace Dooggy.Factory.Data
         public string GetPath(string prmSubPath) => Dados.Pool.GetPath(prmSubPath);
 
     }
-    public class TestDataModel
+    public class TestDataModel : TestDataMask
     {
 
         public string tag;
-
-        private string mask;
 
         public xJSON Parametros;
 
@@ -83,9 +81,9 @@ namespace Dooggy.Factory.Data
 
             tag = prmTag;
 
-            mask = prmMask;
-
             Parametros = new xJSON(prmModel);
+
+            SetMask(prmMask);
 
             DataBase = prmDataBase;
 

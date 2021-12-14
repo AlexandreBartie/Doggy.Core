@@ -13,6 +13,13 @@ using System.Text;
 namespace Dooggy.Factory.Data
 {
 
+    public enum eTipoFileSave : int
+    {
+        json = 0,
+        csv = 1,
+        txt = 2
+    }
+
     public class TestDataProject : TestFactory
     {
 
@@ -68,7 +75,10 @@ namespace Dooggy.Factory.Data
 
         public bool AddDataBase(string prmTag, string prmConexao) => Bases.AddItem(prmTag, prmConexao, this);
 
+        public bool AddDataView(string prmTag, string prmSQL) => AddDataView(prmTag, prmSQL, prmMask: "");
         public bool AddDataView(string prmTag, string prmSQL, string prmMask) => Visoes.AddItem(prmTag, prmSQL, prmMask, DataBaseCorrente);
+
+        public void SetMaskDataView(string prmMask) => Visoes.SetMask(prmMask);
 
         public bool AddDataModel(string prmTag, string prmModelo, string prmMask) => Modelos.AddItem(prmTag, prmModelo, prmMask, DataBaseCorrente);
 
@@ -114,7 +124,7 @@ namespace Dooggy.Factory.Data
 
         public string csv(string prmTags) => Visoes.csv(prmTags);
         public string json(string prmTags) => Visoes.json(prmTags);
-        public string txt(string prmTags, string prmCabecalho, string prmSeparador, bool prmColunaExtra) => Visoes.txt(prmTags, prmCabecalho, prmSeparador, prmColunaExtra);
+        public string txt(string prmTags, string prmSeparador, bool prmColunaExtra) => Visoes.txt(prmTags, prmSeparador, prmColunaExtra);
 
     }
     public class TestDataLocal
@@ -126,6 +136,8 @@ namespace Dooggy.Factory.Data
 
         public TestDataFile File;
 
+        public TestDataKeyDriven KeyDriven;
+
         public TestDataView View { get => Pool.DataViewCorrente; }
 
         public string tagView { get => View.tag; }
@@ -134,6 +146,8 @@ namespace Dooggy.Factory.Data
         {
 
             File = new TestDataFile(this);
+
+            KeyDriven = new TestDataKeyDriven(Pool);
 
         }
 
@@ -147,7 +161,7 @@ namespace Dooggy.Factory.Data
         }
         public bool AddDataBase(string prmTag, string prmConexao) => (Pool.AddDataBase(prmTag, prmConexao));
 
-        public bool AddDataView(string prmTag, string prmSQL) => (Pool.AddDataView(prmTag, prmSQL, prmMask: ""));
+        public bool AddDataView(string prmTag, string prmSQL) => (AddDataView(prmTag, prmSQL, prmMask: ""));
         public bool AddDataView(string prmTag, string prmSQL, string prmMask) => (Pool.AddDataView(prmTag, prmSQL, prmMask));
 
         public void AddDataModel(string prmTag, string prmModelo) => AddDataModel(prmTag, prmModelo, prmMask: "");
@@ -156,56 +170,119 @@ namespace Dooggy.Factory.Data
         public void AddDataVariant(string prmTag) => AddDataVariant(prmTag, prmRegra: "");
         public void AddDataVariant(string prmTag, string prmRegra) => Pool.AddDataVariant(prmTag, prmRegra);
 
+        public string Save(string prmTags, eTipoFileSave prmTipo)
+        {
+
+            switch (prmTipo)
+            {
+
+                case eTipoFileSave.csv:
+                    return csv(prmTags);
+
+                case eTipoFileSave.txt:
+                    return txt(prmTags);
+
+            }
+
+            return json(prmTags);
+
+        }
+
         public string csv(string prmTags) => (Pool.csv(prmTags));
         public string json(string prmTags) => (Pool.json(prmTags));
 
-        public string txt(string prmTags, string prmCabecalho) => txt(prmTags, prmCabecalho, prmColunaExtra: true);
-        public string txt(string prmTags, string prmCabecalho, bool prmColunaExtra) => txt(prmTags, prmCabecalho, prmSeparador: ",", prmColunaExtra);
-        public string txt(string prmTags, string prmCabecalho, string prmSeparador, bool prmColunaExtra) => Pool.txt(prmTags, prmCabecalho, prmSeparador, prmColunaExtra);
+        public string txt(string prmTags) => txt(prmTags, prmColunaExtra: true);
+        public string txt(string prmTags, bool prmColunaExtra) => txt(prmTags, prmSeparador: ",", prmColunaExtra);
+        public string txt(string prmTags, string prmSeparador, bool prmColunaExtra) => Pool.txt(prmTags, prmSeparador, prmColunaExtra);
 
     }
-    public class TestDataView
+
+    public class TestDataKeyDriven
     {
+
+        public TestDataPool Pool;
+
+        public TestDataKeyDriven(TestDataPool prmPool)
+        {
+
+            Pool = prmPool;
+
+        }
+
+        public void SetMaskDataView(string prmTag, string prmMask) => Pool.SetMaskDataView(prmMask);
+
+
+    }
+    public class TestDataView : TestDataMask
+    {
+
 
         public string tag;
 
         public DataBaseConnection DataBase;
 
-        public DataCursorConnection Cursor;
+        // internal
+
+        private string sql;
+
+        private DataCursorConnection _cursor;
+
+        public DataCursorConnection Cursor
+        {
+            get
+            {
+                if (_cursor == null)
+                    _cursor = new DataCursorConnection(sql, mask, DataBase);
+
+                return (_cursor);
+
+            }
+
+
+        }
 
         public bool IsOK { get => Cursor.IsOK(); }
-        public string sql { get => Cursor.sql; }
         public Exception erro { get => Cursor.erro; }
-
-
 
         public TestDataView(string prmTag, string prmSQL, string prmMask, DataBaseConnection prmDataBase)
         {
 
             tag = prmTag;
 
-            DataBase = prmDataBase;
+            sql = prmSQL;
 
-            Cursor = new DataCursorConnection(prmSQL, prmMask, prmDataBase);
+            SetMask(prmMask);
+
+            DataBase = prmDataBase;
 
         }
 
         public bool Next() => Cursor.Next();
 
         public string GetName(int prmIndice) => Cursor.GetName(prmIndice);
-
         public string GetValor(int prmIndice) => Cursor.GetValor(prmIndice);
-
         public string GetValor(string prmNome) => Cursor.GetValor(prmNome);
+
+        public bool Fechar() => Cursor.Fechar();
+
 
         public string csv(string prmSeparador) => Cursor.GetCSV(prmSeparador);
         public string csv() => Cursor.GetCSV();
         public string json() => Cursor.GetJSON();
 
-        public bool Fechar() => Cursor.Fechar();
-
         public string log_sql() => String.Format("VIEW:[{0,25}] SQL: {1}", tag, sql);
         public string log_data() => String.Format("DATA:[{0,25}] Fluxo: {1}", tag, json());
+
+    }
+
+    public class TestDataMask
+    {
+
+        private string _mask;
+
+        public string mask { get => _mask; }
+
+        public void SetMask(string prmMask) { _mask = prmMask; }
 
     }
     public class TestDataViews : List<TestDataView>
@@ -241,6 +318,8 @@ namespace Dooggy.Factory.Data
 
         }
 
+        public void SetMask(string prmMask) { Corrente.SetMask(prmMask); }
+
         public bool SetView(string prmTag)
         {
 
@@ -261,10 +340,13 @@ namespace Dooggy.Factory.Data
             return (false);
 
         }
-        public string txt(string prmTags, string prmCabecalho, string prmSeparador, bool prmColunaExtra)
+        public string txt(string prmTags, string prmSeparador, bool prmColunaExtra)
         {
 
-            string txt = prmCabecalho + Environment.NewLine;
+            string tags;
+            string header;
+             
+            string txt = "xxx" + Environment.NewLine;
 
             string linha; string extra = "";
 

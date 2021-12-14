@@ -5,61 +5,36 @@ using System.Text;
 
 namespace Dooggy
 {
+
     public static class xString
     {
-        public static string GetBloco(string prmTexto, string prmDelimitador) => GetBloco(prmTexto, prmDelimitador, prmDelimitador);
-        public static string GetBloco(string prmTexto, string prmDelimitador, bool prmPreservar) => GetBloco(prmTexto, prmDelimitador, prmDelimitador, prmPreservar);
-        public static string GetBloco(string prmTexto, string prmDelimitadorInicial, string prmDelimitadorFinal) => GetBloco(prmTexto, prmDelimitadorInicial, prmDelimitadorFinal, prmPreservar: false);
-        public static string GetBloco(string prmTexto, string prmDelimitadorInicial, string prmDelimitadorFinal, bool prmPreservar)
+
+        public static bool IsStringOK(string prmTexto)
         {
-
-            string retorno = "";
-
             if (prmTexto != null)
-            {
-
-                int inicio = prmTexto.IndexOf(prmDelimitadorInicial);
-
-                int limite = inicio + prmDelimitadorInicial.Length;
-
-                int final = prmTexto.IndexOf(prmDelimitadorFinal, limite);
-
-                if ((inicio >= 0) & (final >= inicio))
-                    retorno = (prmTexto.Substring(limite, final - limite));
-
-            }
-
-            if (prmPreservar)
-                retorno = prmDelimitadorInicial + retorno + prmDelimitadorFinal;
-
-            return (retorno);
+                return (prmTexto.Trim() != "");
+            return (false);
 
         }
-
-        public static string GetTroca(string prmTexto, string prmDelimitador, string prmDelimitadorNovo) => GetTroca(prmTexto, prmDelimitador, prmDelimitador, prmDelimitadorNovo);
-        public static string GetTroca(string prmTexto, string prmDelimitadorInicial, string prmDelimitadorFinal, string prmDelimitadorNovo) => GetTroca(prmTexto, prmDelimitadorInicial, prmDelimitadorFinal, prmDelimitadorNovo, prmDelimitadorNovo);
-        public static string GetTroca(string prmTexto, string prmDelimitadorInicial, string prmDelimitadorFinal, string prmDelimitadorInicialNovo, string prmDelimitadorFinalNovo)
+        public static string GetFirst(string prmTexto)
         {
+            if (prmTexto != null)
+                return xString.GetChar(prmTexto,1);
+            return ("");
 
-            string texto = prmTexto;
+        }
+        public static string GetLast(string prmTexto)
+        {
+            if (prmTexto != null)
+                return xString.GetChar(prmTexto,prmTexto.Length);
+            return ("");
 
-            while (true) 
-            {
-
-                string bloco = GetBloco(texto, prmDelimitadorInicial, prmDelimitadorFinal);
-
-                if (bloco == "")
-                    break;
-
-                string trecho_velho = prmDelimitadorInicial + bloco + prmDelimitadorFinal;
-
-                string trecho_novo = prmDelimitadorInicialNovo + bloco + prmDelimitadorFinalNovo;
-
-                texto = texto.Replace(trecho_velho, trecho_novo);
-
-            }
-
-            return (texto);
+        }
+        public static string GetChar(string prmTexto, int prmIndice)
+        {
+            if (prmTexto != null)
+                return (prmTexto.Substring(prmIndice -1, 1));
+            return ("");
 
         }
         public static string GetSubstring(string prmValor, int prmIndice)
@@ -72,9 +47,18 @@ namespace Dooggy
 
             return ("");
         }
+        public static string GetRemove(string prmTexto, string prmParte)
+        {
+
+            if (xString.IsStringOK(prmTexto))
+                return (prmTexto.Replace(prmParte, newValue: ""));
+
+            return ("");
+
+        }
         public static string GetReverse(string prmValor)
         {
-            
+
             if (prmValor != null)
                 return (new string(prmValor.Reverse().ToArray()));
 
@@ -82,7 +66,7 @@ namespace Dooggy
         }
         public static string GetMask(string prmValor, string prmMask)
         {
-            
+
             int cont = 0; int indice = 0; char simbolo = '#'; bool IsEnd = false; string resto;
 
             // Verifica se existe uma formatação a ser aplicada 
@@ -114,7 +98,7 @@ namespace Dooggy
                             texto = item + texto;
 
                         if (cont == valor.Length) IsEnd = true;
-                    
+
                     }
                     else
                     {
@@ -143,7 +127,7 @@ namespace Dooggy
             }
         }
 
-
     }
+
 
 }

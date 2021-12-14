@@ -10,36 +10,86 @@ namespace Dooggy.Lib.Generic
 {
     public class xTupla
     {
+
         private string separador;
-        public xTupla()
-        {
-            separador = "=";
-        }
-        public xTupla(string prmSeparador)
-        {
-            separador = prmSeparador;
-        }
+
+        private bool delimitador;
 
         private string _tag;
         private string _valor;
 
-        public string tag
-        { get => _tag; }
-        public string valor
-        { get => _valor; }
-        public string memo
-        { get => tag + separador + valor; }
-        public void Set(string prmTupla)
+        public string tag { get => _tag; }
+        public string valor { get => _valor; }
+
+        public string memo { get => GetMemo(); }
+
+        private bool TemDados { get => xString.IsStringOK(tag + valor); }
+
+        private bool TemDelimitador { get { if (delimitador && xString.IsStringOK(separador)) return (separador.Trim().Length >= 2); return (false); } }
+
+        private string delimitador_inicial { get { if (TemDelimitador) return xString.GetFirst(separador); return (""); } }
+        private string delimitador_final { get { if (TemDelimitador) return xString.GetLast(separador); return (""); } }
+
+        public xTupla(string prmTexto)
         {
-            xLista lista = new xLista(prmTupla, prmSeparador: "=");
+
+            Parse(prmTexto, prmSeparador: "=");
+
+        }
+        public xTupla(string prmTexto, string prmSeparador)
+        {
+
+            Parse(prmTexto, prmSeparador);
+
+        }
+
+        public xTupla(string prmTexto, string prmSeparador, bool prmDelimitador)
+        {
+
+            delimitador = prmDelimitador;
+
+            Parse(prmTexto, prmSeparador);
+
+        }
+
+        private void Parse(string prmTexto, string prmSeparador)
+        {
+
+            separador = prmSeparador;
+
+            if (TemDelimitador)
+                ParseDelimitador(prmTexto);
+            else
+                ParseSeparador(prmTexto);
+
+        }
+
+        private void ParseDelimitador(string prmTexto)
+        {
+
+            _tag = xSubString.GetBloco(prmTexto, delimitador_inicial, delimitador_final, prmPreserve: true, prmExtract: true).Trim();
+            _valor = xSubString.GetBloco(prmTexto, delimitador_inicial, delimitador_final).Trim();
+
+        }
+        private void ParseSeparador(string prmTexto)
+        {
+
+            xLista lista = new xLista(prmTexto, separador);
 
             _tag = lista.First;
-            _valor = lista.Last;
+
+            if (lista.IsUnico)
+                _valor = "";
+            else
+                _valor = lista.Last;
+
         }
+
         private void Set(string prmTag, string prmValor)
         {
             _tag = prmTag;
             _valor = prmValor;
+
         }
         public string GetOpcao(string prmKey, string prmOpcoes)
         {
@@ -51,6 +101,18 @@ namespace Dooggy.Lib.Generic
             return (Lista.GetFindx("[" + prmKey + "]"));
 
         }
+
+        private string GetMemo()
+        {
+            string texto = "";
+
+            if (TemDados)
+                texto = tag + ": (" + valor + ")";
+
+            return texto;
+
+        }
+
     }
     public class xLista : List<string>
     {
@@ -82,7 +144,7 @@ namespace Dooggy.Lib.Generic
 
             separador = prmSeparador;
 
-            if (prmLista.Trim() != "")
+            if (xString.IsStringOK(prmLista))
                 foreach (string item in prmLista.Split(separador))
                 {
                     this.Add(item.Trim());
@@ -91,9 +153,11 @@ namespace Dooggy.Lib.Generic
         }
         public int qtde { get => this.Count; }
 
-        public bool IsVazio { get => (qtde == 0); }
-
         public bool IsOK { get => !IsVazio; }
+
+        public bool IsUnico { get => (qtde == 1); }
+
+        public bool IsVazio { get => (qtde == 0); }
 
         public string First { get => Item(1); }
 
@@ -258,6 +322,4 @@ namespace Dooggy.Lib.Generic
         }
 
     }
-
 }
-

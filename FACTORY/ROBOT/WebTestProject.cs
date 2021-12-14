@@ -21,14 +21,12 @@ namespace Dooggy.Factory.Robot
         
         public string name;
 
-        public List<TestRobotSuite> Suites = new List<TestRobotSuite>();
+        public TestRobotSuites Suites = new TestRobotSuites();
 
         public void Start(eTipoDriver prmTipoDriver)
         {
 
             Trace.LogRobot.ActionTag(prmTag: "Projeto", name);
-
-            //Trace.LogRobot.ActionMassaOnLine(Massa.IsONLINE);
 
             BuildSuites();
 
@@ -72,7 +70,7 @@ namespace Dooggy.Factory.Robot
 
         public eTipoDriver tipoDriver;
 
-        public List<TestRobotScript> Scripts = new List<TestRobotScript>();
+        public TestRobotScripts Scripts = new TestRobotScripts();
 
         public string nome { get => this.GetType().Name; }
 
@@ -216,5 +214,7 @@ namespace Dooggy.Factory.Robot
         }
     }
 
+    public class TestRobotSuites : List<TestRobotSuite> { }
+    public class TestRobotScripts : List<TestRobotScript> { }
 
 }

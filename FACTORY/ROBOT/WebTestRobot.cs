@@ -292,9 +292,7 @@ namespace Dooggy.Factory.Robot
         public bool SetTarget(string prmTarget)
         {
 
-            xTupla Target = new xTupla();
-
-            Target.Set(prmTarget);
+            xTupla Target = new xTupla(prmTarget);
 
             return Elemento.SetAction(Target.valor);
         }
@@ -319,17 +317,15 @@ namespace Dooggy.Factory.Robot
 
         private eTipoElemento _tipo = eTipoElemento.Input;
 
-        private xTupla _chave = new xTupla();
-
         private QA_WebDominio Dominio;
 
         private QA_WebTarget _target;
 
+        public xTupla chave;
+
         public string key { get => _key; }
 
         public eTipoElemento tipo { get => _tipo; }
-
-        public xTupla Chave { get => _chave; }
 
         public IWebElement control { get => Target.control; }
 
@@ -343,7 +339,7 @@ namespace Dooggy.Factory.Robot
             _key = prmKey.ToLower();
             _tipo = eTipoElemento.Input;
 
-            _chave.Set(prmTarget);
+            chave = new xTupla(prmTarget);
 
             Dominio = new QA_WebDominio(this);
 
@@ -466,7 +462,7 @@ namespace Dooggy.Factory.Robot
         private string filtro;
 
         private ReadOnlyCollection<IWebElement> Opcoes;
-        public xTupla Chave { get => Elemento.Chave; }
+        public xTupla chave { get => Elemento.chave; }
 
         public QA_WebRobot Robot { get => Elemento.Robot; }
         public TestRobotProject Projeto { get => Robot.Projeto; }
@@ -538,9 +534,9 @@ namespace Dooggy.Factory.Robot
             string raiz_elemento = Projeto.Parameters.GetXPathBuscaRaizElementos();
 
             if (filtro == null)
-                return (string.Format(raiz_elemento, Chave.tag, Chave.valor));
+                return (string.Format(raiz_elemento, chave.tag, chave.valor));
 
-            return (string.Format(raiz_elemento + filtro, Chave.tag, Chave.valor));
+            return (string.Format(raiz_elemento + filtro, chave.tag, chave.valor));
 
         }
         public bool IsIndiceOk(int prmIndice)
@@ -560,14 +556,14 @@ namespace Dooggy.Factory.Robot
 
         public IWebElement control;
 
-        public xTupla Chave { get => Elemento.Chave; }
+        public xTupla chave { get => Elemento.chave; }
         public QA_WebRobot Robot { get => Elemento.Robot; }
 
         public QA_WebTarget(QA_WebElemento prmElemento)
         {
             Elemento  = prmElemento;
 
-            Setup(Chave.tag, Chave.valor);
+            Setup(chave.tag, chave.valor);
 
         }
         private void Setup(string prmTag, string prmValor)

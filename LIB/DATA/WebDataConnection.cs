@@ -185,7 +185,7 @@ namespace Dooggy.Lib.Data
         private string GetTratarSQL(string prmSQL)
         {
 
-            string sql = xString.GetTroca(prmSQL, prmDelimitadorInicial: "<##>", prmDelimitadorFinal: "<##>", prmDelimitadorNovo: "'");
+            string sql = xSubString.GetTroca(prmSQL, prmDelimitadorInicial: "<##>", prmDelimitadorFinal: "<##>", prmDelimitadorNovo: "'");
             
             return (sql); 
 
