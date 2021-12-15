@@ -13,7 +13,7 @@ using System.Text;
 namespace Dooggy.Factory.Data
 {
 
-    public enum eTipoFileSave : int
+    public enum eTipoFileFormat : int
     {
         json = 0,
         csv = 1,
@@ -46,7 +46,7 @@ namespace Dooggy.Factory.Data
         private TestDataViews Visoes;
         private TestDataModels Modelos;
 
-        private string pathDataFiles;
+        private xPath PathDataFiles;
 
         public DataBaseConnection DataBaseCorrente { get => (Bases.Corrente); }
 
@@ -63,6 +63,8 @@ namespace Dooggy.Factory.Data
         {
 
             Trace = new TestTrace();
+
+            PathDataFiles = new xPath();
 
             Bases = new DataBasesConnection();
 
@@ -108,24 +110,16 @@ namespace Dooggy.Factory.Data
         public void SetPathDestino(string prmPath)
         {
 
-            pathDataFiles = prmPath;
+            PathDataFiles.SetPath(prmPath);
 
             LogFile.SetPath(prmContexto: "MassaTestes", prmPath);
 
         }
+        public string GetPathDestino(string prmSubPath) => PathDataFiles.GetPath(prmSubPath);
 
-        public string GetPath(string prmSubPath)
-        {
-            if (prmSubPath != "")
-                return (pathDataFiles + @"\" + prmSubPath + @"\"); 
-
-            return (pathDataFiles);
-        }
-
-        public string csv(string prmTags) => Visoes.csv(prmTags);
-        public string json(string prmTags) => Visoes.json(prmTags);
-        public string txt(string prmTags, string prmSeparador, bool prmColunaExtra) => Visoes.txt(prmTags, prmSeparador, prmColunaExtra);
-
+        public string txt(string prmTags) => Visoes.Save(prmTags, prmTipo: eTipoFileFormat.txt);
+        public string csv(string prmTags) => Visoes.Save(prmTags, prmTipo: eTipoFileFormat.csv);
+        public string json(string prmTags) => Visoes.Save(prmTags, prmTipo: eTipoFileFormat.json);
     }
     public class TestDataLocal
     {
@@ -170,16 +164,16 @@ namespace Dooggy.Factory.Data
         public void AddDataVariant(string prmTag) => AddDataVariant(prmTag, prmRegra: "");
         public void AddDataVariant(string prmTag, string prmRegra) => Pool.AddDataVariant(prmTag, prmRegra);
 
-        public string Save(string prmTags, eTipoFileSave prmTipo)
+        public string Save(string prmTags, eTipoFileFormat prmTipo)
         {
 
             switch (prmTipo)
             {
 
-                case eTipoFileSave.csv:
+                case eTipoFileFormat.csv:
                     return csv(prmTags);
 
-                case eTipoFileSave.txt:
+                case eTipoFileFormat.txt:
                     return txt(prmTags);
 
             }
@@ -188,12 +182,9 @@ namespace Dooggy.Factory.Data
 
         }
 
+        public string txt(string prmTags) => (Pool.txt(prmTags));
         public string csv(string prmTags) => (Pool.csv(prmTags));
         public string json(string prmTags) => (Pool.json(prmTags));
-
-        public string txt(string prmTags) => txt(prmTags, prmColunaExtra: true);
-        public string txt(string prmTags, bool prmColunaExtra) => txt(prmTags, prmSeparador: ",", prmColunaExtra);
-        public string txt(string prmTags, string prmSeparador, bool prmColunaExtra) => Pool.txt(prmTags, prmSeparador, prmColunaExtra);
 
     }
 
@@ -218,6 +209,8 @@ namespace Dooggy.Factory.Data
 
 
         public string tag;
+
+        public string layout;
 
         public DataBaseConnection DataBase;
 
@@ -340,14 +333,30 @@ namespace Dooggy.Factory.Data
             return (false);
 
         }
-        public string txt(string prmTags, string prmSeparador, bool prmColunaExtra)
+        public string Save(string prmTags, eTipoFileFormat prmTipo)
         {
 
-            string tags;
-            string header;
-             
-            string txt = "xxx" + Environment.NewLine;
+            switch (prmTipo)
+            {
 
+                case eTipoFileFormat.csv:
+                    return csv(prmTags);
+
+                case eTipoFileFormat.txt:
+                    return txt(prmTags);
+
+            }
+
+            return json(prmTags);
+
+        }
+
+        private string txt(string prmTags) => txt(prmTags, prmSeparador: ",", prmColunaExtra: true);
+        private string txt(string prmTags, string prmSeparador, bool prmColunaExtra)
+        {
+
+            string corpo = ""; string header = "";
+             
             string linha; string extra = "";
 
             if (prmColunaExtra)
@@ -356,19 +365,40 @@ namespace Dooggy.Factory.Data
             foreach (TestDataView Visao in GetFiltro(prmTags))
             {
 
+                //
+                // Adicionar o Cabeçalho (Header) sempre que o layout da visão for diferente ...
+                //
+
+                if (header != Visao.layout)
+                {
+
+                    header = Visao.layout;
+
+                    corpo += header + Environment.NewLine;
+
+                    //Trace.LogFile.DataFileFormatTXT(header);
+
+                }
+
+                //
+                // Montar o Corpo do arquivo TXT ...
+                //
+
                 linha = Visao.csv(prmSeparador);
 
                 if (linha != "")
-                    txt += extra + linha;
+                    corpo += extra + linha;
 
-                txt += Environment.NewLine;
+                corpo += Environment.NewLine;
+
+                //Trace.LogFile.DataFileFormatTXT(linha);
 
             }
 
-            return (txt);
+            return (corpo);
 
         }
-        public string csv(string prmLista)
+        private string csv(string prmLista)
         {
 
             string csv = "";
@@ -380,7 +410,7 @@ namespace Dooggy.Factory.Data
             return (csv);
 
         }
-        public string json(string prmLista)
+        private string json(string prmLista)
         {
 
             string json = ""; string separador = "";
@@ -400,7 +430,7 @@ namespace Dooggy.Factory.Data
 
             TestDataViews filtro = new TestDataViews(Pool);
 
-            xLista lista = new xLista(prmLista);
+            xTuplas lista = new xTuplas(prmLista, prmSeparador: "+");
 
             foreach (TestDataView view in this)
             {
@@ -414,22 +444,27 @@ namespace Dooggy.Factory.Data
 
         }
 
-        private TestDataViews GetTrace(xLista prmLista, TestDataViews prmViews)
+        private TestDataViews GetTrace(xTuplas prmLista, TestDataViews prmViews)
         {
 
-            foreach (string item in prmLista)
+            foreach (xTupla tupla in prmLista)
             {
 
                 int cont = 0;
 
+                string tag = tupla.tag.ToLower();
+
                 foreach (TestDataView view in this)
                 {
 
-                    if (view.tag.ToLower().StartsWith(item.ToLower())) cont++;
+                    if (view.tag.ToLower().StartsWith(tag))
+                    { 
+                        view.layout = tupla.descricao; cont++;
+                    }
 
                 }
 
-                Trace.LogData.ViewsSelection(prmTag: item, prmQtde: cont);
+                Trace.LogData.ViewsSelection(prmTag: tag, prmQtde: cont);
 
             }
             return (prmViews);

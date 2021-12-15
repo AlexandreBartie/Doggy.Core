@@ -20,8 +20,8 @@ namespace Dooggy.POC.MassaTestes
             Dados.AddDataModel(prmTag: "Login", prmModelo: @"{'#TABELAS#':'seg.usuario','#CAMPOS#':'cod_usuario as login, ""1234as"" as senha, nom_usuario as usuarioLogado '}");
             Dados.AddDataVariant(prmTag: "=Marli", prmRegra: @"{'#CONDICAO#': 'cod_usuario = ""1016283"" ' }");
 
-            Dados.File.SaveAll(prmTags: "Login", prmNome: "LoginAdm", prmCabecalho: "testLoginAdmValido,login,senha,usuarioLogado"); 
-            
+            Dados.File.SaveAll(prmTags: "Login[testLoginAdmValido,login,senha,usuarioLogado]", prmNome: "LoginAdm");
+
             //
             // Buscar dados tabela Aluno
             //
@@ -31,7 +31,13 @@ namespace Dooggy.POC.MassaTestes
                 prmSQL: "SELECT * FROM (SELECT cod_matricula as matricula, nom_aluno as getNomeAluno FROM sia.aluno, sia.aluno_curso WHERE sia.aluno.num_seq_aluno = '4495769' and cod_matricula = '201903371619') WHERE ROWNUM = 1",
                 prmMask: "{ 'matricula': '####.##.#####-#' }");
 
-            Dados.File.SaveAll(prmTags: "Aluno", prmNome: "ArqDadosAtendimentoAoAluno", prmCabecalho: "test01_ValidarInformacoesDoAluno,matricula,getNomeAluno");
+            Dados.File.SaveAll(prmTags: "Aluno[test01_ValidarInformacoesDoAluno,matricula,getNomeAluno]", prmNome: "ArqDadosAtendimentoAoAluno");
+
+            //
+            // Cria um 3o. arquivo Unificado
+            //
+
+            Dados.File.SaveAll(prmTags: "Login[testLoginAdmValido,login,senha,usuarioLogado] + Aluno[test01_ValidarInformacoesDoAluno,matricula,getNomeAluno]", prmNome: "ArqDadosUnificado");
 
         }
         public void CONFIG()

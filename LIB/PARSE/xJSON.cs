@@ -16,7 +16,7 @@ namespace Dooggy.Lib.Parse
         public bool IsErro { get => (Erro != null); }
         public bool IsCurrent { get => Controle.IsCurrent; }
 
-         public Exception Erro { get => Controle.erro; }
+        public Exception Erro { get => Controle.erro; }
 
         public string fluxo { get => Controle.fluxo; }
 

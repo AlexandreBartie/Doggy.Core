@@ -9,8 +9,7 @@ namespace Dooggy
         public static string GetBloco(string prmTexto, string prmDelimitador) => GetBloco(prmTexto, prmDelimitador, prmDelimitador);
         public static string GetBloco(string prmTexto, string prmDelimitador, bool prmPreserve) => GetBloco(prmTexto, prmDelimitador, prmDelimitador, prmPreserve);
         public static string GetBloco(string prmTexto, string prmDelimitadorInicial, string prmDelimitadorFinal) => GetBloco(prmTexto, prmDelimitadorInicial, prmDelimitadorFinal, prmPreserve: false);
-        public static string GetBloco(string prmTexto, string prmDelimitadorInicial, string prmDelimitadorFinal, bool prmPreserve) => GetBloco(prmTexto, prmDelimitadorInicial, prmDelimitadorFinal, prmPreserve, prmExtract: false);
-        public static string GetBloco(string prmTexto, string prmDelimitadorInicial, string prmDelimitadorFinal, bool prmPreserve, bool prmExtract)
+        public static string GetBloco(string prmTexto, string prmDelimitadorInicial, string prmDelimitadorFinal, bool prmPreserve)
         {
 
             string retorno = "";
@@ -32,10 +31,15 @@ namespace Dooggy
             if (prmPreserve)
                 retorno = prmDelimitadorInicial + retorno + prmDelimitadorFinal;
 
-            if (prmExtract)
-                retorno = xString.GetRemove(prmTexto, retorno);
-
             return (retorno);
+
+        }
+        public static string GetBlocoRemove(string prmTexto, string prmDelimitadorInicial, string prmDelimitadorFinal)
+        {
+
+            string retorno = GetBloco(prmTexto, prmDelimitadorInicial ,prmDelimitadorFinal, prmPreserve:true);
+
+            return (xString.GetRemove(prmTexto, retorno));
 
         }
 

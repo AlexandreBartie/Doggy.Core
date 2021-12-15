@@ -11,29 +11,33 @@ namespace Dooggy.Lib.Generic
     public class xTupla
     {
 
-        private string separador;
-
-        private bool delimitador;
+        private string delimitadorInicial = "[";
+        private string delimitadorFinal = "]";
 
         private string _tag;
         private string _valor;
 
+        private string _bruto;
+        private string _descricao;
+
         public string tag { get => _tag; }
         public string valor { get => _valor; }
+
+        public string bruto { get => _bruto; }
+        public string descricao { get => _descricao; }
 
         public string memo { get => GetMemo(); }
 
         private bool TemDados { get => xString.IsStringOK(tag + valor); }
+        private bool TemDescricao { get => (descricao != ""); }
 
-        private bool TemDelimitador { get { if (delimitador && xString.IsStringOK(separador)) return (separador.Trim().Length >= 2); return (false); } }
-
-        private string delimitador_inicial { get { if (TemDelimitador) return xString.GetFirst(separador); return (""); } }
-        private string delimitador_final { get { if (TemDelimitador) return xString.GetLast(separador); return (""); } }
+        public xTupla()
+        { }
 
         public xTupla(string prmTexto)
         {
 
-            Parse(prmTexto, prmSeparador: "=");
+            Parse(prmTexto);
 
         }
         public xTupla(string prmTexto, string prmSeparador)
@@ -43,38 +47,33 @@ namespace Dooggy.Lib.Generic
 
         }
 
-        public xTupla(string prmTexto, string prmSeparador, bool prmDelimitador)
+        public void Parse(string prmTexto)
         {
 
-            delimitador = prmDelimitador;
-
-            Parse(prmTexto, prmSeparador);
+            Parse(prmTexto, prmSeparador: "=");
 
         }
 
-        private void Parse(string prmTexto, string prmSeparador)
+        public void Parse(string prmTexto, string prmSeparador)
         {
 
-            separador = prmSeparador;
+            //
+            // Get descricao Tupla (estão entre delimitadores pré-definidos)
+            //
 
-            if (TemDelimitador)
-                ParseDelimitador(prmTexto);
-            else
-                ParseSeparador(prmTexto);
+            _descricao = xSubString.GetBloco(prmTexto, delimitadorInicial, delimitadorFinal).Trim();
 
-        }
+            //
+            // Remove descricao da Tupla (para permitir identificar "tag" e "valor")
+            //
 
-        private void ParseDelimitador(string prmTexto)
-        {
+            _bruto = xSubString.GetBlocoRemove(prmTexto, delimitadorInicial, delimitadorFinal);
 
-            _tag = xSubString.GetBloco(prmTexto, delimitador_inicial, delimitador_final, prmPreserve: true, prmExtract: true).Trim();
-            _valor = xSubString.GetBloco(prmTexto, delimitador_inicial, delimitador_final).Trim();
+            //
+            // Identifica "tag" e "valor"
+            //
 
-        }
-        private void ParseSeparador(string prmTexto)
-        {
-
-            xLista lista = new xLista(prmTexto, separador);
+            xLista lista = new xLista(bruto, prmSeparador);
 
             _tag = lista.First;
 
@@ -105,15 +104,79 @@ namespace Dooggy.Lib.Generic
         private string GetMemo()
         {
             string texto = "";
-
+            
             if (TemDados)
-                texto = tag + ": (" + valor + ")";
+                texto += tag + ": '" + valor + "'";
 
-            return texto;
+            if (TemDescricao)
+                texto += " <" + descricao + ">";
+
+            return texto.Trim();
 
         }
 
     }
+
+    public class xTuplas : List<xTupla>
+    {
+
+        public string memo { get => GetMemo(); }
+
+        public xTuplas(string prmLista)
+        {
+            Parse(prmLista, prmSeparador: ",");
+        }
+
+        public xTuplas(string prmLista, string prmSeparador)
+        {
+            
+            Parse(prmLista, prmSeparador);
+
+        }
+
+        public virtual void Parse(string prmLista, string prmSeparador)
+        {
+
+            if (xString.IsStringOK(prmLista))
+            {
+
+                foreach (string item in new xLista(prmLista, prmSeparador))
+                {
+                    this.Add(new xTupla(item));
+                }
+
+            }
+
+        }
+        public bool IsContem(string prmItem)
+        {
+
+            foreach (xTupla tupla in this)
+            {
+                if (prmItem.ToLower().Contains(tupla.bruto.ToLower()))
+                    return true;
+            }
+
+            return (false);
+        }
+        private string GetMemo()
+        {
+
+            string memo = ""; string separador = "";
+
+            foreach (xTupla tupla in this)
+            {
+                memo += separador + tupla.memo;
+
+                separador = ", ";
+            }
+
+            return (memo);
+
+        }
+
+    }
+
     public class xLista : List<string>
     {
 
@@ -186,18 +249,6 @@ namespace Dooggy.Lib.Generic
                 return (this[prmIndice - 1]);
             else
                 return ("");
-        }
-
-        public bool IsContem(string prmItem)
-        {
-
-            foreach (string item in this)
-            {
-                if (prmItem.ToLower().Contains(item.ToLower()))
-                    return true;
-            }
-
-            return (false);
         }
 
         public string GetRemove() => GetRemove(prmIndice: 1);

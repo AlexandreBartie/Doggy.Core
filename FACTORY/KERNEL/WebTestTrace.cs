@@ -84,11 +84,16 @@ namespace Dooggy.Factory
 
         public void SetPath(string prmContexto, string prmPath) => msgFile(String.Format(@"Path Definido: ""{0}"" tag[{1}]", prmPath, prmContexto));
         public void DataFileExport(string prmNome, string prmSubPath, string prmExtensao) => msgFile(String.Format(@"Arquivo [{0}.{1}] gerado com sucesso. path: ""..\{2}""", prmNome, prmExtensao, prmSubPath));
+        public void DataFileFormatTXT(string prmConteudo) => msgFile(prmConteudo, prmTipo: "TXT");
+        public void DataFileFormatCSV(string prmConteudo) => msgFile(prmConteudo, prmTipo: "CSV");
+        public void DataFileFormatJSON(string prmConteudo) => msgFile(prmConteudo, prmTipo: "JSON");
 
-        public void FailDataFileExport(string prmPath, string prmNome, string prmExtensao) => msgErro(String.Format("Criação do arquivo falhou ... file:[{0}.{1}] path:[{2}]", prmNome, prmExtensao, prmPath));
+        public void FailDataFileExport(string prmPath, string prmNome, string prmExtensao) => msgErro(String.Format("Falha na criação do arquivo ... file:[{0}.{1}] path:[{2}]", prmNome, prmExtensao, prmPath));
+        public void FailDataFileOpen(string prmPath, string prmNome, string prmExtensao) => msgErro(String.Format("Falha na abertura do arquivo ... file:[{0}.{1}] path:[{2}]", prmNome, prmExtensao, prmPath));
         public void FailJSONFormat(string prmContexto, string prmFluxo, Exception prmErro) => msgErro(prmTexto: String.Format(@"Fluxo JSON: [invalid format] ... contexto: {0} fluxo: {1}", prmContexto, prmFluxo));
   
     }
+
     public class TestTraceLogRobot : TestTraceLog
     {
 
@@ -121,7 +126,8 @@ namespace Dooggy.Factory
         public void msgTrace(string prmTrace) => Message(prmTipo: "TRACE", prmTrace);
         public void msgSQL(string prmMensagem) => Message(prmTipo: "SQL", prmMensagem);
         public void msgData(string prmMensagem) => Message(prmTipo: "DATA", prmMensagem);
-        public void msgFile(string prmMensagem) => Message(prmTipo: "FILE", prmMensagem);
+        public void msgFile(string prmMensagem) => msgFile(prmMensagem, prmTipo: "FILE");
+        public void msgFile(string prmMensagem, string prmTipo) => Message(prmTipo, prmMensagem);
         public void msgShow(string prmMensagem) => Message(prmTipo: "SHOW", prmMensagem);
         public void msgAviso(string prmAviso) => Message(prmTipo: "AVISO", prmAviso);
         public void msgFalha(string prmAviso) => Message(prmTipo: "FALHA", prmAviso);

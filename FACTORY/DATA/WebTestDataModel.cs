@@ -56,7 +56,7 @@ namespace Dooggy.Factory.Data
             return (false);
         }
 
-        public string GetPath(string prmSubPath) => Dados.Pool.GetPath(prmSubPath);
+        public string GetPath(string prmSubPath) => Dados.Pool.GetPathDestino(prmSubPath);
 
     }
     public class TestDataModel : TestDataMask
