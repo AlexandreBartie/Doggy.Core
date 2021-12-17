@@ -16,55 +16,70 @@ namespace Dooggy
             return (false);
 
         }
-        public static string GetFirst(string prmTexto)
-        {
-            if (prmTexto != null)
-                return xString.GetChar(prmTexto,1);
-            return ("");
 
-        }
+        public static string GetChar(string prmTexto, int prmIndice) => (GetSubstring(prmTexto, prmIndice, 1));
+
+        public static string GetFirst(string prmTexto) => GetChar(prmTexto, prmIndice: 1);
         public static string GetLast(string prmTexto)
         {
-            if (prmTexto != null)
-                return xString.GetChar(prmTexto,prmTexto.Length);
+            if (IsStringOK(prmTexto))
+                return GetChar(prmTexto, prmIndice: prmTexto.Length);
+
             return ("");
 
         }
-        public static string GetChar(string prmTexto, int prmIndice)
+
+    public static string GetInicial(string prmTexto, int prmTamanho)
         {
-            if (prmTexto != null)
-                return (prmTexto.Substring(prmIndice -1, 1));
+            if (IsStringOK(prmTexto))
+                return GetSubstring(prmTexto, prmIndice: 1, prmTamanho);
+
             return ("");
 
         }
-        public static string GetSubstring(string prmValor, int prmIndice)
+        public static string GetFinal(string prmTexto, int prmTamanho)
+        {
+            if (IsStringOK(prmTexto))
+                return GetSubstring(prmTexto, prmIndice: prmTexto.Length - prmTamanho + 1, prmTamanho);
+            
+            return ("");
+
+        }
+
+        public static string GetSubstring(string prmTexto, int prmIndice) => GetSubstring(prmTexto, prmIndice, prmTamanho: prmTexto.Length - prmIndice);
+        public static string GetSubstring(string prmTexto, int prmIndice, int prmTamanho)
         {
 
-            if ((prmValor != null) & (prmValor.Length >= prmIndice))
-            {
-                return (prmValor.Substring(prmIndice));
-            }
+            int indice = prmIndice - 1;
+
+            if (IsStringOK(prmTexto))
+
+                if ( (indice >= 0) && (prmTexto.Length >= indice + prmTamanho))
+                    return (prmTexto.Substring(indice, prmTamanho));
+                else
+                    return (prmTexto);
 
             return ("");
         }
+        
         public static string GetRemove(string prmTexto, string prmParte)
         {
 
-            if (xString.IsStringOK(prmTexto))
+            if (IsStringOK(prmTexto))
                 return (prmTexto.Replace(prmParte, newValue: ""));
 
             return ("");
 
         }
-        public static string GetReverse(string prmValor)
+        public static string GetReverse(string prmTexto)
         {
 
-            if (prmValor != null)
-                return (new string(prmValor.Reverse().ToArray()));
+            if (IsStringOK(prmTexto))
+                return (new string(prmTexto.Reverse().ToArray()));
 
             return ("");
         }
-        public static string GetMask(string prmValor, string prmMask)
+        public static string GetMask(string prmTexto, string prmMask)
         {
 
             int cont = 0; int indice = 0; char simbolo = '#'; bool IsEnd = false; string resto;
@@ -72,11 +87,11 @@ namespace Dooggy
             // Verifica se existe uma formatação a ser aplicada 
 
             if (prmMask == "")
-                return prmValor;
+                return prmTexto;
 
             // Inverter Valores
 
-            string valor = GetReverse(prmValor);
+            string valor = GetReverse(prmTexto);
             string mask = GetReverse(prmMask);
 
             string texto = "";

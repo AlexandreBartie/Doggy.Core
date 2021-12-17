@@ -61,13 +61,13 @@ namespace Dooggy.Lib.Generic
             // Get descricao Tupla (estão entre delimitadores pré-definidos)
             //
 
-            _descricao = xSubString.GetBloco(prmTexto, delimitadorInicial, delimitadorFinal).Trim();
+            _descricao = Blocos.GetBloco(prmTexto, delimitadorInicial, delimitadorFinal).Trim();
 
             //
             // Remove descricao da Tupla (para permitir identificar "tag" e "valor")
             //
 
-            _bruto = xSubString.GetBlocoRemove(prmTexto, delimitadorInicial, delimitadorFinal);
+            _bruto = Blocos.GetBlocoRemove(prmTexto, delimitadorInicial, delimitadorFinal);
 
             //
             // Identifica "tag" e "valor"
@@ -250,6 +250,8 @@ namespace Dooggy.Lib.Generic
             else
                 return ("");
         }
+
+        public bool IsContem(string prmTexto) => (GetContain(prmTexto) != 0);
 
         public string GetRemove() => GetRemove(prmIndice: 1);
 

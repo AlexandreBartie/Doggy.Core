@@ -683,7 +683,7 @@ namespace Dooggy.Factory.Robot
 
         public QA_FonteDados Fonte;
 
-        private TestDataView DefaultView;
+        private TestDataFluxo DefaultView;
 
         public xJSON JSON = new xJSON();
 
@@ -713,7 +713,7 @@ namespace Dooggy.Factory.Robot
             DefaultView = null;
 
             if (Pool.SetView(prmTag))
-                DefaultView = Pool.DataViewCorrente;
+                DefaultView = Pool.DataFluxoCorrente;
 
             return (IsSTATIC);
 

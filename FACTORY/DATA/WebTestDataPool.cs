@@ -38,19 +38,22 @@ namespace Dooggy.Factory.Data
     public class TestDataPool
     {
 
+        private DataBasesConnection Bases;
+
         public TestTrace Trace;
 
         public TestDataConnect Connect;
 
-        private DataBasesConnection Bases;
-        private TestDataViews Visoes;
+        private TestDataViews Views;
+        private TestDataFluxos Fluxos;
         private TestDataModels Modelos;
 
         private xPath PathDataFiles;
 
         public DataBaseConnection DataBaseCorrente { get => (Bases.Corrente); }
 
-        public TestDataView DataViewCorrente { get => (Visoes.Corrente); }
+        public TestDataView DataViewCorrente { get => (Views.Corrente); }
+        public TestDataFluxo DataFluxoCorrente { get => (Fluxos.Corrente); }
         public TestDataModel DataModelCorrente { get => (Modelos.Corrente); }
 
         public TestTraceLogData LogData { get => (Trace.LogData); }
@@ -68,7 +71,8 @@ namespace Dooggy.Factory.Data
 
             Bases = new DataBasesConnection();
 
-            Visoes = new TestDataViews(this);
+            Views = new TestDataViews(this);
+            Fluxos = new TestDataFluxos(this);
             Modelos = new TestDataModels();
 
             Connect = new TestDataConnect(this);
@@ -77,18 +81,19 @@ namespace Dooggy.Factory.Data
 
         public bool AddDataBase(string prmTag, string prmConexao) => Bases.AddItem(prmTag, prmConexao, this);
 
-        public bool AddDataView(string prmTag, string prmSQL) => AddDataView(prmTag, prmSQL, prmMask: "");
-        public bool AddDataView(string prmTag, string prmSQL, string prmMask) => Visoes.AddItem(prmTag, prmSQL, prmMask, DataBaseCorrente);
+        public string AddDataView(string prmTag) => Views.AddItem(prmTag, DataBaseCorrente);
 
-        public void SetMaskDataView(string prmMask) => Visoes.SetMask(prmMask);
+        public bool AddDataFluxo(string prmTag, string prmSQL) => AddDataFluxo(prmTag, prmSQL, prmMask: "");
+        public bool AddDataFluxo(string prmTag, string prmSQL, string prmMask) => Fluxos.AddItem(prmTag, prmSQL, prmMask, DataViewCorrente);
+
+        public void SetMaskDataFluxo(string prmMask) => Fluxos.SetMask(prmMask);
 
         public bool AddDataModel(string prmTag, string prmModelo, string prmMask) => Modelos.AddItem(prmTag, prmModelo, prmMask, DataBaseCorrente);
-
         public bool AddDataVariant(string prmTag, string prmRegra) => AddDataVariant(prmTag, prmRegra, prmQtde: 1);
 
         public bool AddDataVariant(string prmTag, string prmRegra, int prmQtde) => DataModelCorrente.CriarVariacao(prmTag, prmRegra, prmQtde);
 
-        public bool SetView(string prmTag) => Visoes.SetView(prmTag);
+        public bool SetView(string prmTag) => Fluxos.SetView(prmTag);
 
         public bool IsON()
         {
@@ -117,9 +122,9 @@ namespace Dooggy.Factory.Data
         }
         public string GetPathDestino(string prmSubPath) => PathDataFiles.GetPath(prmSubPath);
 
-        public string txt(string prmTags) => Visoes.Save(prmTags, prmTipo: eTipoFileFormat.txt);
-        public string csv(string prmTags) => Visoes.Save(prmTags, prmTipo: eTipoFileFormat.csv);
-        public string json(string prmTags) => Visoes.Save(prmTags, prmTipo: eTipoFileFormat.json);
+        public string txt(string prmTags) => Fluxos.Save(prmTags, prmTipo: eTipoFileFormat.txt);
+        public string csv(string prmTags) => Fluxos.Save(prmTags, prmTipo: eTipoFileFormat.csv);
+        public string json(string prmTags) => Fluxos.Save(prmTags, prmTipo: eTipoFileFormat.json);
     }
     public class TestDataLocal
     {
@@ -134,7 +139,9 @@ namespace Dooggy.Factory.Data
 
         public TestDataView View { get => Pool.DataViewCorrente; }
 
-        public string tagView { get => View.tag; }
+        //public TestDataFluxo Fluxo { get => Pool.DataFluxoCorrente; }
+
+        //public string tagFluxo { get => Fluxo.tag; }
 
         public TestDataLocal()
         {
@@ -155,8 +162,10 @@ namespace Dooggy.Factory.Data
         }
         public bool AddDataBase(string prmTag, string prmConexao) => (Pool.AddDataBase(prmTag, prmConexao));
 
-        public bool AddDataView(string prmTag, string prmSQL) => (AddDataView(prmTag, prmSQL, prmMask: ""));
-        public bool AddDataView(string prmTag, string prmSQL, string prmMask) => (Pool.AddDataView(prmTag, prmSQL, prmMask));
+        public string AddDataView(string prmTag) => (Pool.AddDataView(prmTag));
+
+        public bool AddDataFluxo(string prmTag, string prmSQL) => (AddDataFluxo(prmTag, prmSQL, prmMask: ""));
+        public bool AddDataFluxo(string prmTag, string prmSQL, string prmMask) => (Pool.AddDataFluxo(prmTag, prmSQL, prmMask));
 
         public void AddDataModel(string prmTag, string prmModelo) => AddDataModel(prmTag, prmModelo, prmMask: "");
         public void AddDataModel(string prmTag, string prmModelo, string prmMask) => Pool.AddDataModel(prmTag, prmModelo, prmMask);
@@ -200,19 +209,57 @@ namespace Dooggy.Factory.Data
 
         }
 
-        public void SetMaskDataView(string prmTag, string prmMask) => Pool.SetMaskDataView(prmMask);
+        public void SetMaskDataFluxo(string prmTag, string prmMask) => Pool.SetMaskDataFluxo(prmMask);
 
 
     }
-    public class TestDataView : TestDataMask
+
+    public class TestDataView
+    {
+
+        public string tag;
+
+        public string descricao;
+
+        public string colunas;
+
+        public string header_txt { get => (descricao + "," + colunas); }
+
+        public DataBaseConnection DataBase;
+
+        public TestDataView(string prmTag, DataBaseConnection prmDataBase)
+        {
+
+            Setup(prmTag);
+
+            DataBase = prmDataBase;
+
+        }
+
+        private void Setup(string prmTag)
+        {
+
+            descricao = Blocos.GetBloco(prmTag, prmDelimitador: "|");
+
+            tag = Blocos.GetBlocoAntes(prmTag, descricao, prmTRIM: true);
+
+            colunas = Blocos.GetBlocoDepois(prmTag, descricao, prmTRIM: true);
+
+        }
+
+
+    }
+
+
+    public class TestDataFluxo : TestDataMask
     {
 
 
         public string tag;
 
-        public string layout;
+        public TestDataView DataView;
 
-        public DataBaseConnection DataBase;
+        public DataBaseConnection DataBase { get => DataView.DataBase; }
 
         // internal
 
@@ -234,10 +281,14 @@ namespace Dooggy.Factory.Data
 
         }
 
+        public string header_txt { get => DataView.header_txt; }
+
+        public bool IsTagPai(string prmTag) => tag.ToLower().StartsWith(prmTag.ToLower());
+            
         public bool IsOK { get => Cursor.IsOK(); }
         public Exception erro { get => Cursor.erro; }
 
-        public TestDataView(string prmTag, string prmSQL, string prmMask, DataBaseConnection prmDataBase)
+        public TestDataFluxo(string prmTag, string prmSQL, string prmMask, TestDataView prmDataView)
         {
 
             tag = prmTag;
@@ -246,7 +297,7 @@ namespace Dooggy.Factory.Data
 
             SetMask(prmMask);
 
-            DataBase = prmDataBase;
+            DataView = prmDataView;
 
         }
 
@@ -263,9 +314,6 @@ namespace Dooggy.Factory.Data
         public string csv() => Cursor.GetCSV();
         public string json() => Cursor.GetJSON();
 
-        public string log_sql() => String.Format("VIEW:[{0,25}] SQL: {1}", tag, sql);
-        public string log_data() => String.Format("DATA:[{0,25}] Fluxo: {1}", tag, json());
-
     }
 
     public class TestDataMask
@@ -278,14 +326,13 @@ namespace Dooggy.Factory.Data
         public void SetMask(string prmMask) { _mask = prmMask; }
 
     }
+
     public class TestDataViews : List<TestDataView>
     {
 
         private TestDataPool Pool;
 
         public TestDataView Corrente;
-
-        public TestTrace Trace { get => Pool.Trace; }
 
         public TestDataViews(TestDataPool prmPool)
         {
@@ -294,18 +341,48 @@ namespace Dooggy.Factory.Data
 
         }
 
-        public bool AddItem(string prmTag, string prmSQL, string prmMask, DataBaseConnection prmDataBase)
+        public string AddItem(string prmTag, DataBaseConnection prmDataBase)
         {
 
-            if (prmDataBase != null)
+            Corrente = new TestDataView(prmTag, prmDataBase);
+
+            Add(Corrente);
+
+            return Corrente.tag;
+
+        }
+
+    }
+    public class TestDataFluxos : List<TestDataFluxo>
+    {
+
+        private TestDataPool Pool;
+
+        public TestDataFluxo Corrente;
+
+        public TestTrace Trace { get => Pool.Trace; }
+
+        public TestDataFluxos(TestDataPool prmPool)
+        {
+
+            Pool = prmPool;
+
+        }
+
+        public bool AddItem(string prmTag, string prmSQL, string prmMask, TestDataView prmDataView)
+        {
+
+            if (prmDataView != null)
             {
 
-                Corrente = new TestDataView(prmTag, prmSQL, prmMask, prmDataBase);
+                Corrente = new TestDataFluxo(prmTag, prmSQL, prmMask, prmDataView);
 
                 Add(Corrente);
 
                 return (true);
             }
+
+            Trace.LogData.FailNoDataViewDetected(prmTag);
 
             return (false);
 
@@ -316,7 +393,7 @@ namespace Dooggy.Factory.Data
         public bool SetView(string prmTag)
         {
 
-            foreach (TestDataView Visao in this)
+            foreach (TestDataFluxo Visao in this)
             {
 
                 if (Visao.tag == prmTag)
@@ -362,17 +439,17 @@ namespace Dooggy.Factory.Data
             if (prmColunaExtra)
                 extra = prmSeparador;
 
-            foreach (TestDataView Visao in GetFiltro(prmTags))
+            foreach (TestDataFluxo Fluxo in GetFiltro(prmTags))
             {
 
                 //
                 // Adicionar o Cabeçalho (Header) sempre que o layout da visão for diferente ...
                 //
 
-                if (header != Visao.layout)
+                if (header != Fluxo.header_txt)
                 {
 
-                    header = Visao.layout;
+                    header = Fluxo.header_txt;
 
                     corpo += header + Environment.NewLine;
 
@@ -384,7 +461,7 @@ namespace Dooggy.Factory.Data
                 // Montar o Corpo do arquivo TXT ...
                 //
 
-                linha = Visao.csv(prmSeparador);
+                linha = Fluxo.csv(prmSeparador);
 
                 if (linha != "")
                     corpo += extra + linha;
@@ -403,8 +480,8 @@ namespace Dooggy.Factory.Data
 
             string csv = "";
 
-            foreach (TestDataView Visao in GetFiltro(prmLista))
-                csv += Visao.csv() + Environment.NewLine;
+            foreach (TestDataFluxo Fluxo in GetFiltro(prmLista))
+                csv += Fluxo.csv() + Environment.NewLine;
 
 
             return (csv);
@@ -415,28 +492,28 @@ namespace Dooggy.Factory.Data
 
             string json = ""; string separador = "";
 
-            foreach (TestDataView Visao in GetFiltro(prmLista))
+            foreach (TestDataFluxo Fluxo in GetFiltro(prmLista))
             {
 
-                json += separador + Visao.json(); separador = ", ";
+                json += separador + Fluxo.json(); separador = ", ";
 
             }
 
             return (json);
 
         }
-        private TestDataViews GetFiltro(string prmLista)
+        private TestDataFluxos GetFiltro(string prmLista)
         {
 
-            TestDataViews filtro = new TestDataViews(Pool);
+            TestDataFluxos filtro = new TestDataFluxos(Pool);
 
-            xTuplas lista = new xTuplas(prmLista, prmSeparador: "+");
+            xLista lista = new xLista(prmLista, prmSeparador: "+");
 
-            foreach (TestDataView view in this)
+            foreach (TestDataFluxo Fluxo in this)
             {
 
-                if (lista.IsContem(view.tag))
-                    filtro.Add(view);
+                if (lista.IsContem(Fluxo.tag))
+                    filtro.Add(Fluxo);
 
             }
 
@@ -444,22 +521,20 @@ namespace Dooggy.Factory.Data
 
         }
 
-        private TestDataViews GetTrace(xTuplas prmLista, TestDataViews prmViews)
+        private TestDataFluxos GetTrace(xLista prmLista, TestDataFluxos prmViews)
         {
 
-            foreach (xTupla tupla in prmLista)
+            foreach (string tag in prmLista)
             {
 
                 int cont = 0;
 
-                string tag = tupla.tag.ToLower();
-
-                foreach (TestDataView view in this)
+                foreach (TestDataFluxo Fluxo in this)
                 {
 
-                    if (view.tag.ToLower().StartsWith(tag))
-                    { 
-                        view.layout = tupla.descricao; cont++;
+                    if (Fluxo.tag.ToLower().StartsWith(tag))
+                    {
+                        cont++;
                     }
 
                 }

@@ -68,7 +68,7 @@ namespace Dooggy.Factory.Data
 
         public DataBaseConnection DataBase;
 
-        private TestDataViews Visoes;
+        private TestDataFluxos Fluxos;
 
         private TestDataVariant Variacao;
 
@@ -79,28 +79,35 @@ namespace Dooggy.Factory.Data
         public TestDataModel(string prmTag, string prmModel, string prmMask, DataBaseConnection prmDataBase)
         {
 
-            tag = prmTag;
-
-            Parametros = new xJSON(prmModel);
-
-            SetMask(prmMask);
-
             DataBase = prmDataBase;
+
+            CriarView(prmTag, prmModel, prmMask);
 
             Variacao = new TestDataVariant(this);
 
-            Visoes = new TestDataViews(Pool);
+            Fluxos = new TestDataFluxos(Pool);
+
+         }
+
+        private void CriarView(string prmTag, string prmModel, string prmMask)
+        {
+
+            tag = Pool.AddDataView(prmTag);
+
+            SetMask(prmMask);
+
+            Parametros = new xJSON(prmModel);
 
             if (Parametros.IsErro)
-                Trace.LogData.FailSQLNoDataModelConnection(prmTag, prmModel, Parametros.Erro);
+                Trace.LogData.FailSQLDataModelConnection(tag, prmModel, Parametros.Erro);
 
         }
 
-        public bool CriarView(string prmTag, string prmSQL)
+        public bool CriarFluxo(string prmTag, string prmSQL)
         {
 
-            if (Pool.AddDataView(prmTag, prmSQL, mask))
-            { Visoes.Add(Pool.DataViewCorrente); return (true); }
+            if (Pool.AddDataFluxo(prmTag, prmSQL, mask))
+            { Fluxos.Add(Pool.DataFluxoCorrente); return (true); }
 
             return (false);
 
@@ -137,7 +144,7 @@ namespace Dooggy.Factory.Data
 
             Regras = new xJSON(prmRegras);
 
-            return (Modelo.CriarView(GetTagExtendida(prmTag), prmSQL: GetSQL(prmQtde)));
+            return (Modelo.CriarFluxo(GetTagExtendida(prmTag), prmSQL: GetSQL(prmQtde)));
 
         }
 

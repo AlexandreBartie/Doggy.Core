@@ -29,7 +29,7 @@ namespace Dooggy
 
             MassaTestes = new POC_MassaTestes();
 
-            string path = @"c:\MassaTestes\";
+            string path = @"c:\MassaTestes\POC\";
             string parametros = @"{ 'branch': '1085', 'port': '1521' }";
 
             //    Console.WriteLine("Por favor, informe o path + parâmetros do banco de dados (branch, porta) no formato json ...");
