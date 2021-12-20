@@ -128,8 +128,6 @@ namespace Dooggy.Factory.Data
 
         public TestDataModel Modelo;
 
-        private string GetTagExtendida(string prmTag) => Modelo.tag + prmTag;
-
         private bool IsRegraOK { get => (Regras.IsOK); }
 
         public TestDataVariant(TestDataModel prmModelo)
@@ -144,7 +142,7 @@ namespace Dooggy.Factory.Data
 
             Regras = new xJSON(prmRegras);
 
-            return (Modelo.CriarFluxo(GetTagExtendida(prmTag), prmSQL: GetSQL(prmQtde)));
+            return (Modelo.CriarFluxo(prmTag, prmSQL: GetSQL(prmQtde)));
 
         }
 

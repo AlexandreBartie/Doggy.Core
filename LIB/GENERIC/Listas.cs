@@ -228,7 +228,7 @@ namespace Dooggy.Lib.Generic
 
         public bool IsRange(int prmIndice) => ((prmIndice >= 1) && (prmIndice <= qtde));
 
-        public string log { get => GetLog(); }
+        public string log { get => GetTXT(); }
 
         public bool Excluir(int prmIndice)
         {
@@ -299,7 +299,7 @@ namespace Dooggy.Lib.Generic
         {
             return GetFind(prmTexto).Replace(prmTexto, "");
         }
-        private string GetLog()
+        private string GetTXT()
         {
 
             string aux = "";

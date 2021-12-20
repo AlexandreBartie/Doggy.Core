@@ -56,9 +56,9 @@ namespace Dooggy.Factory
         {
 
             if (prmQtde > 0)
-                msgData(string.Format(@"Views selecionadas: tag:[{0}] views: {1}", prmTag, prmQtde));
+                msgData(string.Format(@"View selecionada: tag: [{0}] fluxos: {1}", prmTag, prmQtde));
             else
-                msgAviso(string.Format(@"Nenhuma View foi encontrada: tag:[{0}]", prmTag));
+                msgAviso(string.Format(@"View não encontrada: tag: [{0}]", prmTag));
 
         }
         //

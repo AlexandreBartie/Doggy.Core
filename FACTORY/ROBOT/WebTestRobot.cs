@@ -683,7 +683,7 @@ namespace Dooggy.Factory.Robot
 
         public QA_FonteDados Fonte;
 
-        private TestDataFluxo DefaultView;
+        private TestDataFluxo DefaultFluxo;
 
         public xJSON JSON = new xJSON();
 
@@ -702,28 +702,28 @@ namespace Dooggy.Factory.Robot
         private TestTrace Trace { get => Robot.Trace; }
         private TestDataPool Pool { get => Project.Pool; }
 
-        private bool IsSTATIC => (DefaultView == null);
+        //private bool IsSTATIC => (DefaultFluxo == null);
         public bool IsOK { get => JSON.IsOK; }
         public bool IsCurrent { get => JSON.IsCurrent; }
 
         public string tipo { get { if (IsON) return ("ON-LINE"); return ("OFF-LINE"); } }
-        public bool SetView(string prmTag)
-        {
+        //public bool SetView(string prmTag)
+        //{
 
-            DefaultView = null;
+        //    DefaultFluxo = null;
 
-            if (Pool.SetView(prmTag))
-                DefaultView = Pool.DataFluxoCorrente;
+        //    if (Pool.SetView(prmTag))
+        //        DefaultFluxo = Pool.DataFluxoCorrente;
 
-            return (IsSTATIC);
+        //    return (IsSTATIC);
 
-        }
+        //}
         public void Add(string prmFluxo)
         {
-            if (IsSTATIC)
+            //if (IsSTATIC)
                 JSON.Add(prmFluxo);
-            else
-                AddCombine(prmFluxo, prmMestre: DefaultView.json());
+            //else
+                //AddCombine(prmFluxo, prmMestre: DefaultView.json());
         }
         public void Add(string prmFluxo, string prmView)
         {
