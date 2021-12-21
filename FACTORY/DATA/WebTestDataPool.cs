@@ -1,5 +1,6 @@
 ﻿using Dooggy;
 using Dooggy.Factory;
+using Dooggy.Factory.Console;
 using Dooggy.Lib.Data;
 using Dooggy.Lib.Files;
 using Dooggy.Lib.Generic;
@@ -22,8 +23,16 @@ namespace Dooggy.Factory.Data
 
     public class TestDataProject : TestFactory
     {
-
         public TestDataConnect Connect { get => Pool.Connect; }
+
+        public TestConsoleFactory Console;
+
+        public TestDataProject()
+        {
+
+            Console = new TestConsoleFactory(Dados);
+
+        }
 
         public void Start(string prmPath)
         {
@@ -137,9 +146,7 @@ namespace Dooggy.Factory.Data
 
         public TestDataView View { get => Pool.DataViewCorrente; }
 
-        //public TestDataFluxo Fluxo { get => Pool.DataFluxoCorrente; }
-
-        //public string tagFluxo { get => Fluxo.tag; }
+        public TestTrace Trace { get => Pool.Trace; }
 
         public TestDataLocal()
         {
@@ -171,7 +178,7 @@ namespace Dooggy.Factory.Data
         public void AddDataVariant(string prmTag) => AddDataVariant(prmTag, prmRegra: "");
         public void AddDataVariant(string prmTag, string prmRegra) => Pool.AddDataVariant(prmTag, prmRegra);
 
-        public string Save(string prmTags, eTipoFileFormat prmTipo)
+        public string SaveFile(string prmTags, eTipoFileFormat prmTipo)
         {
 
             switch (prmTipo)
@@ -188,7 +195,6 @@ namespace Dooggy.Factory.Data
             return json(prmTags);
 
         }
-
         public string txt(string prmTags) => (Pool.txt(prmTags));
         public string csv(string prmTags) => (Pool.csv(prmTags));
         public string json(string prmTags) => (Pool.json(prmTags));
@@ -246,7 +252,6 @@ namespace Dooggy.Factory.Data
             colunas = Blocos.GetBlocoDepois(prmTag, bloco, prmTRIM: true);
 
         }
-
 
     }
 

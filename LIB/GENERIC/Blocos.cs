@@ -14,7 +14,7 @@ namespace Dooggy
 
             string retorno = "";
 
-            if (prmTexto != null)
+            if (xString.IsStringOK(prmTexto))
             {
 
                 int inicio = prmTexto.IndexOf(prmDelimitadorInicial);

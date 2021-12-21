@@ -79,6 +79,15 @@ namespace Dooggy
 
             return ("");
         }
+        public static string GetNoBlank(string prmTexto)
+        {
+
+            if (IsStringOK(prmTexto))
+                return (GetRemove(prmTexto, " "));
+
+            return ("");
+        }
+        
         public static string GetMask(string prmTexto, string prmMask)
         {
 

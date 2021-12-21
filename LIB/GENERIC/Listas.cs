@@ -375,4 +375,23 @@ namespace Dooggy.Lib.Generic
         }
 
     }
+    public class xLinhas : xMemo
+    {
+
+        public xLinhas()
+        { Setup(); }
+
+        public xLinhas(string prmTexto)
+        {
+
+            Setup();
+
+            Parse(prmTexto);
+        
+        }
+
+        private void Setup() => separador = Environment.NewLine;
+
+
+    }
 }

@@ -18,7 +18,9 @@ namespace Dooggy.Factory
 
         public TestTraceLogRobot LogRobot;
 
-         public TestTrace()
+        public TestTraceLogConsole LogConsole;
+
+        public TestTrace()
         {
 
             LogGeneric = new TestTraceLog();
@@ -30,6 +32,8 @@ namespace Dooggy.Factory
             LogFile = new TestTraceLogFile();
 
             LogRobot = new TestTraceLogRobot();
+
+            LogConsole = new TestTraceLogConsole();
 
         }
 
@@ -75,10 +79,6 @@ namespace Dooggy.Factory
         private void FailConnection(string prmMSG, string prmTag, string prmFluxo, Exception prmErro) => msgErro(String.Format(@"{0} >>> tag:[{1}] {2}:", prmMSG, prmTag, prmFluxo), prmErro);
         private void FailConnection(string prmMSG, string prmVar, string prmTag, string prmSQL, Exception prmErro) => msgErro(String.Format(@"{0} >>> tag:[{2}] {1}: ""{3}""", prmMSG, prmVar, prmTag, prmSQL), prmErro);
 
-
-
-
-
     }
 
     public class TestTraceLogFile : TestTraceLog
@@ -119,6 +119,15 @@ namespace Dooggy.Factory
         public void ActionFailFormatJSON(string prmComando, Exception e) => msgErro("ACTION FAIL: JSON invalid format." + prmComando, e);
 
         public void TargetNotFound(string prmTAG) => msgErro("TARGET NOT FOUND: " + prmTAG);
+
+    }
+
+    public class TestTraceLogConsole : TestTraceLog
+    {
+
+        public void ActionKeyWord(string prmCommand) => msgTrace(String.Format("command: {0}", prmCommand));
+
+        public void FailKeyWord(string prmKeyWord) => msgErro(String.Format("KeyWord não encontrada ... key:[{0}]", prmKeyWord));
 
     }
     public class TestTraceLog : TestTraceErro
