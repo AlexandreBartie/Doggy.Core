@@ -25,12 +25,12 @@ namespace Dooggy.Factory.Data
     {
         public TestDataConnect Connect { get => Pool.Connect; }
 
-        public TestConsoleFactory Console;
+        public TestConsole Console;
 
         public TestDataProject()
         {
 
-            Console = new TestConsoleFactory(Dados);
+            Console = new TestConsole(Dados);
 
         }
 
@@ -94,6 +94,8 @@ namespace Dooggy.Factory.Data
 
         public bool AddDataFluxo(string prmTag, string prmSQL) => AddDataFluxo(prmTag, prmSQL, prmMask: "");
         public bool AddDataFluxo(string prmTag, string prmSQL, string prmMask) => Fluxos.AddItem(prmTag, prmSQL, prmMask, DataViewCorrente);
+
+        public void SetDataFluxo(string prmArg, string prmInstrucao) => Fluxos.SetArg(prmArg, prmInstrucao);
 
         public void SetMaskDataFluxo(string prmMask) => Fluxos.SetMask(prmMask);
 
@@ -169,9 +171,11 @@ namespace Dooggy.Factory.Data
 
         public string AddDataView(string prmTag) => (Pool.AddDataView(prmTag));
 
+        public bool AddDataFluxo(string prmTag) => (AddDataFluxo(prmTag, prmSQL: ""));
         public bool AddDataFluxo(string prmTag, string prmSQL) => (AddDataFluxo(prmTag, prmSQL, prmMask: ""));
         public bool AddDataFluxo(string prmTag, string prmSQL, string prmMask) => (Pool.AddDataFluxo(prmTag, prmSQL, prmMask));
 
+        public void AddDataModel(string prmTag) => AddDataModel(prmTag, prmModelo: "");
         public void AddDataModel(string prmTag, string prmModelo) => AddDataModel(prmTag, prmModelo, prmMask: "");
         public void AddDataModel(string prmTag, string prmModelo, string prmMask) => Pool.AddDataModel(prmTag, prmModelo, prmMask);
 
@@ -309,6 +313,8 @@ namespace Dooggy.Factory.Data
 
         }
 
+        public void SetSQL(string prmSQL) => sql = prmSQL; 
+
         public bool Next() => Cursor.Next();
 
         public string GetName(int prmIndice) => Cursor.GetName(prmIndice);
@@ -345,7 +351,7 @@ namespace Dooggy.Factory.Data
 
         public string mask { get => _mask; }
 
-        public void SetMask(string prmMask) { _mask = prmMask; }
+        public void SetMask(string prmMask) => _mask = prmMask;
 
     }
 
@@ -425,7 +431,26 @@ namespace Dooggy.Factory.Data
 
         }
 
-        public void SetMask(string prmMask) { Corrente.SetMask(prmMask); }
+        public void SetArg(string prmArg, string prmInstrucao)
+        {
+
+            switch (prmArg)
+            {
+
+                case "sql":
+                    SetSQL(prmInstrucao);
+                    break;
+
+                case "mask":
+                    SetSQL(prmInstrucao);
+                    break;
+
+            }
+
+        }
+
+        public void SetSQL(string prmSQL) => Corrente.SetSQL(prmSQL); 
+        public void SetMask(string prmMask) => Corrente.SetMask(prmMask);
 
         public string Save(string prmTags, eTipoFileFormat prmTipo)
         {

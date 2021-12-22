@@ -125,15 +125,25 @@ namespace Dooggy.Factory
     public class TestTraceLogConsole : TestTraceLog
     {
 
-        public void ActionKeyWord(string prmCommand) => msgTrace(String.Format("command: {0}", prmCommand));
+        public void WriteKeyWord(string prmKeyWord, string prmTarget) => msgView(String.Format("{0}:{1}", prmKeyWord, prmTarget));
 
-        public void FailKeyWord(string prmKeyWord) => msgErro(String.Format("KeyWord não encontrada ... key:[{0}]", prmKeyWord));
+        public void WriteKeyWordArg(string prmArg, string prmParametros) => msgView(String.Format("  -{0}: {1}", prmArg, prmParametros));
+
+        public void FailFindKeyWord(string prmKeyWord) => msgErro(String.Format("KeyWord não encontrada ... key:[{0}]", prmKeyWord));
+
+        public void FailActionKeyWord(string prmKeyWord) => msgErro(String.Format("KeyWord não executada ... key:[{0}]", prmKeyWord));
+
+        public void FailArgKeyWord(string prmKeyWord, string prmArg) => msgErro(String.Format("Argumento KeyWord não encontrada ... arg:[{0}.{1}]", prmKeyWord, prmArg));
+
+        public void FailMergeKeyWord(string prmKeyWord, string prmLinha) => msgErro(String.Format("Argumento KeyWord não definido ... arg:[{0}.{1}]", prmKeyWord, prmLinha));
 
     }
     public class TestTraceLog : TestTraceErro
     {
 
         public void msgStart(string prmTrace) => Message(prmTipo: "START", prmTrace);
+        public void msgView(string prmTrace) => Message(prmTipo: "VIEW", prmTrace);
+        public void msgPlay(string prmTrace) => Message(prmTipo: "PLAY", prmTrace);
         public void msgTrace(string prmTrace) => Message(prmTipo: "TRACE", prmTrace);
         public void msgSQL(string prmMensagem) => Message(prmTipo: "SQL", prmMensagem);
         public void msgData(string prmMensagem) => Message(prmTipo: "DATA", prmMensagem);
@@ -160,7 +170,7 @@ namespace Dooggy.Factory
         public void Message(string prmTipo, string prmMensagem)
         {
 
-            String texto = String.Format("[{0,5}]: {1} ", prmTipo, prmMensagem);
+            String texto = String.Format("[{0,5}] {1} ", prmTipo, prmMensagem);
 
 #if DEBUG
 

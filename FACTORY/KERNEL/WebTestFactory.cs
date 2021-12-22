@@ -18,7 +18,7 @@ namespace Dooggy.Factory
         public xJSON args = new xJSON();
 
         public TestDataPool Pool = new TestDataPool();
-
+        
         public TestTrace Trace = new TestTrace();
 
         public TestConfig Config = new TestConfig();

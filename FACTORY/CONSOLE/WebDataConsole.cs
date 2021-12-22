@@ -6,127 +6,118 @@ using System.Text;
 
 namespace Dooggy.Factory.Console
 {
-    public class TestConsoleFactory
+    public class TestConsole
     {
 
         public TestDataLocal Dados;
 
-        public TestConsoleMenu Menu;
-
-        private TestConsoleCommands Commands;
+        private TestCommands Commands;
 
         public TestTrace Trace => Dados.Trace;
 
-        public TestConsoleFactory(TestDataLocal prmDados)
+        public TestConsole(TestDataLocal prmDados)
         {
 
             Dados = prmDados;
 
-            Menu = new TestConsoleMenu(this);
-
-            Commands = new TestConsoleCommands(this);
+            Commands = new TestCommands(this);
 
         }
 
-        public bool Play(string prmCommand)
+        public void Write(string prmLinha) => Commands.Write(prmLinha);
+        public void Write(string prmWord, string prmTarget) => Write(prmWord, prmTarget, prmParameters: "");
+        public void Write(string prmWord, string prmTarget, string prmParameters) => Write(prmLinha: Commands.GetFormatLine(prmWord, prmTarget, prmParameters));
+
+        public void Play() => Commands.Play();
+        public void Play(string prmBloco) => Commands.Play(prmBloco);
+
+        public void SetOutput(string prmData) => Commands.output = prmData;
+        public string output() => Commands.output;
+    }
+
+    public class TestCommands : List<TestCommand>
+    {
+
+        public TestConsole Console;
+
+        public TestCommand Corrente;
+
+        public string output = "";
+
+        public TestCommands(TestConsole prmConsole)
         {
-            
-            Commands.Play(prmCommand);
-            
+
+            Console = prmConsole;
+
+        }
+
+        public void Write(string prmLinha)
+        {
+
+            string linha = prmLinha.Trim();
+
+            if (linha == "") return;
+
+            //
+            // Identifica KeyWord:Target do comando a ser executado ...
+            //
+
+            string key_target = Blocos.GetBloco(linha, prmDelimitadorInicial: "<", prmDelimitadorFinal: ">");
+
+            if (GetNewCommand(key_target))
+                Add(Corrente);
+            else
+                Corrente.AddParametros(linha);
+
+        }
+
+        public void Play() => Execute();
+        public void Play(string prmBloco)
+        {
+
+            foreach (string linha in new xLinhas(prmBloco))
+                Write(linha);
+
+            Play();
+
+        }
+
+        private void Execute()
+        {
+
+            foreach (TestCommand command in this)
+                command.Play();
+
+        }
+        private bool GetNewCommand(string prmKeyTarget)
+        {
+
+            if (prmKeyTarget == "") return (false);
+
+            //
+            // Separar o KeyWord e Target  ...
+            //
+
+            string keyword = xString.GetNoBlank(xString.GetInicial(prmKeyTarget, prmDelimitador: ":")).ToLower();
+            string target = xString.GetNoBlank(xString.GetFinal(prmKeyTarget, prmDelimitador: ":")).ToLower();
+
+            //
+            // Criar Novo Comando  ...
+            //
+
+            Corrente = new TestCommand(keyword, target, Console);
+
             return (true);
 
         }
 
-        public bool Play(string prmWord, string prmTarget) => Play(prmWord, prmTarget, prmRules: "");
-        public bool Play(string prmWord, string prmTarget, string prmRules) => Play(Commands.GetFormat(prmWord, prmTarget, prmRules));
-
-        public void SetData(string prmData) => Commands.dados = prmData;
-        public string GetData() => Commands.dados;
-    }
-
-    public class TestConsoleMenu
-    {
-
-        public TestConsoleFactory Console;
-
-        public TestDataLocal Dados { get => Console.Dados; }
-
-        public TestConsoleMenu(TestConsoleFactory prmConsole)
+        public string GetFormatLine(string prmWord, string prmTarget, string prmParameters)
         {
 
-            Console = prmConsole;
+            string command = xString.GetNoBlank( string.Format("{0}:{1}", prmWord, prmTarget));
 
-        }
-        public void ActionDataView(string prmTag)
-        {
-
-            Dados.AddDataView(prmTag);
-
-        }
-
-        public void ActionDataFluxo(string prmTag, string prmSQL)
-        {
-
-            Dados.AddDataFluxo(prmTag, prmSQL);
-
-        }
-
-        public void ActionDataModel(string prmTag, string prmModelo)
-        {
-
-            Dados.AddDataModel(prmTag, prmModelo);
-
-        }
-
-        public void ActionDataVariant(string prmTag, string prmRegra)
-        {
-
-            Dados.AddDataVariant(prmTag, prmRegra);
-
-        }
-        public void ActionSaveFile(string prmTags, eTipoFileFormat prmTipo)
-        {
-
-            Console.SetData(prmData: Dados.SaveFile(prmTags, prmTipo));
-
-        }
-
-    }
-
-    public class TestConsoleCommands : List<TestConsoleCommand>
-    {
-
-        public TestConsoleFactory Console;
-
-        public string dados;
-
-        public xLinhas linhas;
-
-        public TestConsoleCommands(TestConsoleFactory prmConsole)
-        {
-
-            Console = prmConsole;
-
-        }
-
-        public void Play(string prmCommand)
-        {
-
-            linhas = new xLinhas(prmCommand);
-
-            foreach (string linha in linhas)
-
-                Add(new TestConsoleCommand(linha, Console));
-
-        }
-
-        public string GetFormat(string prmWord, string prmTarget, string prmRules)
-        {
-
-            string command = string.Format("[{0}]{1}", prmWord, prmTarget);
-
-            if (xString.IsStringOK(prmRules))
-                command += " <<# " + prmRules + " #>>";
+            if (xString.IsStringOK(prmParameters))
+                command += " " + prmParameters;
 
             return (command);
 
@@ -134,154 +125,362 @@ namespace Dooggy.Factory.Console
 
     }
 
-    public class TestConsoleCommand
+    public enum eTipoTestCommand : int
     {
 
-        private TestConsoleFactory Console;
+        fail = -1,
 
-        public string command;
+        note = 0,
+
+        view  = 1,
+        item  = 2,
+        model = 3,
+        var   = 4,
+
+        savetxt  = 21,
+        savecsv  = 22,
+        savejson = 23,
+    }
+    public class TestCommand
+    {
+
+        public TestConsole Console;
 
         public string keyword;
 
         public string target;
 
-        public string dados;
+        public string _args;
 
-        public TestConsoleMenu Menu { get => Console.Menu; }
+        public eTipoTestCommand tipo; 
+
+        private xLista Args;
+
+        public TestCommandParameters Parametros;
+
+
+        private TestCommandAction Action;
 
         public TestTrace Trace { get => Console.Trace; }
 
-        public TestConsoleCommand(string prmCommand, TestConsoleFactory prmConsole)
+        public TestDataLocal Dados { get => Console.Dados; }
+
+        public TestCommand(string prmKeyWord, string prmTarget, TestConsole prmConsole)
         {
 
             Console = prmConsole;
 
-            Setup(prmCommand);
+            keyword = prmKeyWord;
 
-            Execute();
+            target = prmTarget;
+
+            Action = new TestCommandAction(this);
+
+            Parametros = new TestCommandParameters(this);
+
+           Setup();
 
         }
 
-        private void Setup(string prmCommand)
+        public void Play()
         {
 
-            command = prmCommand;
-
-            string bloco; string parametros;
-
-            //
-            // Obter o KeyWord do comando a ser executado ...
-            //
-
-            bloco = Blocos.GetBloco(prmCommand, prmDelimitadorInicial: "[", prmDelimitadorFinal: "]", prmPreserve: true);
-
-            keyword = xString.GetNoBlank(Blocos.GetBloco(prmCommand, prmDelimitadorInicial: "[", prmDelimitadorFinal: "]")).ToLower();
-
-            //
-            // Obter TARGET e RULES para executar o comando ...
-            //
-
-            parametros = xString.GetRemove(prmCommand, bloco);
-
-            bloco = Blocos.GetBloco(parametros, prmDelimitadorInicial: "<<#", prmDelimitadorFinal: "#>>", prmPreserve: true);
-
-            target = Blocos.GetBlocoAntes(parametros, bloco, prmTRIM: true);
-
-            dados = (Blocos.GetBloco(parametros, prmDelimitadorInicial: "<<#", prmDelimitadorFinal: "#>>")).Trim();
+            Action.Play();
 
         }
 
-        public void Execute()
+        public void AddParametros(string prmLinha)
+        {
+
+            string linha = prmLinha;
+
+            //
+            // Obter PARAMETRO do comando ...
+            //
+
+            string key_arg = Blocos.GetBloco(prmLinha, prmDelimitadorInicial: "-", prmDelimitadorFinal: ":");
+
+            if (GetArg(key_arg))
+            {
+
+                Parametros.Criar(key_arg);
+
+                linha = xString.GetFinal(prmLinha, prmDelimitador: ":").Trim();
+
+            }
+
+            if (!Parametros.Write(linha))
+                Trace.LogConsole.FailMergeKeyWord(keyword, linha);
+
+        }
+
+        private void Setup()
         {
 
             switch (keyword)
             {
 
+                case "note":
+                    tipo = eTipoTestCommand.note;
+                    break;
+
+                case "view":
                 case "dataview":
-                    ActionDataView();
+                    tipo = eTipoTestCommand.view;
                     break;
 
+                case "item":
                 case "datafluxo":
-                    ActionDataFluxo();
+                    tipo = eTipoTestCommand.item;
+                    _args = "sql";
                     break;
 
+                case "model":
                 case "datamodel":
-                    ActionDataModel();
+                    tipo = eTipoTestCommand.model;
+                    _args = "tabelas;campos";
                     break;
 
+                case "var":
                 case "datavariant":
-                    ActionDataVariant();
+                    tipo = eTipoTestCommand.var;
+                    _args = "condicao;ordem";
                     break;
-
+                
+                case "txt":
                 case "savetxt":
-                    ActionSaveTXT();
+                    tipo = eTipoTestCommand.savetxt;
                     break;
 
+                case "csv":
                 case "savecsv":
-                    ActionSaveCSV();
+                    tipo = eTipoTestCommand.savecsv;
                     break;
-
+                
+                case "json":
                 case "savejson":
-                    ActionSaveJSON();
+                    tipo = eTipoTestCommand.savejson;
                     break;
 
                 default:
-                    Trace.LogConsole.FailKeyWord(keyword);
+                    tipo = eTipoTestCommand.fail;
+                    Trace.LogConsole.FailFindKeyWord(keyword);
                     return ;
             }
 
-            Trace.LogConsole.ActionKeyWord(command);
+            Args = new xLista(_args);
+
+            Trace.LogConsole.WriteKeyWord(keyword, target);
 
         }
-        private void ActionDataView()
+
+        private bool GetArg(string prmArg)
         {
 
-            Menu.ActionDataView(prmTag: target);
+            if (xString.IsStringOK(prmArg))
+            {
+
+                if (Args.IsContem(prmArg))
+                    return (true);
+
+                Trace.LogConsole.FailArgKeyWord(keyword, prmArg);
+
+            }
+
+            return (false);
 
         }
 
-        private void ActionDataFluxo()
-        {
-
-            Menu.ActionDataFluxo(prmTag: target, prmSQL: dados);
-
-        }
-        private void ActionDataModel()
-        {
-
-            Menu.ActionDataModel(prmTag: target, prmModelo: dados);
-
-        }
-
-        private void ActionDataVariant()
-        {
-
-            Menu.ActionDataVariant(prmTag: target, prmRegra: dados);
-
-        }
-        private void ActionSaveTXT()
-        {
-
-            Menu.ActionSaveFile(prmTags: target, prmTipo: eTipoFileFormat.txt);
-
-        }
-
-        private void ActionSaveCSV()
-        {
-
-            Menu.ActionSaveFile(prmTags: target, prmTipo: eTipoFileFormat.csv);
-
-        }
-
-        private void ActionSaveJSON()
-        {
-
-            Menu.ActionSaveFile(prmTags: target, prmTipo: eTipoFileFormat.json);
-
-        }
     }
 
+    public class TestCommandAction
+    {
 
+        private TestCommand Command;
 
+        private string target { get => Command.target; }
+
+        private TestConsole Console { get => Command.Console; }
+
+        private eTipoTestCommand tipo { get => Command.tipo; }
+
+        private TestTrace Trace { get => Command.Trace; }
+        private TestDataLocal Dados { get => Command.Dados; }
+
+        private TestDataPool Pool { get => Dados.Pool; }
+
+        private bool IsAction() => (Command.tipo > eTipoTestCommand.note);
+
+        public TestCommandAction(TestCommand prmCommand)
+        {
+
+            Command = prmCommand;
+
+        }
+
+        public void Play()
+        {
+
+            if (!IsAction()) return;
+
+            switch (tipo)
+            {
+
+                case eTipoTestCommand.view:
+                    ActionAddDataView();
+                    break;
+
+                case eTipoTestCommand.item:
+                    ActionAddDataFluxo();
+                    break;
+
+                case eTipoTestCommand.model:
+                    ActionAddDataModel();
+                    break;
+
+                case eTipoTestCommand.var:
+                    ActionAddDataVariant();
+                    break;
+
+                case eTipoTestCommand.savetxt:
+                    ActionSaveFile(prmTipo: eTipoFileFormat.txt);
+                    break;
+
+                case eTipoTestCommand.savecsv:
+                    ActionSaveFile(prmTipo: eTipoFileFormat.csv); ;
+                    break;
+
+                case eTipoTestCommand.savejson:
+                    ActionSaveFile(prmTipo: eTipoFileFormat.json);
+                    break;
+
+                default:
+                    Trace.LogConsole.FailActionKeyWord(Command.keyword);
+                    return;
+            }
+
+            PlayParametros();
+
+        }
+
+        private void PlayParametros()
+        {
+
+            foreach (TestCommandParameter parametro in Command.Parametros)
+                PlayArg(parametro.arg, parametro.instrucao);
+
+        }
+
+        private void PlayArg(string prmArg, string prmInstrucao)
+        {
+
+            switch (tipo)
+            {
+
+                case eTipoTestCommand.view:
+                    //ActionDataView(prmArg, prmInstrucao);
+                    break;
+
+                case eTipoTestCommand.item:
+                    ActionSetDataFluxo(prmArg, prmInstrucao);
+                    break;
+
+                case eTipoTestCommand.model:
+                    //ActionDataModel(prmArg, prmInstrucao);
+                    break;
+
+                case eTipoTestCommand.var:
+                    //ActionDataVariant(prmArg, prmInstrucao);
+                    break;
+
+                default:
+                    return;
+            }
+
+        }
+        private void ActionAddDataView() => Dados.AddDataView(prmTag: target);
+
+        private void ActionAddDataFluxo() => Dados.AddDataFluxo(prmTag: target);
+
+        private void ActionSetDataFluxo(string prmArg, string prmInstrucao) => Pool.SetDataFluxo(prmArg, prmInstrucao);
+
+        private void ActionAddDataModel() => Dados.AddDataModel(prmTag: target);
+
+        private void ActionAddDataVariant() => Dados.AddDataVariant(prmTag: target);
+
+        private void ActionSaveFile(eTipoFileFormat prmTipo) => Console.SetOutput(prmData:  Dados.SaveFile(prmTags: target, prmTipo));
+
+    }
+
+    public class TestCommandParameter
+    {
+
+        private TestCommand Command;
+
+        public string arg;
+
+        private xMemo Memo;
+
+        public string instrucao { get => Memo.memo(); }
+
+        private TestTrace Trace { get => Command.Trace; }
+
+        public TestCommandParameter(string prmArg, TestCommand prmCommand)
+        {
+
+            arg = prmArg;
+
+            Memo = new xMemo(prmSeparador: " ");
+
+            Command = prmCommand;
+
+        }
+
+        public void Add(string prmLinha)
+        {
+
+            Memo.Add(prmLinha);
+
+            Trace.LogConsole.WriteKeyWordArg(arg, prmLinha);
+
+        }
+
+    }
+    public class TestCommandParameters : List<TestCommandParameter>
+    {
+
+        private TestCommand Command;
+
+        public TestCommandParameter Corrente;
+
+        public TestCommandParameters(TestCommand prmCommand)
+        {
+
+            Command = prmCommand;
+
+        }
+
+        public void Criar(string prmArg)
+        {
+
+            Corrente = new TestCommandParameter(prmArg, Command);
+
+            Add(Corrente);
+
+        }
+        public bool Write(string prmLinha)
+        {
+
+            if (Corrente != null)
+            {
+                Corrente.Add(prmLinha);
+                return true;
+            }
+
+            return (false);
+
+        }
+
+    }
 
 }

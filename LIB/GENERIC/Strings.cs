@@ -29,10 +29,27 @@ namespace Dooggy
 
         }
 
-    public static string GetInicial(string prmTexto, int prmTamanho)
+        public static string GetInicial(string prmTexto, int prmTamanho)
         {
             if (IsStringOK(prmTexto))
                 return GetSubstring(prmTexto, prmIndice: 1, prmTamanho);
+
+            return ("");
+
+        }
+        public static string GetInicial(string prmTexto, string prmDelimitador)
+        {
+            if (IsStringOK(prmTexto))
+            {
+
+                int indice = GetFind(prmTexto, prmDelimitador);
+
+                if (indice != 0)
+                    return GetSubstring(prmTexto, prmIndice: 1, prmTamanho: indice-1);
+    
+                return (prmTexto);
+
+            }
 
             return ("");
 
@@ -45,16 +62,42 @@ namespace Dooggy
             return ("");
 
         }
+        public static string GetFinal(string prmTexto, string prmDelimitador)
+        {
+            if (IsStringOK(prmTexto))
+            {
+                
+                int indice = GetFind(prmTexto, prmDelimitador);
 
+                if (indice != 0)
+                {
+                    return GetSubstring(prmTexto, prmIndice: indice + 1, prmTamanho: prmTexto.Length - indice);
+                }
+            }
+
+            return ("");
+
+        }
+        public static int GetFind(string prmTexto, string prmDelimitador)
+        {
+            if (IsStringOK(prmTexto))
+            {
+
+                return (prmTexto.IndexOf(prmDelimitador)) + 1;
+            }
+
+            return (0);
+
+        }
         public static string GetSubstring(string prmTexto, int prmIndice) => GetSubstring(prmTexto, prmIndice, prmTamanho: prmTexto.Length - prmIndice);
         public static string GetSubstring(string prmTexto, int prmIndice, int prmTamanho)
         {
 
             int indice = prmIndice - 1;
 
-            if (IsStringOK(prmTexto))
+            if ((prmTamanho >= 1) && IsStringOK(prmTexto))
 
-                if ( (indice >= 0) && (prmTexto.Length >= indice + prmTamanho))
+                if ((indice >= 0) && (prmTexto.Length >= indice + prmTamanho))
                     return (prmTexto.Substring(indice, prmTamanho));
                 else
                     return (prmTexto);
