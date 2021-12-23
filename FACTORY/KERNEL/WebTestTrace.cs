@@ -14,6 +14,8 @@ namespace Dooggy.Factory
 
         public TestTraceLogData LogData;
 
+        public TestTraceLogPath LogPath;
+
         public TestTraceLogFile LogFile;
 
         public TestTraceLogRobot LogRobot;
@@ -30,6 +32,8 @@ namespace Dooggy.Factory
             LogData = new TestTraceLogData();
 
             LogFile = new TestTraceLogFile();
+
+            LogPath = new TestTraceLogPath();
 
             LogRobot = new TestTraceLogRobot();
 
@@ -50,8 +54,8 @@ namespace Dooggy.Factory
         //
         // Sucess
         //
-        public void DBConnection(string prmTag, string prmStatus) => msgSQL(string.Format("Banco de Dados {1}: tag[{0}]", prmTag, prmStatus)); 
-        public void SQLExecution(string prmTag, string prmSQL) => msgSQL(string.Format(@"SQL executado: tag:[{0}] sql: ""{1}""", prmTag, prmSQL));
+        public void DBConnection(string prmTag, string prmStatus) => msgSQL(string.Format("act# -db:[{0}] -status: {1}", prmTag, prmStatus)); 
+        public void SQLExecution(string prmTag, string prmSQL) => msgSQL(string.Format(@"act# -db:[{0}] -sql: {1}", prmTag, prmSQL));
 
         //
         // Sucess or Warning 
@@ -60,9 +64,9 @@ namespace Dooggy.Factory
         {
 
             if (prmQtde > 0)
-                msgData(string.Format(@"View selecionada: tag: [{0}] fluxos: {1}", prmTag, prmQtde));
+                msgData(string.Format(@"act# -view:[{0}] -itens: {1}", prmTag, prmQtde));
             else
-                msgAviso(string.Format(@"View não encontrada: tag: [{0}]", prmTag));
+                msgErro(string.Format(@"msg# -view[{0}] -desc: View não encontrada:", prmTag));
 
         }
         //
@@ -81,19 +85,39 @@ namespace Dooggy.Factory
 
     }
 
+    public class TestTraceLogPath : TestTraceLog
+    {
+        public void SetPath(string prmContexto, string prmPath) => msgPath(String.Format(@"def# {0} -path: {1}", prmContexto, prmPath));
+
+    }
     public class TestTraceLogFile : TestTraceLog
     {
+        public void DataFileImport(string prmNome, string prmExtensao, string prmSubPath) => DataFileAction(prmAcao: "READ", prmContexto: "Importado com sucesso" , prmNome, prmExtensao, prmSubPath);
+        public void DataFileExport(string prmNome, string prmExtensao, string prmSubPath) => DataFileAction(prmAcao: "SAVE", prmContexto: "Gerado com sucesso", prmNome, prmExtensao, prmSubPath);
+        private void DataFileAction(string prmAcao, string prmContexto, string prmNome, string prmExtensao, string prmSubPath)
+        {
 
-        public void SetPath(string prmContexto, string prmPath) => msgFile(String.Format(@"Path Definido: ""{0}"" tag[{1}]", prmPath, prmContexto));
-        public void DataFileExport(string prmNome, string prmSubPath, string prmExtensao) => msgFile(String.Format(@"Arquivo [{0}.{1}] gerado com sucesso. path: ""..\{2}""", prmNome, prmExtensao, prmSubPath));
-        public void DataFileFormatTXT(string prmConteudo) => msgFile(prmConteudo, prmTipo: "TXT");
-        public void DataFileFormatCSV(string prmConteudo) => msgFile(prmConteudo, prmTipo: "CSV");
-        public void DataFileFormatJSON(string prmConteudo) => msgFile(prmConteudo, prmTipo: "JSON");
+            string msg = String.Format(@"file# '{0}.{1}' -msg: {2}", prmNome, prmExtensao, prmContexto);
+
+            if (prmSubPath != "")
+                msg += @" - path: ..\" + prmSubPath;
+
+            msgFile(prmAcao, msg);
+
+        }
+
+        public void DataFileFormatTXT(string prmConteudo) => msgFile(prmTipo: "TXT", prmConteudo);
+        public void DataFileFormatCSV(string prmConteudo) => msgFile(prmTipo: "CSV", prmConteudo);
+        public void DataFileFormatJSON(string prmConteudo) => msgFile(prmTipo: "JSON", prmConteudo);
 
         public void FailDataFileExport(string prmPath, string prmNome, string prmExtensao) => msgErro(String.Format("Falha na criação do arquivo ... file:[{0}.{1}] path:[{2}]", prmNome, prmExtensao, prmPath));
-        public void FailDataFileOpen(string prmPath, string prmNome, string prmExtensao) => msgErro(String.Format("Falha na abertura do arquivo ... file:[{0}.{1}] path:[{2}]", prmNome, prmExtensao, prmPath));
+        public void FailDataFileOpen(string prmPath, string prmNome, string prmExtensao) => FailDataFileOpen(prmPath, prmArquivo: prmNome + "." + prmExtensao);
+        public void FailDataFileOpen(string prmPath, string prmArquivo) => FailDataFileOpenDefault(prmLocal: String.Format("file:[{0}] path:[{1}]", prmArquivo, prmPath));
+        public void FailDataFileOpen(string prmArquivo) => FailDataFileOpenDefault(prmLocal: String.Format("file:[{0}]", prmArquivo));
         public void FailJSONFormat(string prmContexto, string prmFluxo, Exception prmErro) => msgErro(prmTexto: String.Format(@"Fluxo JSON: [invalid format] ... contexto: {0} fluxo: {1}", prmContexto, prmFluxo));
-  
+
+        private void FailDataFileOpenDefault(string prmLocal) => msgErro(String.Format("Falha na abertura do arquivo ... {0}", prmLocal));
+
     }
 
     public class TestTraceLogRobot : TestTraceLog
@@ -125,9 +149,9 @@ namespace Dooggy.Factory
     public class TestTraceLogConsole : TestTraceLog
     {
 
-        public void WriteKeyWord(string prmKeyWord, string prmTarget) => msgView(String.Format("{0}:{1}", prmKeyWord, prmTarget));
+        public void WriteKeyWord(string prmKeyWord, string prmTarget) => msgCode(String.Format("{0}:{1}", prmKeyWord, prmTarget));
 
-        public void WriteKeyWordArg(string prmArg, string prmParametros) => msgView(String.Format("  -{0}: {1}", prmArg, prmParametros));
+        public void WriteKeyWordArg(string prmArg, string prmParametros) => msgCode(String.Format("  -{0}: {1}", prmArg, prmParametros));
 
         public void FailFindKeyWord(string prmKeyWord) => msgErro(String.Format("KeyWord não encontrada ... key:[{0}]", prmKeyWord));
 
@@ -142,13 +166,14 @@ namespace Dooggy.Factory
     {
 
         public void msgStart(string prmTrace) => Message(prmTipo: "START", prmTrace);
-        public void msgView(string prmTrace) => Message(prmTipo: "VIEW", prmTrace);
+        public void msgCode(string prmTrace) => Message(prmTipo: "CODE", prmTrace);
         public void msgPlay(string prmTrace) => Message(prmTipo: "PLAY", prmTrace);
         public void msgTrace(string prmTrace) => Message(prmTipo: "TRACE", prmTrace);
         public void msgSQL(string prmMensagem) => Message(prmTipo: "SQL", prmMensagem);
         public void msgData(string prmMensagem) => Message(prmTipo: "DATA", prmMensagem);
-        public void msgFile(string prmMensagem) => msgFile(prmMensagem, prmTipo: "FILE");
-        public void msgFile(string prmMensagem, string prmTipo) => Message(prmTipo, prmMensagem);
+        public void msgPath(string prmMensagem) => Message(prmTipo: "PATH", prmMensagem);
+        public void msgFile(string prmMensagem) => Message(prmTipo: "FILE", prmMensagem);
+        public void msgFile(string prmTipo, string prmMensagem) => Message(prmTipo, prmMensagem);
         public void msgShow(string prmMensagem) => Message(prmTipo: "SHOW", prmMensagem);
         public void msgAviso(string prmAviso) => Message(prmTipo: "AVISO", prmAviso);
         public void msgFalha(string prmAviso) => Message(prmTipo: "FALHA", prmAviso);
@@ -170,7 +195,7 @@ namespace Dooggy.Factory
         public void Message(string prmTipo, string prmMensagem)
         {
 
-            String texto = String.Format("[{0,5}] {1} ", prmTipo, prmMensagem);
+            String texto = String.Format("[{0,4}] {1} ", prmTipo, prmMensagem);
 
 #if DEBUG
 

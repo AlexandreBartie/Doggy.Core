@@ -34,12 +34,21 @@ namespace Dooggy.Factory.Data
 
         }
 
-        public void Start(string prmPath)
+        public void Start(string prmPathDestino)
         {
 
-            Pool.SetPathDestino(prmPath);
+            Pool.SetPathDestino(prmPathDestino);
 
             Call(this, Parameters.GetDataFactoryBlockCode());
+
+        }
+
+        public void Start(string prmPathDestino, string prmPathINI)
+        {
+
+            Pool.SetPathDestino(prmPathDestino);
+
+            Console.Start(prmPathINI);
 
         }
 
@@ -57,16 +66,13 @@ namespace Dooggy.Factory.Data
         private TestDataFluxos Fluxos;
         private TestDataModels Modelos;
 
-        private xPath PathDataFiles;
+        private Path PathDataFiles;
 
         public DataBaseConnection DataBaseCorrente { get => (Bases.Corrente); }
 
         public TestDataView DataViewCorrente { get => (Views.Corrente); }
         public TestDataFluxo DataFluxoCorrente { get => (Fluxos.Corrente); }
         public TestDataModel DataModelCorrente { get => (Modelos.Corrente); }
-
-        public TestTraceLogData LogData { get => (Trace.LogData); }
-        public TestTraceLogFile LogFile { get => (Trace.LogFile); }
 
         private bool IsBaseCorrente { get => (DataBaseCorrente != null); }
         private bool IsModelCorrente { get => (DataModelCorrente != null); }
@@ -76,7 +82,7 @@ namespace Dooggy.Factory.Data
 
             Trace = new TestTrace();
 
-            PathDataFiles = new xPath();
+            PathDataFiles = new Path();
 
             Bases = new DataBasesConnection();
 
@@ -88,21 +94,28 @@ namespace Dooggy.Factory.Data
 
         }
 
-        public bool AddDataBase(string prmTag, string prmConexao) => Bases.AddItem(prmTag, prmConexao, this);
+        public bool AddDataBase(string prmTag, string prmConexao) => Bases.Criar(prmTag, prmConexao, this);
 
-        public string AddDataView(string prmTag) => Views.AddItem(prmTag, DataBaseCorrente);
+        public string AddDataView(string prmTag) => Views.Criar(prmTag, DataBaseCorrente);
 
         public bool AddDataFluxo(string prmTag, string prmSQL) => AddDataFluxo(prmTag, prmSQL, prmMask: "");
-        public bool AddDataFluxo(string prmTag, string prmSQL, string prmMask) => Fluxos.AddItem(prmTag, prmSQL, prmMask, DataViewCorrente);
+        public bool AddDataFluxo(string prmTag, string prmSQL, string prmMask) => Fluxos.Criar(prmTag, prmSQL, prmMask, DataViewCorrente);
 
-        public void SetDataFluxo(string prmArg, string prmInstrucao) => Fluxos.SetArg(prmArg, prmInstrucao);
-
-        public void SetMaskDataFluxo(string prmMask) => Fluxos.SetMask(prmMask);
-
-        public bool AddDataModel(string prmTag, string prmModelo, string prmMask) => Modelos.AddItem(prmTag, prmModelo, prmMask, DataBaseCorrente);
+        public bool AddDataModel(string prmTag, string prmModelo, string prmMask) => Modelos.Criar(prmTag, prmModelo, prmMask, DataBaseCorrente);
         public bool AddDataVariant(string prmTag, string prmRegra) => AddDataVariant(prmTag, prmRegra, prmQtde: 1);
 
         public bool AddDataVariant(string prmTag, string prmRegra, int prmQtde) => DataModelCorrente.CriarVariacao(prmTag, prmRegra, prmQtde);
+
+
+
+        public void SetDataView(string prmArg, string prmInstrucao) => Views.SetArgumento(prmArg, prmInstrucao);
+        public void SetDataFluxo(string prmArg, string prmInstrucao) => Fluxos.SetArgumento(prmArg, prmInstrucao);
+
+        //public void SetDataModel(string prmArg, string prmInstrucao) => Modelos.SetArgumento(prmArg, prmInstrucao);
+        //public void SetDataVariant(string prmArg, string prmInstrucao) => Fluxos.SetArgumento(prmArg, prmInstrucao);
+
+        public void SetMaskDataFluxo(string prmMask) => Fluxos.SetMask(prmMask);
+
 
         public bool IsON()
         {
@@ -124,9 +137,9 @@ namespace Dooggy.Factory.Data
         public void SetPathDestino(string prmPath)
         {
 
-            PathDataFiles.SetPath(prmPath);
+            PathDataFiles.Setup(prmPath);
 
-            LogFile.SetPath(prmContexto: "MassaTestes", prmPath);
+            Trace.LogPath.SetPath(prmContexto: "DestinoMassaTestes", prmPath);
 
         }
         public string GetPathDestino(string prmSubPath) => PathDataFiles.GetPath(prmSubPath);
@@ -134,6 +147,7 @@ namespace Dooggy.Factory.Data
         public string txt(string prmTags) => Fluxos.Save(prmTags, prmTipo: eTipoFileFormat.txt);
         public string csv(string prmTags) => Fluxos.Save(prmTags, prmTipo: eTipoFileFormat.csv);
         public string json(string prmTags) => Fluxos.Save(prmTags, prmTipo: eTipoFileFormat.json);
+
     }
     public class TestDataLocal
     {
@@ -182,7 +196,7 @@ namespace Dooggy.Factory.Data
         public void AddDataVariant(string prmTag) => AddDataVariant(prmTag, prmRegra: "");
         public void AddDataVariant(string prmTag, string prmRegra) => Pool.AddDataVariant(prmTag, prmRegra);
 
-        public string SaveFile(string prmTags, eTipoFileFormat prmTipo)
+        public string GetOutput(string prmTags, eTipoFileFormat prmTipo)
         {
 
             switch (prmTipo)
@@ -222,16 +236,16 @@ namespace Dooggy.Factory.Data
 
     }
 
-    public class TestDataView
+    public class TestDataView : TestDataMask
     {
 
         public string tag;
 
         public string descricao;
 
-        public string colunas;
+        public string saida;
 
-        public string header_txt { get => (descricao + "," + colunas); }
+        public string header_txt { get => (descricao + "," + saida); }
 
         public DataBaseConnection DataBase;
 
@@ -253,7 +267,7 @@ namespace Dooggy.Factory.Data
 
             tag = Blocos.GetBlocoAntes(prmTag, bloco, prmTRIM: true);
 
-            colunas = Blocos.GetBlocoDepois(prmTag, bloco, prmTRIM: true);
+            saida = Blocos.GetBlocoDepois(prmTag, bloco, prmTRIM: true);
 
         }
 
@@ -261,7 +275,6 @@ namespace Dooggy.Factory.Data
 
     public class TestDataFluxo : TestDataMask
     {
-
 
         public string tag;
 
@@ -280,12 +293,11 @@ namespace Dooggy.Factory.Data
             get
             {
                 if (_cursor == null)
-                    _cursor = new DataCursorConnection(sql, mask, DataBase);
+                    _cursor = new DataCursorConnection(sql, GetMask(), DataBase);
 
                 return (_cursor);
 
             }
-
 
         }
 
@@ -342,16 +354,30 @@ namespace Dooggy.Factory.Data
 
         }
 
+        private string GetMask()
+        {
+
+            if (mask == "")
+                return (DataView.mask);
+
+            return mask;
+
+        }
+
     }
 
     public class TestDataMask
     {
-
-        private string _mask;
-
+        private string _mask = "";
         public string mask { get => _mask; }
 
-        public void SetMask(string prmMask) => _mask = prmMask;
+        public void SetMask(string prmMask)
+        {
+
+            _mask = prmMask;
+
+        }
+
 
     }
 
@@ -368,9 +394,8 @@ namespace Dooggy.Factory.Data
             Pool = prmPool;
 
         }
-        public bool Existe(string prmTag) => (FindBy(prmTag) != null);
 
-        public string AddItem(string prmTag, DataBaseConnection prmDataBase)
+        public string Criar(string prmTag, DataBaseConnection prmDataBase)
         {
 
             Corrente = new TestDataView(prmTag, prmDataBase);
@@ -380,18 +405,25 @@ namespace Dooggy.Factory.Data
             return Corrente.tag;
 
         }
-        private TestDataView FindBy(string prmTag)
+        public void SetArgumento(string prmArg, string prmInstrucao)
         {
 
-            foreach (TestDataView Visao in this)
+            switch (prmArg)
             {
 
-                if (Visao.tag.ToLower() == prmTag.ToLower())
-                    return (Visao);
+                case "descricao":
+                    Corrente.descricao = prmInstrucao;
+                    break;
+
+                case "saida":
+                    Corrente.saida = prmInstrucao;
+                    break;
+
+                case "mask":
+                    Corrente.SetMask(prmInstrucao);
+                    break;
 
             }
-
-            return (null);
 
         }
 
@@ -403,6 +435,8 @@ namespace Dooggy.Factory.Data
 
         public TestDataFluxo Corrente;
 
+        public TestDataView View { get => Pool.DataViewCorrente; }
+
         public TestTrace Trace { get => Pool.Trace; }
 
         public TestDataFluxos(TestDataPool prmPool)
@@ -411,8 +445,7 @@ namespace Dooggy.Factory.Data
             Pool = prmPool;
 
         }
-
-        public bool AddItem(string prmTag, string prmSQL, string prmMask, TestDataView prmDataView)
+        public bool Criar(string prmTag, string prmSQL, string prmMask, TestDataView prmDataView)
         {
 
             if (prmDataView != null)
@@ -431,7 +464,7 @@ namespace Dooggy.Factory.Data
 
         }
 
-        public void SetArg(string prmArg, string prmInstrucao)
+        public void SetArgumento(string prmArg, string prmInstrucao)
         {
 
             switch (prmArg)

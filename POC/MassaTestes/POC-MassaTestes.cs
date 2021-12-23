@@ -9,7 +9,45 @@ using Dooggy.Factory.Data;
 
 namespace Dooggy.POC.MassaTestes
 {
-    public class POC_MassaTestes : TestDataProject
+
+    public class POC_GeracaoMassaConsole : TestDataProject
+    {
+        public void DATA()
+        {
+
+            //''LoginAdm();
+
+            //''ArqDadosAtendimentoAoAluno();
+
+            //ArqDadosConsultaCursos();
+
+            //''ArqDadosBancos();
+
+        }
+
+        public void CONFIG()
+        {
+
+            //Dados.File.SetPathDestino(prmPath: @"C:\Users\alexa\OneDrive\Área de Trabalho\MassaTeste\");
+
+        }
+        public void BASE()
+        {
+
+            Connect.Oracle.user = "desenvolvedor_sia";
+            Connect.Oracle.password = "asdfg";
+
+            Connect.Oracle.host = "10.250.1.35";
+            Connect.Oracle.port = args.GetValor("port", "1521");
+
+            Connect.Oracle.service = "branch_1085.prod01.redelocal.oraclevcn.com";
+
+            Connect.Oracle.Add(prmTag: "SIA");
+
+        }
+
+    }
+    public class POC_GeracaoMassaScripts : TestDataProject
     {
         public void DATA()
         {

@@ -6,12 +6,12 @@ using System.IO;
 
 namespace Dooggy.Lib.Files
 {
-    public class xFileTXT
+    public class FileTXT
     {
 
         public string[] lines;
 
-        private xDiretorio _diretorio;
+        private Diretorio _diretorio;
 
         private Encoding encoding = null;
 
@@ -21,21 +21,20 @@ namespace Dooggy.Lib.Files
 
         public void SetEncoding(Encoding prmEncoding) => encoding = prmEncoding;
 
-        public xDiretorio Diretorio { get { if (_diretorio == null) _diretorio = new xDiretorio(); return _diretorio; } }
+        public Diretorio Diretorio { get { if (_diretorio == null) _diretorio = new Diretorio(); return _diretorio; } }
 
         public virtual bool Open(string prmPath, string prmName, string prmExtensao) => Open(prmPath, prmName + "." + prmExtensao);
-        public virtual bool Open(string prmPath, string prmName)
+        public virtual bool Open(string prmPath, string prmName) => Open(prmArquivo: prmPath + prmName);
+        public virtual bool Open(string prmArquivo)
         {
 
             try
             {
 
-                string arquivo = prmPath + prmName;
-
                 if ((encoding == null))
-                    lines = System.IO.File.ReadAllLines(arquivo);
+                    lines = System.IO.File.ReadAllLines(prmArquivo);
                 else
-                    lines = System.IO.File.ReadAllLines(arquivo, encoding);
+                    lines = System.IO.File.ReadAllLines(prmArquivo, encoding);
 
                 _IsOK = true;
 
@@ -51,18 +50,16 @@ namespace Dooggy.Lib.Files
 
         }
 
-        public bool Save(string prmPath, string prmName, string prmConteudo) => Save(prmPath, prmName, prmConteudo, prmExtensao: "txt");
-        public bool Save (string prmPath, string prmName, string prmConteudo, string prmExtensao)
+        public bool Save(string prmPath, string prmName, string prmConteudo, string prmExtensao) => Save(prmPath, prmArquivo: prmName + "." + prmExtensao, prmConteudo);
+        public bool Save(string prmPath, string prmArquivo, string prmConteudo)
         {
-
-            string nome_completo = GetNomeCompleto(prmPath, prmName, prmExtensao);
 
             if (Diretorio.Criar(prmPath))
             {
 
                 try
                 {
-                    File.WriteAllText(nome_completo, prmConteudo);
+                    File.WriteAllText(prmPath + prmArquivo, prmConteudo);
 
                     return (true);
                 }

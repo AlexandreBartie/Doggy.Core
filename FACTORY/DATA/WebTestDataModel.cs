@@ -8,57 +8,57 @@ using System.Text;
 
 namespace Dooggy.Factory.Data
 {
-    public class TestDataImport
-    {
+    //public class TestDataImport
+    //{
 
-        private TestDataLocal Dados;
+    //    private TestDataLocal Dados;
 
-        private xFileTXT File = new xFileTXT();
+    //    private xFileTXT File = new xFileTXT();
 
-        public TestTraceLogFile Log { get => Dados.Pool.LogFile; }
+    //    public TestTrace Trace { get => Dados.Pool.Trace; }
 
-        public TestDataImport(TestDataLocal prmDados)
-        {
+    //    public TestDataImport(TestDataLocal prmDados)
+    //    {
 
-            Dados = prmDados;
+    //        Dados = prmDados;
 
-        }
+    //    }
 
-        public string Open(string prmNome, string prmSubPath, string prmExtensao)
-        {
+    //    public string Open(string prmNome, string prmSubPath, string prmExtensao)
+    //    {
 
-            string path = GetPath(prmSubPath);
+    //        string path = GetPath(prmSubPath);
 
-            if (File.Open(path, prmNome, prmExtensao))
-                return File.txt();
+    //        if (File.Open(path, prmNome, prmExtensao))
+    //            return File.txt();
 
-            return ("");
+    //        return ("");
 
-        }
+    //    }
 
-        public bool Save(string prmNome, string prmSubPath, string prmConteudo, string prmExtensao)
-        {
+    //    public bool Save(string prmNome, string prmSubPath, string prmConteudo, string prmExtensao)
+    //    {
 
-            string path = GetPath(prmSubPath);
+    //        string path = GetPath(prmSubPath);
 
 
-            if (File.Save(path, prmNome, prmConteudo, prmExtensao))
-            {
+    //        if (File.Save(path, prmNome, prmConteudo, prmExtensao))
+    //        {
 
-                Log.DataFileExport(prmNome, prmSubPath, prmExtensao);
+    //            Trace.LogFile.DataFileExport(prmNome, prmSubPath, prmExtensao);
 
-                return (true);
+    //            return (true);
 
-            }
+    //        }
 
-            Log.FailDataFileExport(path, prmNome, prmExtensao);
+    //        Trace.LogFile.FailDataFileExport(path, prmNome, prmExtensao);
 
-            return (false);
-        }
+    //        return (false);
+    //    }
 
-        public string GetPath(string prmSubPath) => Dados.Pool.GetPathDestino(prmSubPath);
+    //    public string GetPath(string prmSubPath) => Dados.Pool.GetPathDestino(prmSubPath);
 
-    }
+    //}
     public class TestDataModel : TestDataMask
     {
 
@@ -174,7 +174,7 @@ namespace Dooggy.Factory.Data
 
         public TestDataModel Corrente;
 
-        public bool AddItem(string prmTag, string prmModel, string prmMask, DataBaseConnection prmDataBase)
+        public bool Criar(string prmTag, string prmModel, string prmMask, DataBaseConnection prmDataBase)
         {
 
             if (prmDataBase != null)

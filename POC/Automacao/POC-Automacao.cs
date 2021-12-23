@@ -8,7 +8,7 @@ using Dooggy.Factory;
 
 namespace Dooggy.POC.AutomacaoTestes
 {
-    public class POC_AutomacaoTestes : TestRobotProject
+    public class POC_AutomacaoTestesScripts : TestRobotProject
     {
 
         public void BASE()

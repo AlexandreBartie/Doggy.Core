@@ -9,11 +9,19 @@ namespace Dooggy.Factory.Console
     public class TestConsole
     {
 
-        public TestDataLocal Dados;
-
         private TestCommands Commands;
 
+        private TestConsoleImport Importacao;
+
+
+        public TestDataLocal Dados;
+
+        public TestDataPool Pool => Dados.Pool;
         public TestTrace Trace => Dados.Trace;
+
+        public string GetArquivoINI => Importacao.arquivoINI;
+
+        public string output { get => Commands.output; }
 
         public TestConsole(TestDataLocal prmDados)
         {
@@ -22,7 +30,22 @@ namespace Dooggy.Factory.Console
 
             Commands = new TestCommands(this);
 
+            Importacao = new TestConsoleImport(this);
+
         }
+
+        public void Setup(string prmPathDestino, string prmPathINI)
+        {
+
+            Pool.SetPathDestino(prmPathDestino);
+
+            Importacao.Setup(prmPathINI);
+
+        }
+
+        public void Start(string prmPathINI) => Importacao.Start(prmPathINI);
+
+        public void Import(string prmNome) => Importacao.Play(prmNome);
 
         public void Write(string prmLinha) => Commands.Write(prmLinha);
         public void Write(string prmWord, string prmTarget) => Write(prmWord, prmTarget, prmParameters: "");
@@ -31,8 +54,8 @@ namespace Dooggy.Factory.Console
         public void Play() => Commands.Play();
         public void Play(string prmBloco) => Commands.Play(prmBloco);
 
-        public void SetOutput(string prmData) => Commands.output = prmData;
-        public string output() => Commands.output;
+        public void Save(string prmData) => Commands.output = prmData;
+
     }
 
     public class TestCommands : List<TestCommand>
@@ -227,6 +250,7 @@ namespace Dooggy.Factory.Console
                 case "view":
                 case "dataview":
                     tipo = eTipoTestCommand.view;
+                    _args = "descricao;saida;mask";
                     break;
 
                 case "item":
@@ -299,6 +323,8 @@ namespace Dooggy.Factory.Console
         private TestCommand Command;
 
         private string target { get => Command.target; }
+
+        private string arquivoINI { get => Console.GetArquivoINI; }
 
         private TestConsole Console { get => Command.Console; }
 
@@ -378,7 +404,7 @@ namespace Dooggy.Factory.Console
             {
 
                 case eTipoTestCommand.view:
-                    //ActionDataView(prmArg, prmInstrucao);
+                    ActionSetDataView(prmArg, prmInstrucao);
                     break;
 
                 case eTipoTestCommand.item:
@@ -399,16 +425,30 @@ namespace Dooggy.Factory.Console
 
         }
         private void ActionAddDataView() => Dados.AddDataView(prmTag: target);
+        private void ActionSetDataView(string prmArg, string prmInstrucao) => Pool.SetDataView(prmArg, prmInstrucao);
 
         private void ActionAddDataFluxo() => Dados.AddDataFluxo(prmTag: target);
-
         private void ActionSetDataFluxo(string prmArg, string prmInstrucao) => Pool.SetDataFluxo(prmArg, prmInstrucao);
 
         private void ActionAddDataModel() => Dados.AddDataModel(prmTag: target);
+        //private void ActionSetDataModel(string prmArg, string prmInstrucao) => Pool.SetDataModel(prmArg, prmInstrucao);
 
         private void ActionAddDataVariant() => Dados.AddDataVariant(prmTag: target);
+        //private void ActionSetDataVariant(string prmArg, string prmInstrucao) => Pool.SetDataVariant(prmArg, prmInstrucao);
 
-        private void ActionSaveFile(eTipoFileFormat prmTipo) => Console.SetOutput(prmData:  Dados.SaveFile(prmTags: target, prmTipo));
+        private void ActionSaveFile(eTipoFileFormat prmTipo)
+        {
+
+            if (arquivoINI != "")
+            {
+
+                Console.Save(prmData: Dados.GetOutput(target, prmTipo));
+
+                Dados.File.SaveFile(prmNome: arquivoINI, prmConteudo: Console.output, prmTipo);
+
+            }
+
+        }
 
     }
 

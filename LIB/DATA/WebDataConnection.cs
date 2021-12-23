@@ -271,7 +271,7 @@ namespace Dooggy.Lib.Data
 
         public DataBaseConnection Corrente;
 
-        public bool AddItem(string prmTag, string prmConexao, TestDataPool prmPool)
+        public bool Criar(string prmTag, string prmConexao, TestDataPool prmPool)
         {
 
             Corrente = new DataBaseConnection(prmTag, prmConexao, prmPool);

@@ -7,23 +7,23 @@ using Dooggy.Lib.Generic;
 
 namespace Dooggy.Lib.Files
 {
-    public class xFileJUnit : xFileTXT
+    public class FileJUNIT : FileTXT
     {
 
-        private xTestCasesJUnit Cases;
+        private TestCasesJUnit Cases;
 
-        private xTestJSONJUnit _JSON;
+        private TestJSONJUnit _JSON;
 
-        public List<xTestCaseJUnit> TestCases { get => Cases.TestCases; }
+        public List<TestCaseJUnit> TestCases { get => Cases.TestCases; }
 
         public string separador { get => ","; }
 
-        public xTestJSONJUnit JSON
+        public TestJSONJUnit JSON
         {
             get
             {
                 if (_JSON == null)
-                    _JSON = new xTestJSONJUnit(this);
+                    _JSON = new TestJSONJUnit(this);
                 return (_JSON);
             }
 
@@ -39,7 +39,7 @@ namespace Dooggy.Lib.Files
             if (base.Open(prmPath, prmName))
             {
 
-                Cases = new xTestCasesJUnit(this);
+                Cases = new TestCasesJUnit(this);
 
                 foreach (string line in base.lines)
                 {
@@ -55,21 +55,21 @@ namespace Dooggy.Lib.Files
         }
 
     }
-    public class xTestCasesJUnit
+    public class TestCasesJUnit
     {
 
-        private xFileJUnit File;
+        private FileJUNIT File;
 
-        internal List<xTestCaseJUnit> TestCases;
+        internal List<TestCaseJUnit> TestCases;
 
-        private xTestCaseJUnit TestCaseCurrent ;
+        private TestCaseJUnit TestCaseCurrent ;
 
-        public xTestCasesJUnit(xFileJUnit prmFile)
+        public TestCasesJUnit(FileJUNIT prmFile)
         {
 
             File = prmFile;
 
-            TestCases = new List<xTestCaseJUnit>();
+            TestCases = new List<TestCaseJUnit>();
 
         }
 
@@ -89,7 +89,7 @@ namespace Dooggy.Lib.Files
         private void AddCase(string prmLine)
         {
 
-            TestCaseCurrent = new xTestCaseJUnit(prmLine, File);
+            TestCaseCurrent = new TestCaseJUnit(prmLine, File);
 
             TestCases.Add(TestCaseCurrent);
 
@@ -108,7 +108,7 @@ namespace Dooggy.Lib.Files
             string lista = "";
             string aux = "";
 
-            foreach (xTestCaseJUnit test_case in TestCases)
+            foreach (TestCaseJUnit test_case in TestCases)
             {
 
                 lista += aux + (test_case.nome);
@@ -123,27 +123,27 @@ namespace Dooggy.Lib.Files
         private bool IsTestCase(string prmLine) => (!prmLine.StartsWith(","));
 
     }
-    public class xTestCaseJUnit
+    public class TestCaseJUnit
     {
 
-        public xFileJUnit File;
+        public FileJUNIT File;
 
-        public xTestDataJUnit Fluxos;
+        public TestDataJUnit Fluxos;
 
-        public xTestParametersJUnit Parametros;
+        public TestParametersJUnit Parametros;
 
         public string nome { get => Parametros.nome; }
 
         public string separador { get => File.separador; }
 
-        public xTestCaseJUnit(string prmLine, xFileJUnit prmFile)
+        public TestCaseJUnit(string prmLine, FileJUNIT prmFile)
         {
 
             File = prmFile;
 
-            Fluxos = new xTestDataJUnit(this);
+            Fluxos = new TestDataJUnit(this);
 
-            Parametros = new xTestParametersJUnit(this, prmLine);
+            Parametros = new TestParametersJUnit(this, prmLine);
 
         }
 
@@ -153,16 +153,16 @@ namespace Dooggy.Lib.Files
         }
 
     }
-    public class xTestParametersJUnit
+    public class TestParametersJUnit
     {
 
-        private xTestCaseJUnit TestCase;
+        private TestCaseJUnit TestCase;
 
         public string nome;
 
         private xMemo Lista;
 
-        public xTestParametersJUnit(xTestCaseJUnit prmTestCase, string prmLine)
+        public TestParametersJUnit(TestCaseJUnit prmTestCase, string prmLine)
         {
 
             TestCase = prmTestCase;
@@ -198,14 +198,14 @@ namespace Dooggy.Lib.Files
         public string memo() => Lista.memo(TestCase.separador);
  
     }
-    public class xTestDataJUnit
+    public class TestDataJUnit
     {
 
-        private xTestCaseJUnit TestCase;
+        private TestCaseJUnit TestCase;
 
         public List<xMemo> Dados;
 
-        public xTestDataJUnit(xTestCaseJUnit prmTestCase)
+        public TestDataJUnit(TestCaseJUnit prmTestCase)
         {
 
             TestCase = prmTestCase;
@@ -243,14 +243,14 @@ namespace Dooggy.Lib.Files
         }
 
     }
-    public class xTestJSONJUnit
+    public class TestJSONJUnit
     {
 
-        private xFileJUnit File;
+        private FileJUNIT File;
 
         public List<xMemo> Dados;
 
-        public xTestJSONJUnit(xFileJUnit prmFile)
+        public TestJSONJUnit(FileJUNIT prmFile)
         {
 
             File = prmFile;
@@ -264,7 +264,7 @@ namespace Dooggy.Lib.Files
         private void GetJSON()
         {
 
-            foreach (xTestCaseJUnit teste in File.TestCases)
+            foreach (TestCaseJUnit teste in File.TestCases)
             {
 
                 foreach (xMemo fluxo in teste.Fluxos.Dados)

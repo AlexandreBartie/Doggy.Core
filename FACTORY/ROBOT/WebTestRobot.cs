@@ -742,18 +742,18 @@ namespace Dooggy.Factory.Robot
 
         private QA_MassaDados Massa;
 
-        private xFileTXT _FileTXT;
+        private FileTXT _FileTXT;
 
-        private xFileJUnit _FileJUnit;
+        private FileJUNIT _FileJUnit;
 
         private TestConfig Config { get => Massa.Project.Config; }
 
-        public xFileTXT FileTXT
+        public FileTXT FileTXT
         {
             get
             {
                 if (_FileTXT is null)
-                    _FileTXT = new xFileTXT();
+                    _FileTXT = new FileTXT();
                 return (_FileTXT);
             }
             set
@@ -761,13 +761,13 @@ namespace Dooggy.Factory.Robot
                 _FileTXT = value;
             }
         }
-        public xFileJUnit FileJUnit
+        public FileJUNIT FileJUnit
         {
             get
             {
                 if (_FileJUnit is null)
                 {
-                    _FileJUnit = new xFileJUnit();
+                    _FileJUnit = new FileJUNIT();
                     _FileJUnit.SetEncoding(Config.EncodedDataJUNIT);
                 }
                 return (_FileJUnit);
