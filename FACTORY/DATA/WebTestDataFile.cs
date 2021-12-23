@@ -142,7 +142,7 @@ namespace Dooggy.Factory.Data
             if (File.Open(path, prmNome, prmExtensao))
                 return File.txt();
             else
-                Trace.LogFile.FailDataFileOpen(path, prmNome, prmExtensao);
+                Trace.LogFile.FailDataFileOpen(prmArquivo: path + prmNome + "." + prmExtensao);
 
             return ("");
 
@@ -179,7 +179,7 @@ namespace Dooggy.Factory.Data
 
                 }
 
-                Trace.LogFile.FailDataFileExport(path, prmNome, prmExtensao);
+                Trace.LogFile.FailDataFileExport(path + prmNome + "." + prmExtensao);
 
             }
 

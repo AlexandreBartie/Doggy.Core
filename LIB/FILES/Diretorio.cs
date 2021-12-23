@@ -1,6 +1,7 @@
 ﻿using Dooggy.Lib.Files;
 using Dooggy.Lib.Generic;
 using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -20,6 +21,7 @@ namespace Dooggy
 
             if (xString.IsStringOK(prmPath))
             {
+                
                 path = prmPath;
 
                 return (true);
@@ -156,7 +158,7 @@ namespace Dooggy
             if (files != null)
             {
 
-                foreach (string file in GetFiles(prmFiltro))
+                foreach (string file in files)
                     retorno.Add(new Arquivo(file, Diretorio));
 
             }
@@ -193,8 +195,8 @@ namespace Dooggy
             {
                 return (Directory.GetFiles(Diretorio.path, prmFiltro));
             }
-            catch
-            { }
+            catch (Exception e)
+            { Debug.WriteLine (string.Format("{0}: -err: {1}", "Erro na leituras do arquivos do diretório.", e.Message)) ; }
 
             return (null);
 
@@ -210,6 +212,7 @@ namespace Dooggy
         public FileTXT file = new FileTXT();
 
         public string nome { get => info.Name; }
+        public string nome_curto { get => xString.GetRemove(nome, prmParte: extensao); }
         public string nome_completo { get => info.FullName; }
 
         public string path { get => info.DirectoryName; }

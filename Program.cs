@@ -37,19 +37,15 @@ namespace Dooggy
 
             MassaTestesByConsole = new POC_GeracaoMassaConsole();
 
-            string path_in = @"c:\MassaTestes\POC\Console\IN";
-            string path_out = @"c:\MassaTestes\POC\Console\OUT";
+            string path_ini = @"c:\MassaTestes\POC\Console\INI\";
+            string path_out = @"c:\MassaTestes\POC\Console\OUT\GeradorFake\";
 
             string parametros = @"{ 'branch': '1085', 'port': '1521' }";
 
-            //    Console.WriteLine("Por favor, informe o path + parâmetros do banco de dados (branch, porta) no formato json ...");
-            //    Console.WriteLine("Siga o exemplo abaixo ...");
-
-            //    Console.WriteLine(Application.ProductName + " <path_massa_testes> " + @"{ 'branch': '1085', 'port': '1521' }");
 
             MassaTestesByConsole.Setup(parametros,prmNomeApp: Application.ProductName, prmVersaoApp: Application.ProductVersion);
 
-            MassaTestesByConsole.Start(path_in, path_out);
+            MassaTestesByConsole.Run(path_ini, path_out);
 
         }
 
@@ -58,7 +54,7 @@ namespace Dooggy
 
             MassaTestesByScript = new POC_GeracaoMassaScripts();
 
-            string path_in = @"c:\MassaTestes\POC\Scripts\IN";
+            string path_ini = @"c:\MassaTestes\POC\Scripts\INI";
             string parametros = @"{ 'branch': '1085', 'port': '1521' }";
 
             //    Console.WriteLine("Por favor, informe o path + parâmetros do banco de dados (branch, porta) no formato json ...");
@@ -68,7 +64,7 @@ namespace Dooggy
 
             MassaTestesByScript.Setup(parametros, prmNomeApp: Application.ProductName, prmVersaoApp: Application.ProductVersion);
 
-            MassaTestesByScript.Start(path_in);
+            MassaTestesByScript.Start(path_ini);
 
         }
         static void AutomacaoTestesScripts()

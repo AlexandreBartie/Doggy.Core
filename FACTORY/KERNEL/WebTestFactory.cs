@@ -46,11 +46,20 @@ namespace Dooggy.Factory
 
 
             if (args.Parse(prmParametros))
-                return (true);
+                return (TestDataBase());
 
             Trace.LogFile.FailJSONFormat(prmContexto: "Parâmetros do Projeto", prmFluxo: prmParametros, prmErro: args.Erro);
 
             return (false);
+
+        }
+
+        private bool TestDataBase()
+        {
+
+
+
+            return (true);
 
         }
 

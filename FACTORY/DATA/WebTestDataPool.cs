@@ -30,7 +30,7 @@ namespace Dooggy.Factory.Data
         public TestDataProject()
         {
 
-            Console = new TestConsole(Dados);
+            Console = new TestConsole(this);
 
         }
 
@@ -43,7 +43,7 @@ namespace Dooggy.Factory.Data
 
         }
 
-        public void Start(string prmPathDestino, string prmPathINI)
+        public void Start(string prmPathINI , string prmPathDestino)
         {
 
             Pool.SetPathDestino(prmPathDestino);
@@ -86,11 +86,19 @@ namespace Dooggy.Factory.Data
 
             Bases = new DataBasesConnection();
 
+            Connect = new TestDataConnect(this);
+
+            ClearAll();
+
+        }
+
+        public void ClearAll()
+        {
+
             Views = new TestDataViews(this);
             Fluxos = new TestDataFluxos(this);
             Modelos = new TestDataModels();
 
-            Connect = new TestDataConnect(this);
 
         }
 

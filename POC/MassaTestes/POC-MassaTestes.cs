@@ -12,26 +12,17 @@ namespace Dooggy.POC.MassaTestes
 
     public class POC_GeracaoMassaConsole : TestDataProject
     {
-        public void DATA()
+
+        public void Run(string prmPathINI, string prmPathDestino)
         {
 
-            //''LoginAdm();
+            ConectarDataBase();
 
-            //''ArqDadosAtendimentoAoAluno();
-
-            //ArqDadosConsultaCursos();
-
-            //''ArqDadosBancos();
+            Start(prmPathINI, prmPathDestino);
 
         }
 
-        public void CONFIG()
-        {
-
-            //Dados.File.SetPathDestino(prmPath: @"C:\Users\alexa\OneDrive\Área de Trabalho\MassaTeste\");
-
-        }
-        public void BASE()
+        private void ConectarDataBase()
         {
 
             Connect.Oracle.user = "desenvolvedor_sia";

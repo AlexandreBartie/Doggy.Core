@@ -110,10 +110,8 @@ namespace Dooggy.Factory
         public void DataFileFormatCSV(string prmConteudo) => msgFile(prmTipo: "CSV", prmConteudo);
         public void DataFileFormatJSON(string prmConteudo) => msgFile(prmTipo: "JSON", prmConteudo);
 
-        public void FailDataFileExport(string prmPath, string prmNome, string prmExtensao) => msgErro(String.Format("Falha na criação do arquivo ... file:[{0}.{1}] path:[{2}]", prmNome, prmExtensao, prmPath));
-        public void FailDataFileOpen(string prmPath, string prmNome, string prmExtensao) => FailDataFileOpen(prmPath, prmArquivo: prmNome + "." + prmExtensao);
-        public void FailDataFileOpen(string prmPath, string prmArquivo) => FailDataFileOpenDefault(prmLocal: String.Format("file:[{0}] path:[{1}]", prmArquivo, prmPath));
-        public void FailDataFileOpen(string prmArquivo) => FailDataFileOpenDefault(prmLocal: String.Format("file:[{0}]", prmArquivo));
+        public void FailDataFileExport(string prmArquivo) => msgErro(String.Format("Falha na criação do arquivo ... -file: {0}", prmArquivo));
+        public void FailDataFileOpen(string prmArquivo) => FailDataFileOpenDefault(prmLocal: String.Format("-file: {0}", prmArquivo));
         public void FailJSONFormat(string prmContexto, string prmFluxo, Exception prmErro) => msgErro(prmTexto: String.Format(@"Fluxo JSON: [invalid format] ... contexto: {0} fluxo: {1}", prmContexto, prmFluxo));
 
         private void FailDataFileOpenDefault(string prmLocal) => msgErro(String.Format("Falha na abertura do arquivo ... {0}", prmLocal));
@@ -203,7 +201,7 @@ namespace Dooggy.Factory
 
 #else
 
-            Console.WriteLine(texto);
+            System.Console.WriteLine(texto);
 
 #endif
 

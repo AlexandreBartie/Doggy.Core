@@ -1,5 +1,6 @@
 ﻿using Dooggy.Factory.Data;
 using Dooggy.Lib.Files;
+using Dooggy.Lib.Parse;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,9 +12,9 @@ namespace Dooggy.Factory.Console
 
         private TestConsole Console;
 
-        private Path PathDataINI = new Path();
+        private Diretorio DiretorioINI = new Diretorio();
 
-        private FileTXT File = new FileTXT();
+        private TestConsoleConexao Conexao;
 
         public string arquivoINI;
 
@@ -27,12 +28,14 @@ namespace Dooggy.Factory.Console
 
             Console = prmConsole;
 
+            Conexao = new TestConsoleConexao(prmConsole);
+
         }
 
         public void Setup(string prmPathINI)
         {
 
-            PathDataINI.Setup(prmPathINI);
+            DiretorioINI.Setup(prmPathINI);
 
             Trace.LogPath.SetPath(prmContexto: "ConfiguracaoMassaTestes", prmPathINI);
 
@@ -43,17 +46,21 @@ namespace Dooggy.Factory.Console
 
             Setup(prmPathINI);
 
+            Conexao.Setup();
 
-            //Play(prmArquivo: );
-            //Play(prmArquivo: );
+            foreach (Arquivo file in DiretorioINI.files.GetFiltro())
+                Play(prmNome: file.nome_curto);
 
         }
 
         public void Play(string prmNome) => Play(prmNome, prmSubPath: "");
+
         public void Play(string prmNome, string prmSubPath)
         {
 
             arquivoINI = prmNome;
+
+            Console.Pool.ClearAll();
 
             Console.Play(prmBloco: Open(arquivoINI, prmSubPath));
 
@@ -61,7 +68,9 @@ namespace Dooggy.Factory.Console
         private string Open(string prmNome, string prmSubPath)
         {
 
-            string path = PathDataINI.GetPath(prmSubPath);
+            string path = DiretorioINI.GetPath(prmSubPath);
+
+            FileTXT File = new FileTXT();
 
             if (File.Open(path, prmNome, extensao))
             {
@@ -73,11 +82,44 @@ namespace Dooggy.Factory.Console
             }
 
             else
-                Trace.LogFile.FailDataFileOpen(arquivoINI);
+                Trace.LogFile.FailDataFileOpen(path + arquivoINI + "." + extensao);
 
             return ("");
 
         }
+
+    }
+
+    public class TestConsoleConexao
+    {
+
+        private TestConsole Console;
+
+        private TestDataConnect Connect => Console.Pool.Connect;
+
+        private xJSON args => Console.Project.args;
+
+        public TestConsoleConexao(TestConsole prmConsole)
+        {
+
+            Console = prmConsole;
+
+        }
+        public void Setup()
+        {
+
+            //Connect.Oracle.user = "desenvolvedor_sia";
+            //Connect.Oracle.password = "asdfg";
+
+            //Connect.Oracle.host = "10.250.1.35";
+            //Connect.Oracle.port = args.GetValor("port", "1521");
+
+            //Connect.Oracle.service = "branch_1085.prod01.redelocal.oraclevcn.com";
+
+            //Connect.Oracle.Add(prmTag: "SIA");
+
+        }
+
 
     }
 }

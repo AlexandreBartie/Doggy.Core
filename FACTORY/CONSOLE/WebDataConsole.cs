@@ -9,13 +9,13 @@ namespace Dooggy.Factory.Console
     public class TestConsole
     {
 
+        public TestDataProject Project;
+
         private TestCommands Commands;
 
         private TestConsoleImport Importacao;
 
-
-        public TestDataLocal Dados;
-
+        public TestDataLocal Dados => Project.Dados;
         public TestDataPool Pool => Dados.Pool;
         public TestTrace Trace => Dados.Trace;
 
@@ -23,10 +23,10 @@ namespace Dooggy.Factory.Console
 
         public string output { get => Commands.output; }
 
-        public TestConsole(TestDataLocal prmDados)
+        public TestConsole(TestDataProject prmDataProject)
         {
 
-            Dados = prmDados;
+            Project = prmDataProject;
 
             Commands = new TestCommands(this);
 
