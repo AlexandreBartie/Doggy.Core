@@ -17,6 +17,20 @@ namespace Dooggy
 
         }
 
+        public static bool IsEqual(string prmTextoA, string prmTextoB) => GetLower(prmTextoA) == GetLower(prmTextoB);
+
+        public static bool IsContem(string prmTextoA, string prmTextoB) => GetLower(prmTextoA).Contains(GetLower(prmTextoB));
+
+        public static string GetLower(string prmTexto)
+        {
+
+            if (IsStringOK(prmTexto))
+                return (prmTexto.ToLower().Trim());
+
+            return ("");
+
+        }
+
         public static string GetChar(string prmTexto, int prmIndice) => (GetSubstring(prmTexto, prmIndice, 1));
 
         public static string GetFirst(string prmTexto) => GetChar(prmTexto, prmIndice: 1);

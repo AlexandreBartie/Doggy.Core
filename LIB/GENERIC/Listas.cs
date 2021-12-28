@@ -251,6 +251,7 @@ namespace Dooggy.Lib.Generic
                 return ("");
         }
 
+        public bool IsEqual(string prmTexto) => (GetEqual(prmTexto));
         public bool IsContem(string prmTexto) => (GetContain(prmTexto) != 0);
 
         public string GetRemove() => GetRemove(prmIndice: 1);
@@ -283,6 +284,16 @@ namespace Dooggy.Lib.Generic
             }
             return ("");
         }
+        public bool GetEqual(string prmTexto)
+        {
+            foreach (string vlItem in this)
+            {
+                if (xString.IsEqual(vlItem, prmTexto))
+                { return true; }
+            }
+            return (false);
+        }
+        
         public int GetContain(string prmTexto)
         {
             int cont = 0;
@@ -290,7 +301,7 @@ namespace Dooggy.Lib.Generic
             foreach (string vlItem in this)
             {
                 cont++;
-                if (vlItem.ToLower().Contains(prmTexto.ToLower()))
+                if (xString.IsContem(vlItem, prmTexto))
                 { return (cont); }
             }
             return (0);

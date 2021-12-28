@@ -60,8 +60,6 @@ namespace Dooggy.Factory.Console
 
             arquivoINI = prmNome;
 
-            Console.Pool.ClearAll();
-
             Console.Play(prmBloco: Open(arquivoINI, prmSubPath));
 
         }

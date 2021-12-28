@@ -66,7 +66,7 @@ namespace Dooggy.Factory
             if (prmQtde > 0)
                 msgData(string.Format(@"act# -view:[{0}] -itens: {1}", prmTag, prmQtde));
             else
-                msgErro(string.Format(@"msg# -view[{0}] -desc: View não encontrada:", prmTag));
+                msgErro(string.Format(@"msg# -view[{0}] -desc: View sem dados", prmTag));
 
         }
         //

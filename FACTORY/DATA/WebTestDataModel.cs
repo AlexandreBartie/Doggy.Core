@@ -85,7 +85,7 @@ namespace Dooggy.Factory.Data
 
             Variacao = new TestDataVariant(this);
 
-            Fluxos = new TestDataFluxos(Pool);
+           // Fluxos = new TestDataFluxos(Pool);
 
          }
 
