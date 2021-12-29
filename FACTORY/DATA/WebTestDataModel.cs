@@ -59,7 +59,7 @@ namespace Dooggy.Factory.Data
     //    public string GetPath(string prmSubPath) => Dados.Pool.GetPathDestino(prmSubPath);
 
     //}
-    public class TestDataModel : TestDataMask
+    public class TestDataModel : TestDataSQL
     {
 
         public string tag;

@@ -44,7 +44,7 @@ namespace Dooggy
             string parte_final = Blocos.GetBlocoDepois(prmTexto, retorno);
 
             if (prmTRIM)
-                return (parte_inicial.Trim() + " " + parte_final.Trim());
+                return (parte_inicial.Trim() + " " + parte_final.Trim()).Trim();
 
             return (parte_inicial + parte_final);
 

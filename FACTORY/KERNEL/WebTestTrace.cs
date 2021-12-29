@@ -147,7 +147,7 @@ namespace Dooggy.Factory
     public class TestTraceLogConsole : TestTraceLog
     {
 
-        public void WriteKeyWord(string prmKeyWord, string prmTarget) => msgCode(String.Format("{0}:{1}", prmKeyWord, prmTarget));
+        public void WriteKeyWord(string prmKeyWord, string prmTarget) => msgCode(String.Format("{0}: {1}", prmKeyWord, prmTarget));
 
         public void WriteKeyWordArg(string prmArg, string prmParametros) => msgCode(String.Format("  -{0}: {1}", prmArg, prmParametros));
 

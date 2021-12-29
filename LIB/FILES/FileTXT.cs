@@ -39,7 +39,7 @@ namespace Dooggy.Lib.Files
                 _IsOK = true;
 
             }
-            catch(Exception ex)
+            catch(Exception e)
             {
 
                 _IsOK = false;

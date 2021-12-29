@@ -14,9 +14,9 @@ namespace Dooggy.Factory.Console
 
         private Diretorio DiretorioINI = new Diretorio();
 
-        private TestConsoleConexao Conexao;
+        public string arquivoINI {  get => DiretorioINI.path; }
 
-        public string arquivoINI;
+        private TestConsoleConexao Conexao;
 
         private string extensao = "ini";
 
@@ -44,36 +44,34 @@ namespace Dooggy.Factory.Console
         public void Start(string prmPathINI)
         {
 
-            Setup(prmPathINI);
-
             Conexao.Setup();
 
+            Setup(arquivoINI);
+
             foreach (Arquivo file in DiretorioINI.files.GetFiltro())
-                Play(prmNome: file.nome_curto);
+                Play(prmArquivoINI: file.nome_curto);
 
         }
 
-        public void Play(string prmNome) => Play(prmNome, prmSubPath: "");
+        public void Play(string prmArquivoINI) => Play(prmArquivoINI, prmSubPath: "");
 
-        public void Play(string prmNome, string prmSubPath)
+        public void Play(string prmArquivoINI, string prmSubPath)
         {
 
-            arquivoINI = prmNome;
-
-            Console.Play(prmBloco: Open(arquivoINI, prmSubPath));
+            Console.Play(prmBloco: Open(prmArquivoINI, prmSubPath));
 
         }
-        private string Open(string prmNome, string prmSubPath)
+        private string Open(string prmArquivoINI, string prmSubPath)
         {
 
             string path = DiretorioINI.GetPath(prmSubPath);
 
             FileTXT File = new FileTXT();
 
-            if (File.Open(path, prmNome, extensao))
+            if (File.Open(path, prmArquivoINI, extensao))
             {
 
-                Trace.LogFile.DataFileImport(prmNome, extensao, prmSubPath);
+                Trace.LogFile.DataFileImport(prmArquivoINI, extensao, prmSubPath);
 
                 return File.txt();
 

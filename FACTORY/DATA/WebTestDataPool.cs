@@ -30,8 +30,10 @@ namespace Dooggy.Factory.Data
 
         public TestDataConnect Connect;
 
+        private TestDataVars Vars;
         private TestDataViews Views;
         private TestDataModels Modelos;
+
 
         private Path PathDataFiles;
 
@@ -55,6 +57,8 @@ namespace Dooggy.Factory.Data
 
             Bases = new DataBasesConnection();
 
+            Vars = new TestDataVars(this);
+
             Views = new TestDataViews(this);
 
             Connect = new TestDataConnect(this);
@@ -62,6 +66,9 @@ namespace Dooggy.Factory.Data
         }
 
         public bool AddDataBase(string prmTag, string prmConexao) => Bases.Criar(prmTag, prmConexao, this);
+
+        public string AddDataDef(string prmTag) => AddDataDef(prmTag, prmValor: "");
+        public string AddDataDef(string prmTag, string prmValor) => Vars.Criar(prmTag, prmValor, DataBaseCorrente);
 
         public string AddDataView(string prmTag) => AddDataView(prmTag, prmMask: "");
         public string AddDataView(string prmTag, string prmMask) => Views.Criar(prmTag, prmMask, DataBaseCorrente);
@@ -75,7 +82,7 @@ namespace Dooggy.Factory.Data
         public bool AddDataVariant(string prmTag, string prmRegra, int prmQtde) => DataModelCorrente.CriarVariacao(prmTag, prmRegra, prmQtde);
 
 
-
+        public void SetDataDef(string prmArg, string prmInstrucao) => Views.SetArgumento(prmArg, prmInstrucao);
         public void SetDataView(string prmArg, string prmInstrucao) => Views.SetArgumento(prmArg, prmInstrucao);
         public void SetDataFluxo(string prmArg, string prmInstrucao) => Fluxos.SetArgumento(prmArg, prmInstrucao);
 
@@ -150,6 +157,9 @@ namespace Dooggy.Factory.Data
 
         }
         public bool AddDataBase(string prmTag, string prmConexao) => (Pool.AddDataBase(prmTag, prmConexao));
+
+        public string AddDataDef(string prmTag) => (AddDataDef(prmTag, prmValor: ""));
+        public string AddDataDef(string prmTag, string prmValor) => (Pool.AddDataDef(prmTag, prmValor));
 
         public string AddDataView(string prmTag) => (AddDataView(prmTag, prmMask: ""));
         public string AddDataView(string prmTag, string prmMask) => (Pool.AddDataView(prmTag, prmMask));

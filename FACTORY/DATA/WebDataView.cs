@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Dooggy.Factory.Data
 {
-    public class TestDataView : TestDataMask
+    public class TestDataView : TestDataSQL
     {
 
         public DataBaseConnection DataBase;
@@ -33,7 +33,7 @@ namespace Dooggy.Factory.Data
 
             Setup(prmTag);
 
-            Fluxos = new TestDataFluxos(Pool);
+            Cleanup();
 
         }
 
@@ -53,25 +53,22 @@ namespace Dooggy.Factory.Data
         public void Cleanup()
         {
 
-
-
+            Fluxos = new TestDataFluxos(Pool);
 
         }
 
     }
 
-    public class TestDataFluxo : TestDataMask
+    public class TestDataFluxo : TestDataSQL
     {
 
         public string tag;
 
-        public TestDataView DataView;
+        public TestDataView View;
 
-        public DataBaseConnection DataBase { get => DataView.DataBase; }
+        public DataBaseConnection DataBase { get => View.DataBase; }
 
         // internal
-
-        private string sql;
 
         private DataCursorConnection _cursor;
 
@@ -80,7 +77,7 @@ namespace Dooggy.Factory.Data
             get
             {
                 if (_cursor == null)
-                    _cursor = new DataCursorConnection(sql, GetMask(), DataBase);
+                    _cursor = new DataCursorConnection(GetSQL(View), GetMask(), DataBase);
 
                 return (_cursor);
 
@@ -88,9 +85,9 @@ namespace Dooggy.Factory.Data
 
         }
 
-        public string tag_view { get => DataView.tag; }
+        public string tag_view { get => View.tag; }
 
-        public string header_txt { get => DataView.header_txt; }
+        public string header_txt { get => View.header_txt; }
 
         public bool IsOK { get => Cursor.IsOK(); }
         public Exception erro { get => Cursor.erro; }
@@ -100,15 +97,13 @@ namespace Dooggy.Factory.Data
 
             tag = prmTag;
 
-            sql = prmSQL;
+            SetSQL(prmSQL);
 
             SetMask(prmMask);
 
-            DataView = prmDataView;
+            View = prmDataView;
 
         }
-
-        public void SetSQL(string prmSQL) => sql = prmSQL;
 
         public bool Next() => Cursor.Next();
 
@@ -127,7 +122,7 @@ namespace Dooggy.Factory.Data
         {
 
             if (mask == "")
-                return (DataView.mask);
+                return (View.mask);
 
             return mask;
 
@@ -135,18 +130,85 @@ namespace Dooggy.Factory.Data
 
     }
 
-    public class TestDataMask
+    public class TestDataSQL
     {
-        private string _mask = "";
-        public string mask { get => _mask; }
 
-        public void SetMask(string prmMask)
+        public string sql;
+
+        public string tabelas;
+
+        public string campos;
+
+        public string relacoes;
+
+        public string filtro;
+
+        public string ordem;
+
+        public string mask;
+
+        private bool TemSQL() => (xString.IsStringOK(sql));
+        private bool TemCombinacoes() => TemRelacoes() && TemFiltro();
+        private bool TemCondicoes() => TemRelacoes() || TemFiltro();
+        private bool TemRelacoes() => (xString.IsStringOK(relacoes));
+        private bool TemFiltro() => (xString.IsStringOK(filtro));
+        private bool TemOrdem() => (xString.IsStringOK(ordem));
+        public void SetSQL(string prmSQL) => sql = prmSQL;
+        public void SetTabelas(string prmTabelas) => tabelas = prmTabelas;
+        public void SetCampos(string prmCampos) => campos = prmCampos;
+        public void SetRelacoes(string prmRelacoes) => relacoes = prmRelacoes;
+        public void SetFiltro(string prmFiltro) => filtro = prmFiltro;
+        public void SetOrdem(string prmOrdem) => ordem = prmOrdem;
+        public void SetMask(string prmMask) => mask = prmMask;
+
+        public string GetSQL(TestDataView prmView)
         {
 
-            _mask = prmMask;
+            if (!TemSQL())
+            {
+
+                tabelas = prmView.tabelas;
+
+                campos = prmView.campos;
+
+                relacoes = prmView.relacoes;
+
+                return (GetSQL());
+
+            }
+            
+            return (sql);
 
         }
 
+        private string GetSQL()
+        {
+
+            string sql = String.Format("SELECT {0} FROM {1}", campos, tabelas);
+
+            string condicoes = ""; string ordenacao = "";
+
+            if (TemCombinacoes())
+                condicoes = String.Format("({0}) AND ({1})", tabelas, filtro);
+
+            else if (TemRelacoes())
+                condicoes = relacoes;
+
+            else if (TemFiltro())
+                condicoes = filtro;
+
+            if (TemCondicoes())
+                condicoes = String.Format(" WHERE {0}", condicoes);
+
+            if (TemOrdem())
+                ordenacao = String.Format(" ORDER BY {0}", ordem);
+
+            sql += condicoes + ordenacao;
+
+            return (sql.Trim());
+
+
+        }
 
     }
 
@@ -199,12 +261,24 @@ namespace Dooggy.Factory.Data
                     Corrente.descricao = prmInstrucao;
                     break;
 
-                case "saida":
-                    Corrente.saida = prmInstrucao;
+                case "tabelas":
+                    Corrente.SetTabelas(prmInstrucao);
                     break;
 
+                case "campos":
+                    Corrente.SetCampos(prmInstrucao);
+                    break;
+
+                case "relacoes":
+                    Corrente.SetRelacoes(prmInstrucao);
+                    break;
+                
                 case "mask":
                     Corrente.SetMask(prmInstrucao);
+                    break;
+
+                case "saida":
+                    Corrente.saida = prmInstrucao;
                     break;
 
             }
@@ -327,6 +401,14 @@ namespace Dooggy.Factory.Data
 
                 case "sql":
                     SetSQL(prmInstrucao);
+                    break;
+
+                case "filtro":
+                    Corrente.SetFiltro(prmInstrucao);
+                    break;
+
+                case "ordem":
+                    Corrente.SetOrdem(prmInstrucao);
                     break;
 
                 case "mask":
