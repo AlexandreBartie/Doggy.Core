@@ -19,7 +19,7 @@ namespace Dooggy.Factory.Console
         public TestDataPool Pool => Dados.Pool;
         public TestTrace Trace => Dados.Trace;
 
-        public string arquivoINI => Import.arquivoINI;
+        public string arquivoINI => Import.ArquivoINI.nome;
 
         public string output { get => Sessoes.output; }
 
@@ -34,12 +34,12 @@ namespace Dooggy.Factory.Console
 
         }
 
-        public void Setup(string prmPathDestino, string prmPathINI)
+        public void Setup(string prmPathINI, string prmPathOUT)
         {
 
-            Pool.SetPathDestino(prmPathDestino);
-
             Import.Setup(prmPathINI);
+
+            Pool.SetPathDestino(prmPathOUT);
 
         }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using static Dooggy.xInt;
 
 namespace Dooggy
 {
@@ -65,7 +66,7 @@ namespace Dooggy
                         int indice = prmTexto.IndexOf(prmItem);
 
                         if (indice != -1)
-                            retorno = (xString.GetInicial(prmTexto, prmTamanho: prmTexto.IndexOf(prmItem)));
+                            retorno = (xString.GetFirst(prmTexto, prmTamanho: prmTexto.IndexOf(prmItem)));
                     }
 
                 if (prmTRIM)
@@ -90,7 +91,7 @@ namespace Dooggy
                 if (indice != -1)
                 {
 
-                    string retorno = (xString.GetFinal(prmTexto, prmTamanho: prmTexto.Length - indice - prmItem.Length));
+                    string retorno = (xString.GetFirst(prmTexto, prmTamanho: prmTexto.Length - indice - prmItem.Length));
 
                     if (prmTRIM)
                         retorno = retorno.Trim();

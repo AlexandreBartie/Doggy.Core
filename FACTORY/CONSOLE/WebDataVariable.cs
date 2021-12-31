@@ -46,13 +46,24 @@ namespace Dooggy.Factory.Console
 
         }
 
-        public string Criar(string prmTag, string prmValor, DataBaseConnection prmDataBase)
+        public string Criar(string prmTarget, DataBaseConnection prmDataBase)
         {
 
-            if (!Find(prmTag))
+            //
+            // Identidica TAG e VALOR da variável 
+            //
+            
+            string tag = xString.GetFirst(prmTarget, prmDelimitador: "=").Trim();
+            string valor = xString.GetLast(prmTarget, prmDelimitador: "=").Trim();
+
+            //
+            // Verifica se a variável já existe ...
+            //
+
+            if (!Find(tag, valor))
             {
 
-                Corrente = new TestDataVar(prmTag, prmValor, prmDataBase);
+                Corrente = new TestDataVar(tag, valor, prmDataBase);
 
                 Add(Corrente);
 
@@ -75,19 +86,28 @@ namespace Dooggy.Factory.Console
             }
 
         }
-        private bool Find(string prmTag)
+
+        public bool Find(string prmTag)
         {
 
             foreach (TestDataVar var in this)
 
                 if (xString.IsEqual(var.tag, prmTag))
                 {
-
-                    Corrente = var;
-
-                    return (true);
-
+                    Corrente = var; return (true);
                 }
+
+            return (false);
+
+        }
+
+        private bool Find(string prmTag, string prmValor)
+        {
+
+            if (Find(prmTag))
+            {
+                Corrente.valor = prmValor; return (true);
+            }
 
             return (false);
 

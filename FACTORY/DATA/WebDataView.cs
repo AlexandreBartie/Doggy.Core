@@ -26,6 +26,8 @@ namespace Dooggy.Factory.Data
 
         private TestDataPool Pool { get => DataBase.Pool; }
 
+        private TestTrace Trace { get => Pool.Trace; }
+
         public TestDataView(string prmTag, DataBaseConnection prmDataBase)
         {
 
@@ -54,6 +56,33 @@ namespace Dooggy.Factory.Data
         {
 
             Fluxos = new TestDataFluxos(Pool);
+
+        }
+
+        public string GetSQLTratado(string prmSQL)
+        {
+
+            string sql = prmSQL; string var; string var_extendido; string var_valor;
+
+            while (true)
+            {
+
+                var_extendido = Blocos.GetBloco(sql, prmDelimitadorInicial: "$(", prmDelimitadorFinal: ")$", prmPreserve: true);
+
+                var = Blocos.GetBloco(sql, prmDelimitadorInicial: "$(", prmDelimitadorFinal: ")$");
+
+                if (var == "") break;
+
+                var_valor = Pool.GetVariavel(prmTag: var);
+
+                sql = xString.GetSubstituir(sql, var_extendido, var_valor);
+
+                if (var_valor == "")
+                    Trace.LogConsole.FailFindValueVariableSQL(var, prmSQL);
+
+            }
+
+            return (sql);
 
         }
 
@@ -164,6 +193,8 @@ namespace Dooggy.Factory.Data
         public string GetSQL(TestDataView prmView)
         {
 
+            string retorno= sql;
+
             if (!TemSQL())
             {
 
@@ -173,11 +204,13 @@ namespace Dooggy.Factory.Data
 
                 relacoes = prmView.relacoes;
 
-                return (GetSQL());
+                retorno = GetSQL();
 
             }
-            
-            return (sql);
+
+            retorno = prmView.GetSQLTratado(retorno);
+
+            return (retorno);
 
         }
 
@@ -391,7 +424,6 @@ namespace Dooggy.Factory.Data
             foreach (TestDataFluxo fluxo in prmFluxos)
                 Add(fluxo);
         }
-
 
         public void SetArgumento(string prmArg, string prmInstrucao)
         {

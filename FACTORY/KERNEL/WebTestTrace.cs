@@ -151,14 +151,15 @@ namespace Dooggy.Factory
 
         public void WriteKeyWordArg(string prmArg, string prmParametros) => msgCode(String.Format("  -{0}: {1}", prmArg, prmParametros));
 
-        public void FailFindKeyWord(string prmKeyWord) => msgErro(String.Format("KeyWord não encontrada ... key:[{0}]", prmKeyWord));
+        public void FailFindKeyWord(string prmKeyWord) => msgErro(String.Format("KeyWord não encontrada ... -key:[{0}]", prmKeyWord));
 
-        public void FailActionKeyWord(string prmKeyWord) => msgErro(String.Format("KeyWord não executada ... key:[{0}]", prmKeyWord));
+        public void FailActionKeyWord(string prmKeyWord) => msgErro(String.Format("KeyWord não executada ... -key:[{0}]", prmKeyWord));
 
-        public void FailArgKeyWord(string prmKeyWord, string prmArg) => msgErro(String.Format("Argumento KeyWord não encontrada ... arg:[{0}.{1}]", prmKeyWord, prmArg));
+        public void FailArgKeyWord(string prmKeyWord, string prmArg) => msgErro(String.Format("Argumento KeyWord não encontrada ... -arg:[{0}.{1}]", prmKeyWord, prmArg));
 
-        public void FailMergeKeyWord(string prmKeyWord, string prmLinha) => msgErro(String.Format("Argumento KeyWord não definido ... arg:[{0}.{1}]", prmKeyWord, prmLinha));
+        public void FailMergeKeyWord(string prmKeyWord, string prmLinha) => msgErro(String.Format("Argumento KeyWord não definido ... -arg:[{0}.{1}]", prmKeyWord, prmLinha));
 
+        public void FailFindValueVariableSQL(string prmVariable, string prmSql) => msgErro(String.Format("Variável não possui valor ... -var:{0} -sql:{1}", prmVariable, prmSql));
     }
     public class TestTraceLog : TestTraceErro
     {

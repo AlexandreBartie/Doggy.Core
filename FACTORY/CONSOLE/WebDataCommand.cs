@@ -3,6 +3,7 @@ using Dooggy.Lib.Generic;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using static Dooggy.xInt;
 
 namespace Dooggy.Factory.Console
 {
@@ -14,7 +15,7 @@ namespace Dooggy.Factory.Console
         note = 0,
 
 
-        def = 1,
+        var = 1,
 
         view = 10,
         item = 11,
@@ -187,7 +188,7 @@ namespace Dooggy.Factory.Console
 
                 Parametros.Criar(key_arg);
 
-                linha = xString.GetFinal(prmLinha, prmDelimitador: ":").Trim();
+                linha = xString.GetLast(prmLinha, prmDelimitador: ":").Trim();
 
             }
 
@@ -206,9 +207,9 @@ namespace Dooggy.Factory.Console
                     tipo = eTipoTestCommand.note;
                     break;
 
-                case "def":
+                case "var":
                 case "variavel":
-                    tipo = eTipoTestCommand.def;
+                    tipo = eTipoTestCommand.var;
                     _args = "sql";
                     break;
 
@@ -305,8 +306,8 @@ namespace Dooggy.Factory.Console
             switch (tipo)
             {
 
-                case eTipoTestCommand.def:
-                    ActionAddDataDef();
+                case eTipoTestCommand.var:
+                    ActionAddDataVar();
                     break;
                 
                 case eTipoTestCommand.view:
@@ -352,8 +353,8 @@ namespace Dooggy.Factory.Console
             switch (tipo)
             {
 
-                case eTipoTestCommand.def:
-                    ActionSetDataDef(prmArg, prmInstrucao);
+                case eTipoTestCommand.var:
+                    ActionSetDataVar(prmArg, prmInstrucao);
                     break;
 
                 case eTipoTestCommand.view:
@@ -369,8 +370,8 @@ namespace Dooggy.Factory.Console
             }
 
         }
-        private void ActionAddDataDef() => Dados.AddDataDef(prmTag: target);
-        private void ActionSetDataDef(string prmArg, string prmInstrucao) => Pool.SetDataDef(prmArg, prmInstrucao); 
+        private void ActionAddDataVar() => Dados.AddDataVar(target);
+        private void ActionSetDataVar(string prmArg, string prmInstrucao) => Pool.SetDataVar(prmArg, prmInstrucao); 
         
         private void ActionAddDataView() => Dados.AddDataView(prmTag: target);
         private void ActionSetDataView(string prmArg, string prmInstrucao) => Pool.SetDataView(prmArg, prmInstrucao);

@@ -5,7 +5,6 @@ using System.Text;
 
 namespace Dooggy
 {
-
     public static class xString
     {
 
@@ -34,16 +33,7 @@ namespace Dooggy
         public static string GetChar(string prmTexto, int prmIndice) => (GetSubstring(prmTexto, prmIndice, 1));
 
         public static string GetFirst(string prmTexto) => GetChar(prmTexto, prmIndice: 1);
-        public static string GetLast(string prmTexto)
-        {
-            if (IsStringOK(prmTexto))
-                return GetChar(prmTexto, prmIndice: prmTexto.Length);
-
-            return ("");
-
-        }
-
-        public static string GetInicial(string prmTexto, int prmTamanho)
+        public static string GetFirst(string prmTexto, int prmTamanho)
         {
             if (IsStringOK(prmTexto))
                 return GetSubstring(prmTexto, prmIndice: 1, prmTamanho);
@@ -51,12 +41,12 @@ namespace Dooggy
             return ("");
 
         }
-        public static string GetInicial(string prmTexto, string prmDelimitador)
+        public static string GetFirst(string prmTexto, string prmDelimitador)
         {
             if (IsStringOK(prmTexto))
             {
 
-                int indice = GetFind(prmTexto, prmDelimitador);
+                int indice = GetPosicao(prmTexto, prmDelimitador);
 
                 if (indice != 0)
                     return GetSubstring(prmTexto, prmIndice: 1, prmTamanho: indice-1);
@@ -68,20 +58,38 @@ namespace Dooggy
             return ("");
 
         }
-        public static string GetFinal(string prmTexto, int prmTamanho)
+        public static string GetLast(string prmTexto)
+            {
+                if (IsStringOK(prmTexto))
+                    return GetChar(prmTexto, prmIndice: prmTexto.Length);
+
+                return ("");
+
+            }
+
+        public static string GetLast(string prmTexto, int prmTamanho)
         {
+
+            int tamanho = prmTamanho;
+
             if (IsStringOK(prmTexto))
-                return GetSubstring(prmTexto, prmIndice: prmTexto.Length - prmTamanho + 1, prmTamanho);
-            
+            {
+
+                if (tamanho < 0)
+                    tamanho = prmTexto.Length - prmTamanho;
+
+                return GetSubstring(prmTexto, prmIndice: prmTexto.Length - tamanho + 1, tamanho);
+
+            }
             return ("");
 
         }
-        public static string GetFinal(string prmTexto, string prmDelimitador)
+        public static string GetLast(string prmTexto, string prmDelimitador)
         {
             if (IsStringOK(prmTexto))
             {
                 
-                int indice = GetFind(prmTexto, prmDelimitador);
+                int indice = GetPosicao(prmTexto, prmDelimitador);
 
                 if (indice != 0)
                 {
@@ -92,12 +100,13 @@ namespace Dooggy
             return ("");
 
         }
-        public static int GetFind(string prmTexto, string prmDelimitador)
+        public static bool GetFind(string prmTexto, string prmParte) => (GetPosicao(prmTexto, prmParte) != 0);
+        public static int GetPosicao(string prmTexto, string prmParte)
         {
             if (IsStringOK(prmTexto))
             {
 
-                return (prmTexto.IndexOf(prmDelimitador)) + 1;
+                return (prmTexto.IndexOf(prmParte)) + 1;
             }
 
             return (0);
@@ -118,14 +127,21 @@ namespace Dooggy
 
             return ("");
         }
+
+        public static string GetSubstituir(string prmTexto, string prmVelho, string prmNovo)
+        {
+
+            if (IsStringOK(prmTexto))
+                return (prmTexto.Replace(prmVelho, prmNovo));
+
+            return ("");
+
+        }
         
         public static string GetRemove(string prmTexto, string prmParte)
         {
 
-            if (IsStringOK(prmTexto))
-                return (prmTexto.Replace(prmParte, newValue: ""));
-
-            return ("");
+            return (GetSubstituir(prmTexto, prmVelho: prmParte, prmNovo: ""));
 
         }
         public static string GetReverse(string prmTexto)
@@ -209,6 +225,5 @@ namespace Dooggy
         }
 
     }
-
 
 }
