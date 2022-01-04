@@ -61,13 +61,13 @@ namespace Dooggy.Lib.Generic
             // Get descricao Tupla (estão entre delimitadores pré-definidos)
             //
 
-            _descricao = Blocos.GetBloco(prmTexto, delimitadorInicial, delimitadorFinal).Trim();
+            _descricao = Bloco.GetBloco(prmTexto, delimitadorInicial, delimitadorFinal).Trim();
 
             //
             // Remove descricao da Tupla (para permitir identificar "tag" e "valor")
             //
 
-            _bruto = Blocos.GetBlocoRemove(prmTexto, delimitadorInicial, delimitadorFinal);
+            _bruto = Bloco.GetBlocoRemove(prmTexto, delimitadorInicial, delimitadorFinal);
 
             //
             // Identifica "tag" e "valor"

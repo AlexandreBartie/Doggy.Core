@@ -83,22 +83,22 @@ namespace Dooggy.Factory.Console
             string keyword; string target;
 
             //
-            // Avalia se o primeiro caracter é uma abertura de KeyWord  ...
-            //
-
-            if (xString.GetFirst(prmLinha) != ">") return (false);
-
-            //
             // Identifica o KeyWord da linha de comando ...
             //
   
-            keyword = xString.GetNoBlank(Blocos.GetBloco(prmLinha, prmDelimitadorInicial: ">", prmDelimitadorFinal: ":")).ToLower();
+            keyword = Prefixo.GetPrefixo(prmLinha, prmSinal: ">", prmDelimitador: " ").ToLower();
+
+            //
+            // Avalia se KeyWord não foi extraído ...
+            //
+
+            if (keyword == "") return (false);
 
             //
             // Identifica o Target da linha de comando ...
             //
 
-            target = Blocos.GetBlocoRemove(prmLinha, prmDelimitadorInicial: ">", prmDelimitadorFinal: ":", prmTRIM: true);
+            target = Prefixo.GetPrefixoRemove(prmLinha, prmSinal: ">", prmDelimitador: " ");
 
             //
             // Criar Novo Comando  ...
@@ -181,7 +181,7 @@ namespace Dooggy.Factory.Console
             // Obter PARAMETRO do comando ...
             //
 
-            string key_arg = Blocos.GetBloco(prmLinha, prmDelimitadorInicial: "-", prmDelimitadorFinal: ":");
+            string key_arg = Bloco.GetBloco(prmLinha, prmDelimitadorInicial: "-", prmDelimitadorFinal: ":");
 
             if (GetArg(key_arg))
             {
@@ -203,7 +203,7 @@ namespace Dooggy.Factory.Console
             switch (keyword)
             {
 
-                case "note":
+                case ">":
                     tipo = eTipoTestCommand.note;
                     break;
 

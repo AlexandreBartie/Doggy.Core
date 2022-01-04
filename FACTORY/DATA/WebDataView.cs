@@ -42,13 +42,13 @@ namespace Dooggy.Factory.Data
         private void Setup(string prmTag)
         {
 
-            string bloco = Blocos.GetBloco(prmTag, prmDelimitador: "|", prmPreserve: true);
+            string bloco = Bloco.GetBloco(prmTag, prmDelimitador: "|", prmPreserve: true);
 
-            descricao = Blocos.GetBloco(bloco, prmDelimitador: "|").Trim();
+            descricao = Bloco.GetBloco(bloco, prmDelimitador: "|").Trim();
 
-            tag = Blocos.GetBlocoAntes(prmTag, bloco, prmTRIM: true);
+            tag = Bloco.GetBlocoAntes(prmTag, bloco, prmTRIM: true);
 
-            saida = Blocos.GetBlocoDepois(prmTag, bloco, prmTRIM: true);
+            saida = Bloco.GetBlocoDepois(prmTag, bloco, prmTRIM: true);
 
         }
 
@@ -62,14 +62,26 @@ namespace Dooggy.Factory.Data
         public string GetSQLTratado(string prmSQL)
         {
 
+            string sql = prmSQL;
+
+            sql = GetSQLVariavel(sql);
+            sql = GetSQLFuncoes(sql);
+
+            return (sql);
+
+        }
+
+        public string GetSQLVariavel(string prmSQL)
+        {
+
             string sql = prmSQL; string var; string var_extendido; string var_valor;
 
             while (true)
             {
 
-                var_extendido = Blocos.GetBloco(sql, prmDelimitadorInicial: "$(", prmDelimitadorFinal: ")$", prmPreserve: true);
+                var_extendido = Bloco.GetBloco(sql, prmDelimitadorInicial: "$(", prmDelimitadorFinal: ")$", prmPreserve: true);
 
-                var = Blocos.GetBloco(sql, prmDelimitadorInicial: "$(", prmDelimitadorFinal: ")$");
+                var = Bloco.GetBloco(sql, prmDelimitadorInicial: "$(", prmDelimitadorFinal: ")$");
 
                 if (var == "") break;
 
@@ -79,6 +91,36 @@ namespace Dooggy.Factory.Data
 
                 if (var_valor == "")
                     Trace.LogConsole.FailFindValueVariableSQL(var, prmSQL);
+
+            }
+
+            return (sql);
+
+        }
+
+        public string GetSQLFuncoes(string prmSQL)
+        {
+
+            string sql = prmSQL; string funcao; string funcao_ext;
+            string prefixo; string parametro; string valor;
+
+            while (true)
+            {
+
+                funcao = Bloco.GetBloco(sql, prmDelimitadorInicial: "$", prmDelimitadorFinal: "(");
+
+                funcao_ext = Bloco.GetBloco(sql, prmDelimitadorInicial: "$", prmDelimitadorFinal: "(", prmPreserve: true);
+
+                prefixo = Bloco.GetBloco(sql, prmDelimitadorInicial: funcao_ext, prmDelimitadorFinal: ")$", prmPreserve: true);
+
+                parametro = Bloco.GetBloco(sql, prmDelimitadorInicial: funcao_ext, prmDelimitadorFinal: ")$");
+
+                if ((funcao == "") || (parametro == "")) break;
+
+                valor = Pool.GetFuncao(funcao, parametro);
+
+                if (valor != "")
+                    sql = xString.GetSubstituir(sql, prefixo, valor);
 
             }
 
@@ -222,7 +264,7 @@ namespace Dooggy.Factory.Data
             string condicoes = ""; string ordenacao = "";
 
             if (TemCombinacoes())
-                condicoes = String.Format("({0}) AND ({1})", tabelas, filtro);
+                condicoes = String.Format("({0}) AND ({1})", relacoes, filtro);
 
             else if (TemRelacoes())
                 condicoes = relacoes;
@@ -476,7 +518,7 @@ namespace Dooggy.Factory.Data
         private string txt(string prmSeparador, bool prmColunaExtra)
         {
 
-            string corpo = ""; string header = ""; string tag_view = "";
+            string corpo = ""; string header = ""; string tag_view = ""; int cont = 0; 
 
             string linha; string coluna_extra = "";
 
@@ -485,6 +527,8 @@ namespace Dooggy.Factory.Data
 
             foreach (TestDataFluxo Fluxo in this)
             {
+
+                cont++;
 
                 //
                 // Adicionar o Cabeçalho (Header) sempre que o layout da visão for diferente ...

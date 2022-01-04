@@ -21,6 +21,8 @@ namespace Dooggy.Factory.Console
 
         public string arquivoINI => Import.ArquivoINI.nome;
 
+        public DateTime ancora => DateTime.Now;
+
         public string output { get => Sessoes.output; }
 
         public TestConsole(TestDataProject prmDataProject)
@@ -42,7 +44,7 @@ namespace Dooggy.Factory.Console
             Pool.SetPathDestino(prmPathOUT);
 
         }
-
+        public void SetAncora(DateTime prmAncora) => Pool.SetAncora(prmAncora);
         public void Start(string prmPathINI) => Import.Start(prmPathINI);
 
         public void ImportINI(string prmArquivoINI) => Import.Play(prmArquivoINI);

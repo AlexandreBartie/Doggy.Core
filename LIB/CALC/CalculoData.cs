@@ -15,33 +15,22 @@ namespace Dooggy
 
         private DynamicDateExport Export;
 
-        public DynamicDate()
+        public DateTime ancora;
+
+        public DynamicDate(DateTime prmAncora)
         {
-            
+
+            ancora = prmAncora;
+
             Rules = new DynamicDateRules(this);
 
             Export = new DynamicDateExport(this);
 
         }
 
-        public DateTime Calcular(string prmSintaxe) => Calcular(prmSintaxe, prmDataAncora: DateTime.Now);
+        public string View(string prmSintaxe) => Rules.View(prmSintaxe);
+        public DateTime Calc(string prmSintaxe) => (Rules.Calc(prmSintaxe));
 
-        public DateTime Calcular(string prmSintaxe, DateTime prmDataAncora)
-        {
-
-            return (Rules.Parse(prmSintaxe, prmDataAncora));
-
-        }
-
-        public string View(string prmSintaxe) => View(prmSintaxe, prmDataAncora: DateTime.Now);
-        public string View(string prmSintaxe, DateTime prmDataAncora)
-        {
-
-            DateTime data = Rules.Parse(prmSintaxe, prmDataAncora);
-
-            return (data.ToString(format: Rules.Format.GetFormatacaoAtual()));
-
-        }
 
     }
     public class DynamicDateRules
@@ -73,16 +62,15 @@ namespace Dooggy
             Relative = new DynamicDateRelative(Raiz);
 
             Restrict = new DynamicDateRestrict(Raiz);
-
  
         }
 
-        public DateTime Parse(string prmSintaxe, DateTime prmDataAncora)
+        public DateTime Calc(string prmSintaxe)
         {
 
             Setup(prmSintaxe);
 
-            DateTime data = prmDataAncora;
+            DateTime data = Raiz.ancora;
 
             data = Anchor.GetDate(data);
             data = Relative.GetDate(data);
@@ -90,7 +78,7 @@ namespace Dooggy
             return (data);
 
         }
-
+        public string View(string prmSintaxe) => (Format.GetView(prmData: Calc(prmSintaxe)));
         private void Setup(string prmSintaxe)
         {
 
@@ -104,13 +92,17 @@ namespace Dooggy
 
         public bool IsMarcaOK(string prmTipoData, string prmTipoOperador) => (IsTipoDataOK(prmTipoData) && IsTipoOperadorOK(prmTipoOperador));
 
-        public void SetValor(string prmTipoData, int prmValor)
+        public void SetFixo(string prmTipoData, int prmValor)
         {
 
-            if (prmTipoData == "=")
-                Anchor.SetValor(prmTipoData, prmValor: xInt.GetPositivo(prmValor));
-            else
-                Relative.SetValor(prmTipoData, prmValor);
+            Anchor.SetValor(prmTipoData, prmValor: xInt.GetPositivo(prmValor));
+
+        }
+
+        public void SetRelative(string prmTipoData, int prmValor)
+        {
+
+            Relative.SetValor(prmTipoData, prmValor);
 
         }
 
@@ -141,7 +133,18 @@ namespace Dooggy
 
         public void Setup(string prmFormat) => formatacao_data = prmFormat;
 
-        public string GetFormatacaoAtual() 
+        public string GetView(DateTime prmData)
+        {
+
+            string formato = GetFormatacaoAtual();
+
+            string retorno = prmData.ToString(formato);
+
+            return (retorno);
+
+        }
+
+        private string GetFormatacaoAtual() 
         {
 
             string formato;
@@ -207,6 +210,16 @@ namespace Dooggy
             else
                 _ano = ano;
 
+            //
+            // Manter valores dentro dos intervalos estabelecidos
+            //
+
+            _ano = GetIntervalo(prmValor: _ano, prmMinimo: 1, prmMaximo: 2500);
+
+            _mes = GetIntervalo(prmValor: _mes, prmMinimo: 1, prmMaximo: 12);
+
+            _dia = GetIntervalo(prmValor: _dia, prmMinimo: 1, prmMaximo: DateTime.DaysInMonth(_ano, _mes));
+
             return new System.DateTime(_ano, _mes, _dia);
 
         }
@@ -228,8 +241,8 @@ namespace Dooggy
 
             DateTime data = prmDataAncora;
 
-            data = data.AddDays(mes);
-            data = data.AddDays(ano);
+            data = data.AddMonths(mes);
+            data = data.AddYears(ano);
 
             data = Restrict.GetDate(data, prmDesvio: dia);
 
@@ -448,12 +461,23 @@ namespace Dooggy
                 parametro = xString.GetLast(prmMarca, prmTamanho: prmMarca.Length - 2);
 
                 if (tipo_operador == "=")
+                {
+
                     valor = Convert.ToInt32(parametro);
+
+                    Rules.SetFixo(tipo_data, valor);
+
+                }
+
                 else
+                {
+
                     valor = Convert.ToInt32(tipo_operador + parametro);
 
-                Rules.SetValor(tipo_data, valor);
+                    Rules.SetRelative(tipo_data, valor);
 
+                }
+            
             }
 
         }
@@ -465,11 +489,11 @@ namespace Dooggy
         public void ParseRestricao(string prmParametro)
         { ; }
 
-        private string ObterParametroAnalise(string prmSintaxe) => Blocos.GetBlocoAntes(prmSintaxe, prmItem: ":");
+        private string ObterParametroAnalise(string prmSintaxe) => Bloco.GetBlocoAntes(prmSintaxe, prmItem: ":");
 
-        private string ObterParametroFormat(string prmSintaxe) => Blocos.GetBlocoDepois(prmSintaxe, prmItem: ":");
+        private string ObterParametroFormat(string prmSintaxe) => Bloco.GetBlocoDepois(prmSintaxe, prmItem: ":");
 
-        private string ObterParametroRestricao(string prmSintaxe) => Blocos.GetBlocoDepois(prmSintaxe, prmItem: ":");
+        private string ObterParametroRestricao(string prmSintaxe) => Bloco.GetBlocoDepois(prmSintaxe, prmItem: ":");
 
     }
     public class DynamicDateExport
@@ -487,10 +511,10 @@ namespace Dooggy
             Raiz = prmRaiz;
 
         }
-        public string GetSintaxeData(string prmSintaxe, DateTime prmDataAncora, string prmFormatacao)
+        public string GetSintaxeData(string prmSintaxe, string prmFormatacao)
         {
 
-            DateTime data = Raiz.Calcular(prmSintaxe, prmDataAncora);
+            DateTime data = Raiz.Calc(prmSintaxe);
 
             return GetSintaxeDataCalculada(data, prmFormatacao);
 

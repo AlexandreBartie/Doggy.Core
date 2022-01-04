@@ -34,6 +34,8 @@ namespace Dooggy.Factory.Data
         private TestDataViews Views;
         private TestDataModels Modelos;
 
+        private DateTime ancora;
+
 
         private Path PathDataFiles;
 
@@ -63,6 +65,8 @@ namespace Dooggy.Factory.Data
 
             Connect = new TestDataConnect(this);
 
+            ancora = DateTime.Now;
+
         }
 
         public bool AddDataBase(string prmTag, string prmConexao) => Bases.Criar(prmTag, prmConexao, this);
@@ -84,10 +88,6 @@ namespace Dooggy.Factory.Data
         public void SetDataVar(string prmArg, string prmInstrucao) => Vars.SetArgumento(prmArg, prmInstrucao);
         public void SetDataView(string prmArg, string prmInstrucao) => Views.SetArgumento(prmArg, prmInstrucao);
         public void SetDataFluxo(string prmArg, string prmInstrucao) => Fluxos.SetArgumento(prmArg, prmInstrucao);
-
-        //public void SetDataModel(string prmArg, string prmInstrucao) => Modelos.SetArgumento(prmArg, prmInstrucao);
-        //public void SetDataVariant(string prmArg, string prmInstrucao) => Fluxos.SetArgumento(prmArg, prmInstrucao);
-
         public void SetMaskDataFluxo(string prmMask) => Fluxos.SetMask(prmMask);
 
 
@@ -116,6 +116,12 @@ namespace Dooggy.Factory.Data
             Trace.LogPath.SetPath(prmContexto: "DestinoMassaTestes", prmPath);
 
         }
+        public void SetAncora(DateTime prmAncora)
+        {
+
+            ancora = prmAncora;
+
+        }
         public string GetVariavel(string prmTag)
         {
 
@@ -125,7 +131,29 @@ namespace Dooggy.Factory.Data
             return ("");
 
         }
-        
+
+        public string GetFuncao(string prmFuncao, string prmParametro)
+        {
+
+            switch (prmFuncao)
+            {
+
+                case "date":
+                    return GetDataDinamica(prmParametro);
+ 
+            }
+
+            return ("");
+        }
+
+        public string GetDataDinamica(string prmParametro)
+        {
+
+            DynamicDate Date = new DynamicDate(ancora);
+
+            return (Date.View(prmSintaxe: prmParametro));
+
+        }
         public string GetPathDestino(string prmSubPath) => PathDataFiles.GetPath(prmSubPath);
 
         public string txt(string prmTags) => Views.Save(prmTags, prmTipo: eTipoFileFormat.txt);

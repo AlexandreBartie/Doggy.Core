@@ -38,5 +38,22 @@ namespace Dooggy
         }
 
         public static int GetPositivo(int prmValor) => (System.Math.Abs(prmValor));
+
+        public static int GetNegativo(int prmValor) => (-GetPositivo(prmValor));
+
+        public static int GetIntervalo(int prmValor, int prmMinimo, int prmMaximo)
+        {
+
+            if (prmValor > prmMaximo)
+                return (prmMaximo);
+
+            if (prmValor < prmMinimo)
+                return (prmMinimo);
+
+            return (prmValor);
+
+        }
+
+
     }
 }

@@ -185,7 +185,7 @@ namespace Dooggy.Lib.Data
         private string GetTratarSQL(string prmSQL)
         {
 
-            string sql = Blocos.GetBlocoTroca(prmSQL, prmDelimitadorInicial: "<##>", prmDelimitadorFinal: "<##>", prmDelimitadorNovo: "'");
+            string sql = Bloco.GetBlocoTroca(prmSQL, prmDelimitadorInicial: "<##>", prmDelimitadorFinal: "<##>", prmDelimitadorNovo: "'");
             
             return (sql); 
 

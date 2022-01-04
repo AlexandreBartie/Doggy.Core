@@ -194,6 +194,8 @@ namespace Dooggy.Factory
         public void Message(string prmTipo, string prmMensagem)
         {
 
+            if (prmTipo == "CODE") return;
+            
             String texto = String.Format("[{0,4}] {1} ", prmTipo, prmMensagem);
 
 #if DEBUG
