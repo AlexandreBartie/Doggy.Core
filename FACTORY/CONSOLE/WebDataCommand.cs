@@ -25,100 +25,134 @@ namespace Dooggy.Factory.Console
         savecsv = 52,
         savejson = 53,
     }
-    public class TestCommands : List<TestCommand>
+
+    public class TestBuilder
     {
 
-        public TestConsole Console;
+        private TestSession Sessao;
 
-        public TestCommand Corrente;
+        public TestCommands Commands;
 
-        public string output = "";
+        public TestConsole Console { get => Sessao.Console; }
 
-        public TestCommands(TestConsole prmConsole)
+        private string linha;
+
+        private string _keyword;
+
+        private string _target;
+
+        private bool IsLinhaOK() => (linha != "");
+
+        public TestBuilder(TestSession prmSessao)
         {
 
-            Console = prmConsole;
+            Sessao = prmSessao;
+
+            Commands = new TestCommands(this);
 
         }
+
+        public void Play(string prmBloco) => Commands.Play(prmBloco);
 
         public void Write(string prmLinha)
         {
 
-            string linha = prmLinha.Trim();
+            linha = prmLinha.Trim();
 
-            if (linha == "") return;
+            if (IsLinhaOK())
+            {
 
-            //
-            // Identifica KeyWord:Target do comando a ser executado ...
-            //
+                if (GetNewCommand())
+                    Commands.AddCommand(_keyword, _target);
+                else
+                    Commands.AddParameter(linha);
 
-            if (GetNewCommand(linha))
-                Add(Corrente);
+            }
+
+        }
+        private bool GetNewCommand()
+        {
+
+            if (DetectedNewNote())
+
+                _target = Prefixo.GetPrefixoRemove(linha, prmPrefixo: _keyword, prmDelimitador: " ").Trim();
+
             else
-                Corrente.AddParametros(linha);
+            {
 
-        }
+                if (!DetectedNewKeyword())
+                    return (false);
 
-        public void Play() => Execute();
-        public void Play(string prmBloco)
-        {
+                _target = Prefixo.GetPrefixoRemove(linha, prmPrefixo: ">", prmDelimitador: ":");
 
-            foreach (string linha in new xLinhas(prmBloco))
-                Write(linha);
-
-            Play();
-
-        }
-
-        private void Execute()
-        {
-
-            foreach (TestCommand command in this)
-                command.Play();
-
-        }
-        private bool GetNewCommand(string prmLinha)
-        {
-
-            string keyword; string target;
-
-            //
-            // Identifica o KeyWord da linha de comando ...
-            //
-  
-            keyword = Prefixo.GetPrefixo(prmLinha, prmSinal: ">", prmDelimitador: " ").ToLower();
-
-            //
-            // Avalia se KeyWord não foi extraído ...
-            //
-
-            if (keyword == "") return (false);
-
-            //
-            // Identifica o Target da linha de comando ...
-            //
-
-            target = Prefixo.GetPrefixoRemove(prmLinha, prmSinal: ">", prmDelimitador: " ");
-
-            //
-            // Criar Novo Comando  ...
-            //
-
-            Corrente = new TestCommand(keyword, target, Console);
+            }
 
             return (true);
 
         }
-
-        public string GetFormatLine(string prmWord, string prmTarget, string prmParameters)
+        private bool DetectedNewNote()
         {
 
-            string command = xString.GetNoBlank(string.Format("{0}: {1}", prmWord, prmTarget));
+            _keyword = ">>";
 
-            if (xString.IsStringOK(prmParameters))
-                command += " " + prmParameters;
+            return(Prefixo.IsPrefixo(linha, prmPrefixo: _keyword));
 
-            return (command);
+        }
+        private bool DetectedNewKeyword()
+        {
+
+            _keyword = Prefixo.GetPrefixo(linha, prmPrefixo: ">", prmDelimitador: ":").ToLower();
+
+            return (_keyword != "");
+
+        }
+        
+    }
+
+    public class TestCommands : List<TestCommand>
+    {
+
+        private TestBuilder Builder;
+
+        public TestCommand Corrente;
+
+        public TestCommands(TestBuilder prmBuilder)
+        {
+
+            Builder = prmBuilder;
+
+        }
+
+        public void AddCommand(string prmKeyword, string prmTarget)
+        {
+
+            Corrente = new TestCommand(prmKeyword, prmTarget, Builder.Console);
+
+            Add(Corrente);
+
+        }
+
+        public void AddParameter(string prmParameter)
+        {
+
+            Corrente.AddParametros(prmParameter);
+
+        }
+
+        public void Play(string prmBloco)
+        {
+
+            foreach (string linha in new xLinhas(prmBloco))
+                Builder.Write(linha);
+
+            Executar();
+
+        }
+        private void Executar()
+        {
+
+            foreach (TestCommand command in this)
+                command.Play();
 
         }
 
@@ -133,6 +167,8 @@ namespace Dooggy.Factory.Console
 
         public string target;
 
+        public string sub_target;
+
         public string _args;
 
         public eTipoTestCommand tipo;
@@ -140,7 +176,6 @@ namespace Dooggy.Factory.Console
         private xLista Args;
 
         public TestCommandParameters Parametros;
-
 
         private TestCommandAction Action;
 
@@ -200,10 +235,16 @@ namespace Dooggy.Factory.Console
         private void Setup()
         {
 
-            switch (keyword)
+            string key;
+
+            sub_target = Bloco.GetBloco(keyword, prmDelimitadorInicial: "[", prmDelimitadorFinal: "]");
+
+            key = Bloco.GetBlocoAntes(keyword, prmDelimitador: "[", prmTRIM: true);
+
+            switch (key)
             {
 
-                case ">":
+                case ">>":
                     tipo = eTipoTestCommand.note;
                     break;
 
@@ -278,7 +319,7 @@ namespace Dooggy.Factory.Console
 
         private string target { get => Command.target; }
 
-        private string arquivoINI { get => Console.arquivoINI; }
+        private string sub_target { get => Command.sub_target; }
 
         private TestConsole Console { get => Command.Console; }
 
@@ -382,14 +423,9 @@ namespace Dooggy.Factory.Console
         private void ActionSaveFile(eTipoFileFormat prmTipo)
         {
 
-            if (arquivoINI != "")
-            {
+            Console.Save(prmData: Dados.GetOutput(target, prmTipo));
 
-                Console.Save(prmData: Dados.GetOutput(target, prmTipo));
-
-                Dados.File.SaveFile(prmNome: arquivoINI, prmConteudo: Console.output, prmTipo);
-
-            }
+            Dados.File.SaveFile(prmNome: Console.GetArquivoOUT(), prmConteudo: Console.output, prmTipo, prmEncoding: sub_target);
 
         }
 

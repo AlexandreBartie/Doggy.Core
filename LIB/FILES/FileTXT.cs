@@ -39,7 +39,7 @@ namespace Dooggy.Lib.Files
                 _IsOK = true;
 
             }
-            catch(Exception e)
+            catch
             {
 
                 _IsOK = false;
@@ -50,8 +50,8 @@ namespace Dooggy.Lib.Files
 
         }
 
-        public bool Save(string prmPath, string prmName, string prmConteudo, string prmExtensao) => Save(prmPath, prmArquivo: prmName + "." + prmExtensao, prmConteudo);
-        public bool Save(string prmPath, string prmArquivo, string prmConteudo)
+        public bool Save(string prmPath, string prmArquivo, string prmConteudo) => Save(prmPath, prmArquivo, prmConteudo, prmEncoding: Encoding.UTF8);
+        public bool Save(string prmPath, string prmArquivo, string prmConteudo, Encoding prmEncoding)
         {
 
             if (Diretorio.Criar(prmPath))
@@ -59,7 +59,7 @@ namespace Dooggy.Lib.Files
 
                 try
                 {
-                    File.WriteAllText(prmPath + prmArquivo, prmConteudo);
+                    File.WriteAllText(prmPath + prmArquivo, prmConteudo, prmEncoding);//, encoding: Encoding.UTF8);
 
                     return (true);
                 }

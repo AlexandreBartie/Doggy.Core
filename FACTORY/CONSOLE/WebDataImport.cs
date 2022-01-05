@@ -60,6 +60,8 @@ namespace Dooggy.Factory.Console
         private FileTXT File;
 
         public string nome;
+        public string nome_extendido { get => nome + "." + extensao; }
+
         public string path { get => DiretorioINI.path; }
 
         private string sub_path;
@@ -94,17 +96,17 @@ namespace Dooggy.Factory.Console
 
             File = new FileTXT();
 
-            if (File.Open(path_completo, prmArquivoINI, extensao))
+            if (File.Open(path_completo, nome_extendido))
             {
 
-                Trace.LogFile.DataFileImport(prmArquivoINI, extensao, prmSubPath);
+                Trace.LogFile.DataFileImport(nome_extendido, prmSubPath);
 
                 return File.txt();
 
             }
 
             else
-                Trace.LogFile.FailDataFileOpen(path_completo + nome + "." + extensao);
+                Trace.LogFile.FailDataFileOpen(path_completo, nome_extendido);
 
             return ("");
 
@@ -113,36 +115,5 @@ namespace Dooggy.Factory.Console
 
     }
 
-    //public class TestConsoleConexao
-    //{
 
-    //    private TestConsole Console;
-
-    //    private TestDataConnect Connect => Console.Pool.Connect;
-
-    //    private xJSON args => Console.Project.args;
-
-    //    public TestConsoleConexao(TestConsole prmConsole)
-    //    {
-
-    //        Console = prmConsole;
-
-    //    }
-    //    public void Setup()
-    //    {
-
-    //        //Connect.Oracle.user = "desenvolvedor_sia";
-    //        //Connect.Oracle.password = "asdfg";
-
-    //        //Connect.Oracle.host = "10.250.1.35";
-    //        //Connect.Oracle.port = args.GetValor("port", "1521");
-
-    //        //Connect.Oracle.service = "branch_1085.prod01.redelocal.oraclevcn.com";
-
-    //        //Connect.Oracle.Add(prmTag: "SIA");
-
-    //    }
-
-
-    //}
 }

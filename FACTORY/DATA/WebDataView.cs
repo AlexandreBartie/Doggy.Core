@@ -13,15 +13,17 @@ namespace Dooggy.Factory.Data
 
         public DataBaseConnection DataBase;
 
-        public string tag;
+        private string key;
+
+        private string alias;
 
         public string descricao;
 
         public string saida;
 
-
         public TestDataFluxos Fluxos;
 
+        public string tag { get => GetTag(); }
         public string header_txt { get => (descricao + "," + saida); }
 
         private TestDataPool Pool { get => DataBase.Pool; }
@@ -46,9 +48,11 @@ namespace Dooggy.Factory.Data
 
             descricao = Bloco.GetBloco(bloco, prmDelimitador: "|").Trim();
 
-            tag = Bloco.GetBlocoAntes(prmTag, bloco, prmTRIM: true);
+            alias = Bloco.GetBlocoAntes(prmTag, bloco, prmTRIM: true);
 
             saida = Bloco.GetBlocoDepois(prmTag, bloco, prmTRIM: true);
+
+            key = Pool.GetNextKeyDataView();
 
         }
 
@@ -115,7 +119,7 @@ namespace Dooggy.Factory.Data
 
                 parametro = Bloco.GetBloco(sql, prmDelimitadorInicial: funcao_ext, prmDelimitadorFinal: ")$");
 
-                if ((funcao == "") || (parametro == "")) break;
+                if ((xString.IsEmpty(funcao)) || (xString.IsEmpty(parametro))) break;
 
                 valor = Pool.GetFuncao(funcao, parametro);
 
@@ -125,6 +129,16 @@ namespace Dooggy.Factory.Data
             }
 
             return (sql);
+
+        }
+
+        private string GetTag()
+        {
+
+            if (alias == "")
+                return (key);
+
+            return (alias);
 
         }
 
@@ -369,7 +383,7 @@ namespace Dooggy.Factory.Data
             foreach (TestDataView View in this)
             {
 
-                if (lista.IsEqual(View.tag))
+                if (xString.IsEmpty(prmTags) || lista.IsEqual(View.tag))
                     filtro.AddItens(View.Fluxos);
 
             }

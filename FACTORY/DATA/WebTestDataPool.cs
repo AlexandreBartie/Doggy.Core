@@ -21,6 +21,13 @@ namespace Dooggy.Factory.Data
         txt = 2
     }
 
+    public enum eTipoFileEncoding : int
+    {
+        json = 0,
+        csv = 1,
+        txt = 2
+    }
+
     public class TestDataPool
     {
 
@@ -154,6 +161,9 @@ namespace Dooggy.Factory.Data
             return (Date.View(prmSintaxe: prmParametro));
 
         }
+
+        public string GetNextKeyDataView() => string.Format("x{0},", Views.Count); 
+
         public string GetPathDestino(string prmSubPath) => PathDataFiles.GetPath(prmSubPath);
 
         public string txt(string prmTags) => Views.Save(prmTags, prmTipo: eTipoFileFormat.txt);

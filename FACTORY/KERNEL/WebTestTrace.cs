@@ -92,15 +92,21 @@ namespace Dooggy.Factory
     }
     public class TestTraceLogFile : TestTraceLog
     {
-        public void DataFileImport(string prmNome, string prmExtensao, string prmSubPath) => DataFileAction(prmAcao: "READ", prmContexto: "Importado com sucesso" , prmNome, prmExtensao, prmSubPath);
-        public void DataFileExport(string prmNome, string prmExtensao, string prmSubPath) => DataFileAction(prmAcao: "SAVE", prmContexto: "Gerado com sucesso", prmNome, prmExtensao, prmSubPath);
-        private void DataFileAction(string prmAcao, string prmContexto, string prmNome, string prmExtensao, string prmSubPath)
+        public void DataFileImport(string prmArquivo, string prmSubPath) => DataFileAction(prmAcao: "READ", prmContexto: "Importado com sucesso" , prmArquivo, prmSubPath);
+        public void DataFileExport(string prmArquivo, string prmSubPath, string prmEncoding) => DataFileAction(prmAcao: "SAVE", prmContexto: "Salvo com sucesso", prmArquivo, prmSubPath, prmEncoding);
+        public void DataFileMute(string prmArquivo, string prmSubPath, string prmEncoding) => DataFileAction(prmAcao: "MUTE", prmContexto: "Silenciado com sucesso", prmArquivo, prmSubPath, prmEncoding);
+
+        private void DataFileAction(string prmAcao, string prmContexto, string prmArquivo, string prmSubPath) => DataFileAction(prmAcao, prmContexto, prmArquivo, prmSubPath, prmEncoding: "");
+        private void DataFileAction(string prmAcao, string prmContexto, string prmArquivo,  string prmSubPath, string prmEncoding)
         {
 
-            string msg = String.Format(@"file# '{0}.{1}' -msg: {2}", prmNome, prmExtensao, prmContexto);
+            string msg = string.Format(@"-file: '{0}' -msg: {1}", prmArquivo, prmContexto);
 
-            if (prmSubPath != "")
-                msg += @" - path: ..\" + prmSubPath;
+            if (xString.IsStringOK(prmEncoding))
+                msg += @" -encoding: " + prmEncoding;
+
+            if (xString.IsStringOK(prmSubPath))
+                msg += @" -path: ..\" + prmSubPath;
 
             msgFile(prmAcao, msg);
 
@@ -110,8 +116,9 @@ namespace Dooggy.Factory
         public void DataFileFormatCSV(string prmConteudo) => msgFile(prmTipo: "CSV", prmConteudo);
         public void DataFileFormatJSON(string prmConteudo) => msgFile(prmTipo: "JSON", prmConteudo);
 
-        public void FailDataFileExport(string prmArquivo) => msgErro(String.Format("Falha na criação do arquivo ... -file: {0}", prmArquivo));
-        public void FailDataFileOpen(string prmArquivo) => FailDataFileOpenDefault(prmLocal: String.Format("-file: {0}", prmArquivo));
+        public void FailDataFileEncoding(string prmPath, string prmArquivo, string prmEncoding) => msgErro(String.Format("Falha no formato encoding [{2}] ... -file: {0} -path: {1}", prmArquivo, prmPath, prmEncoding));
+        public void FailDataFileExport(string prmPath, string prmArquivo) => msgErro(String.Format("Falha na criação do arquivo ... -file: {0} -path: {1}", prmArquivo, prmPath));
+        public void FailDataFileOpen(string prmPath, string prmArquivo) => FailDataFileOpenDefault(prmLocal: String.Format("-file: {0} -path: {1}", prmArquivo, prmPath));
         public void FailJSONFormat(string prmContexto, string prmFluxo, Exception prmErro) => msgErro(prmTexto: String.Format(@"Fluxo JSON: [invalid format] ... contexto: {0} fluxo: {1}", prmContexto, prmFluxo));
 
         private void FailDataFileOpenDefault(string prmLocal) => msgErro(String.Format("Falha na abertura do arquivo ... {0}", prmLocal));
@@ -151,9 +158,9 @@ namespace Dooggy.Factory
 
         public void WriteKeyWordArg(string prmArg, string prmParametros) => msgCode(String.Format("  -{0}: {1}", prmArg, prmParametros));
 
-        public void FailFindKeyWord(string prmKeyWord) => msgErro(String.Format("KeyWord não encontrada ... -key:[{0}]", prmKeyWord));
+        public void FailFindKeyWord(string prmKeyWord) => msgErro(String.Format("KeyWord não encontrada ... -key: {0}", prmKeyWord));
 
-        public void FailActionKeyWord(string prmKeyWord) => msgErro(String.Format("KeyWord não executada ... -key:[{0}]", prmKeyWord));
+        public void FailActionKeyWord(string prmKeyWord) => msgErro(String.Format("KeyWord não executada ... -key: {0}", prmKeyWord));
 
         public void FailArgKeyWord(string prmKeyWord, string prmArg) => msgErro(String.Format("Argumento KeyWord não encontrada ... -arg:[{0}.{1}]", prmKeyWord, prmArg));
 

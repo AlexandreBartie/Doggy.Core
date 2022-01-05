@@ -19,11 +19,9 @@ namespace Dooggy.Factory.Console
         public TestDataPool Pool => Dados.Pool;
         public TestTrace Trace => Dados.Trace;
 
-        public string arquivoINI => Import.ArquivoINI.nome;
+        private TestConsoleExport Export => Sessoes.Export;
 
-        public DateTime ancora => DateTime.Now;
-
-        public string output { get => Sessoes.output; }
+        public string output { get => Export.resultado; }
 
         public TestConsole(TestDataProject prmDataProject)
         {
@@ -49,16 +47,21 @@ namespace Dooggy.Factory.Console
 
         public void ImportINI(string prmArquivoINI) => Import.Play(prmArquivoINI);
 
-        public void Play(string prmBloco) => Sessoes.Play(prmBloco);
-
+        public void Play(string prmBloco) => Play(prmBloco, prmArquivoOUT: "");
+        public void Play(string prmBloco, string prmArquivoOUT) => Sessoes.Play(prmBloco, prmArquivoOUT);
         public void Save(string prmData) => Sessoes.Save(prmData);
+        
+        public string GetArquivoOUT()
+        {
+            
+            string nome = Import.ArquivoINI.nome;
 
+            if (xString.IsStringOK(nome))
+                return(nome);
 
+            return (Export.nome);
 
-        //public void Write(string prmLinha) => Commands.Write(prmLinha);
-        //public void Write(string prmWord, string prmTarget) => Write(prmWord, prmTarget, prmParameters: "");
-        //public void Write(string prmWord, string prmTarget, string prmParameters) => Write(prmLinha: Commands.GetFormatLine(prmWord, prmTarget, prmParameters));
-
+        }
 
     }
 
@@ -71,7 +74,7 @@ namespace Dooggy.Factory.Console
 
         public TestTrace Trace => Console.Trace;
 
-        public string output { get => Corrente.output; }
+        public TestConsoleExport Export => Corrente.Export; 
 
         public TestSessions(TestConsole prmConsole)
         {
@@ -80,7 +83,7 @@ namespace Dooggy.Factory.Console
 
         }
 
-        public void Play(string prmBloco) { Criar(); Corrente.Play(prmBloco); }
+        public void Play(string prmBloco, string prmArquivoOUT) { Criar(); Corrente.Play(prmBloco, prmArquivoOUT); }
 
         public void Save(string prmData) { Corrente.Save(prmData); }
 
@@ -98,26 +101,46 @@ namespace Dooggy.Factory.Console
     public class TestSession
     {
 
-        private TestConsole Console;
+        public TestConsole Console;
 
-        private TestCommands Commands;
+        private TestBuilder Builder;
 
-        public string arquivoINI { get => Console.arquivoINI; }
+        public TestConsoleExport Export;
 
-        public string output { get => Commands.output; }
+        public string output { get => Export.resultado; }
 
         public TestSession(TestConsole prmConsole)
         {
 
             Console = prmConsole;
 
-            Commands = new TestCommands(prmConsole);
+            Builder = new TestBuilder(this);
+
+            Export = new TestConsoleExport();
 
         }
 
-        public void Play(string prmBloco) => Commands.Play(prmBloco); 
+        public void Play(string prmBloco, string prmArquivoOUT)
+        {
+
+            Export.Setup(prmArquivoOUT);
+
+            Builder.Play(prmBloco);
+
+        }
         
-        public void Save(string prmData) => Commands.output = prmData;
+        public void Save(string prmData) => Export.resultado = prmData;
+
+    }
+
+    public class TestConsoleExport
+    {
+
+        public string nome;
+
+        public string resultado;
+
+        public void Setup(string prmArquivoOUT) => nome = prmArquivoOUT;
 
     }
 

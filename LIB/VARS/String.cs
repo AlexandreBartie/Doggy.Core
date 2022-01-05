@@ -16,6 +16,8 @@ namespace Dooggy
 
         }
 
+        public static bool IsEmpty(string prmTexto) => !(IsStringOK(prmTexto));
+
         public static bool IsEqual(string prmTextoA, string prmTextoB) => GetLower(prmTextoA) == GetLower(prmTextoB);
 
         public static bool IsContem(string prmTextoA, string prmTextoB)

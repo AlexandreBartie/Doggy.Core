@@ -272,18 +272,20 @@ namespace Dooggy
         public void SetValor(string prmTipoData, int prmValor)
         {
 
-            switch (prmTipoData)
+            string tipo = prmTipoData.ToLower();
+
+            switch (tipo)
             {
 
-                case "D":
+                case "d":
                     dia = prmValor;
                     break;
 
-                case "M":
+                case "m":
                     mes = prmValor;
                     break;
 
-                case "A":
+                case "a":
                     ano = prmValor;
                     break;
 
@@ -450,15 +452,17 @@ namespace Dooggy
         private void AtualizarMarca(string prmMarca)
         {
 
-            string tipo_data; string tipo_operador; string parametro; int valor;
+            string marca; string tipo_data; string tipo_operador; string parametro; int valor;
 
-            tipo_data = xString.GetFirst(prmMarca);
-            tipo_operador = xString.GetChar(prmMarca, 2);
+            marca = xString.GetNoBlank(prmMarca);
+
+            tipo_data = xString.GetFirst(marca);
+            tipo_operador = xString.GetChar(marca, 2);
 
             if (Rules.IsMarcaOK(tipo_data, tipo_operador))
             {
 
-                parametro = xString.GetLast(prmMarca, prmTamanho: prmMarca.Length - 2);
+                parametro = xString.GetLast(prmMarca, prmTamanho: marca.Length - 2);
 
                 if (tipo_operador == "=")
                 {
@@ -482,18 +486,17 @@ namespace Dooggy
 
         }
 
-
         public void ParseFormatacao(string prmParametro)
         { Rules.SetFormat(prmFormat: prmParametro); }
 
         public void ParseRestricao(string prmParametro)
         { ; }
 
-        private string ObterParametroAnalise(string prmSintaxe) => Bloco.GetBlocoAntes(prmSintaxe, prmItem: ":");
+        private string ObterParametroAnalise(string prmSintaxe) => Bloco.GetBlocoAntes(prmSintaxe, prmDelimitador: ":");
 
-        private string ObterParametroFormat(string prmSintaxe) => Bloco.GetBlocoDepois(prmSintaxe, prmItem: ":");
+        private string ObterParametroFormat(string prmSintaxe) => Bloco.GetBlocoDepois(prmSintaxe, prmDelimitador: ":");
 
-        private string ObterParametroRestricao(string prmSintaxe) => Bloco.GetBlocoDepois(prmSintaxe, prmItem: ":");
+        private string ObterParametroRestricao(string prmSintaxe) => Bloco.GetBlocoDepois(prmSintaxe, prmDelimitador: ":");
 
     }
     public class DynamicDateExport
@@ -634,59 +637,5 @@ namespace Dooggy
         }
 
     }
-    public class DynamicDate_Test
-        {
-
-            //Public Sub teste_data_relativa()
-
-            //Dim vlData As New CLS_EXIBICAO_DATA_RELATIVA
-
-            //Dim vlSintaxe As String
-
-            //'vlSintaxe = "D+1|M+1|A=2005::6"
-            //vlSintaxe = "" '"d+1"
-
-            //If vlData.Editar(vlSintaxe) Then
-
-            //    Debug.Print "Modificado: ", vlData.sintaxe
-
-            //Else
-
-            //    Debug.Print "Intacto: ", vlData.sintaxe
-
-            //End If
-
-            //End Sub
-
-            //Public Sub teste_calcula_data()
-
-            //Dim vlData As New CLS_DATA_RELATIVA
-
-            //'vlData.Data.Importar "D+1|M+1|A=2005", "1237"
-
-            //Debug.Print vlData.Calcular("dbJDDK:70", Now)
-
-            //Debug.Print vlData.Calcular("D+10:70", Now)
-
-            //Debug.Print vlData.Calcular("D+30:70", Now)
-
-
-            //End Sub
-
-            //Public Sub teste_formatar_data()
-
-            //Dim vlData As New CLS_DATA_RELATIVA
-
-            //'Debug.Print vlData.Exportar("D+1|M+0:dd-mmm-aa", Now) ', "dd-mm-aa")
-            //Debug.Print vlData.Exportar("D=12:UTIL", Now) ', "dd-mm-aa")
-            //'Debug.Print vlData.Exportar("D+1|M+0:dd-mmm-aa", Now) ', "dd-mm-aa")
-            //'Debug.Print vlData.Exportar("D+1|M+0:dd-mmm-aa", Now) ', "dd-mm-aa")
-            //'Debug.Print vlData.Exportar("D+1|M+0:dd-mmm-aa", Now) ', "dd-mm-aa")
-
-            //End Sub
-
-
-
-        }
 
 }

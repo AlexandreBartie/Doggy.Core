@@ -27,7 +27,6 @@ namespace Dooggy.Factory.Data
 
         }
 
-        public bool Save(eTipoFileFormat prmTipo, string prmTags, string prmNome) => Save(prmTipo, prmTags, prmNome, prmSubPath: "");
         public bool Save(eTipoFileFormat prmTipo, string prmTags, string prmNome, string prmSubPath)
         {
 
@@ -82,8 +81,8 @@ namespace Dooggy.Factory.Data
 
         }
 
-        public bool SaveFile(string prmNome, string prmConteudo, eTipoFileFormat prmTipo) => SaveFile(prmNome, prmSubPath: "", prmConteudo, prmTipo);
-        public bool SaveFile(string prmNome, string prmSubPath, string prmConteudo, eTipoFileFormat prmTipo) => Output.Save(prmNome, prmSubPath: "", prmConteudo, prmExtensao: GetExtensao(prmTipo));
+        public bool SaveFile(string prmNome, string prmConteudo, eTipoFileFormat prmTipo, string prmEncoding) => SaveFile(prmNome, prmSubPath: "", prmConteudo, prmTipo, prmEncoding);
+        public bool SaveFile(string prmNome, string prmSubPath, string prmConteudo, eTipoFileFormat prmTipo, string prmEncoding) => Output.Save(prmNome, prmSubPath, prmConteudo, prmExtensao: GetExtensao(prmTipo), prmEncoding);
 
         public bool SaveJSON(string prmTags, string prmNome) => SaveJSON(prmTags, prmNome, prmSubPath: "");
         public bool SaveJSON(string prmTags, string prmNome, string prmSubPath) => Output.Save(prmNome, prmSubPath, prmConteudo: Dados.json(prmTags), prmExtensao: "json");
@@ -142,7 +141,7 @@ namespace Dooggy.Factory.Data
             if (File.Open(path, prmNome, prmExtensao))
                 return File.txt();
             else
-                Trace.LogFile.FailDataFileOpen(prmArquivo: path + prmNome + "." + prmExtensao);
+                Trace.LogFile.FailDataFileOpen(path, prmArquivo: prmNome + "." + prmExtensao);
 
             return ("");
 
@@ -153,6 +152,8 @@ namespace Dooggy.Factory.Data
     }
     public class TestDataOutput : TestDataPath
     {
+        private string path;
+        private string arquivo;
 
         public TestDataOutput(TestDataLocal prmDados)
         {
@@ -161,32 +162,88 @@ namespace Dooggy.Factory.Data
 
         }
 
-        public bool Save(string prmNome, string prmSubPath, string prmConteudo, string prmExtensao)
+        public bool Save(string prmNome, string prmSubPath, string prmConteudo, string prmExtensao) => Save(prmNome, prmSubPath, prmConteudo, prmExtensao, prmEncoding: "");
+        public bool Save(string prmNome, string prmSubPath, string prmConteudo, string prmExtensao, string prmEncoding)
         {
 
             if (xString.IsStringOK(prmNome))
             {
 
-                string path = GetPath(prmSubPath);
+                path = GetPath(prmSubPath);
 
+                arquivo = prmNome + "." + prmExtensao;
 
-                if (File.Save(path, prmNome, prmConteudo, prmExtensao))
+                if (File.Save(path, arquivo, prmConteudo, prmEncoding: GetEncoding(prmEncoding)))
                 {
 
-                    Trace.LogFile.DataFileExport(prmNome, prmExtensao, prmSubPath);
+                    Trace.LogFile.DataFileExport(arquivo, prmSubPath, prmEncoding);
 
                     return (true);
 
                 }
 
-                Trace.LogFile.FailDataFileExport(path + prmNome + "." + prmExtensao);
+                Trace.LogFile.FailDataFileExport(path, arquivo);
 
             }
+            else
+                Trace.LogFile.DataFileMute(path, arquivo, prmEncoding);
 
             return (false);
         }
 
         public string GetPath(string prmSubPath) => Dados.Pool.GetPathDestino(prmSubPath);
+
+        private Encoding GetEncoding(string prmTipoEncoding)
+        {
+
+            string tipo = prmTipoEncoding.Trim().ToLower();
+
+            switch(tipo)
+            {
+                case "":
+                case "utf8":
+                    return (Encoding.UTF8);
+
+                case "utf7":
+                    return (Encoding.UTF7);
+
+                case "utf32":
+                    return (Encoding.UTF32);
+
+                case "unicode":
+                    return (Encoding.Unicode);
+
+                case "ascii":
+                    return (Encoding.ASCII);
+
+                default:
+
+                    Encoding encode = GetEncodingCodePage(tipo);
+
+                    if (encode != null)
+                        return encode;
+
+                    break;
+
+
+            }
+
+            Trace.LogFile.FailDataFileEncoding(path, arquivo, prmTipoEncoding);
+
+            return (Encoding.UTF8);
+
+        }
+
+        private Encoding GetEncodingCodePage(string prmTipoEncoding)
+        {
+
+            int code_page = xInt.GetNumero(prmTipoEncoding);
+
+            Encoding encode = Encoding.GetEncoding(code_page);
+
+            return (encode);
+
+        }
 
     }
 

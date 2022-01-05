@@ -36,7 +36,25 @@ namespace Dooggy
             return (-prmValor);
 
         }
+        public static int GetNumero(string prmValor)
+        {
 
+            try
+            {
+
+                if (xString.IsStringOK(prmValor))
+                    return (Convert.ToInt32(prmValor));
+
+            }
+            catch
+            {
+
+
+            }
+  
+            return (0);
+
+        }
         public static int GetPositivo(int prmValor) => (System.Math.Abs(prmValor));
 
         public static int GetNegativo(int prmValor) => (-GetPositivo(prmValor));
