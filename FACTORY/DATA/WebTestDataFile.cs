@@ -25,7 +25,7 @@ namespace Dooggy.Factory.Data
 
             Output = new TestDataOutput(Dados);
 
-        }
+         }
 
         public bool Save(eTipoFileFormat prmTipo, string prmTags, string prmNome, string prmSubPath)
         {
@@ -140,8 +140,8 @@ namespace Dooggy.Factory.Data
 
             if (File.Open(path, prmNome, prmExtensao))
                 return File.txt();
-            else
-                Trace.LogFile.FailDataFileOpen(path, prmArquivo: prmNome + "." + prmExtensao);
+            
+            Trace.LogFile.FailDataFileOpen(path, prmArquivo: prmNome + "." + prmExtensao);
 
             return ("");
 
@@ -152,13 +152,17 @@ namespace Dooggy.Factory.Data
     }
     public class TestDataOutput : TestDataPath
     {
-        private string path;
-        private string arquivo;
+        public string path;
+        public string arquivo;
+
+        private TestDataEncoding Encode;
 
         public TestDataOutput(TestDataLocal prmDados)
         {
 
             Dados = prmDados;
+
+            Encode = new TestDataEncoding(this);
 
         }
 
@@ -173,7 +177,7 @@ namespace Dooggy.Factory.Data
 
                 arquivo = prmNome + "." + prmExtensao;
 
-                if (File.Save(path, arquivo, prmConteudo, prmEncoding: GetEncoding(prmEncoding)))
+                if (File.Save(path, arquivo, prmConteudo, prmEncoding: Encode.Find(prmEncoding)))
                 {
 
                     Trace.LogFile.DataFileExport(arquivo, prmSubPath, prmEncoding);
@@ -193,12 +197,36 @@ namespace Dooggy.Factory.Data
 
         public string GetPath(string prmSubPath) => Dados.Pool.GetPathDestino(prmSubPath);
 
-        private Encoding GetEncoding(string prmTipoEncoding)
+
+    }
+    public class TestDataPath
+    {
+
+        public TestDataLocal Dados;
+
+        public FileTXT File = new FileTXT();
+
+        public TestTrace Trace { get => Dados.Trace; }
+
+    }
+
+    public class TestDataEncoding
+    {
+
+        private TestDataOutput Ouput;
+
+        public TestDataEncoding(TestDataOutput prmOuput)
+        {
+
+            Ouput = prmOuput;
+
+        }
+        public Encoding Find(string prmTipoEncoding)
         {
 
             string tipo = prmTipoEncoding.Trim().ToLower();
 
-            switch(tipo)
+            switch (tipo)
             {
                 case "":
                 case "utf8":
@@ -216,46 +244,29 @@ namespace Dooggy.Factory.Data
                 case "ascii":
                     return (Encoding.ASCII);
 
-                default:
-
-                    Encoding encode = GetEncodingCodePage(tipo);
-
-                    if (encode != null)
-                        return encode;
-
-                    break;
-
-
             }
 
-            Trace.LogFile.FailDataFileEncoding(path, arquivo, prmTipoEncoding);
-
-            return (Encoding.UTF8);
+            return (FindByCodePage(tipo));
 
         }
 
-        private Encoding GetEncodingCodePage(string prmTipoEncoding)
+        private Encoding FindByCodePage(string prmEncoding)
         {
 
-            int code_page = xInt.GetNumero(prmTipoEncoding);
+            int code_page = xInt.GetNumero(prmEncoding);
 
-            Encoding encode = Encoding.GetEncoding(code_page);
+            foreach (EncodingInfo info in System.Text.Encoding.GetEncodings())
+            {
+                if (info.CodePage == code_page)
+                    return info.GetEncoding();
+            }
 
-            return (encode);
+            Ouput.Trace.LogFile.FailDataFileEncoding(Ouput.path, Ouput.arquivo, prmEncoding);
+
+            return (Encoding.Default);
 
         }
 
-    }
-
-    public class TestDataPath
-    {
-
-        public TestDataLocal Dados;
-
-        public FileTXT File = new FileTXT();
-
-        public TestTrace Trace { get => Dados.Trace; }
 
     }
-
 }
