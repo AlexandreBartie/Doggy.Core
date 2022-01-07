@@ -1,4 +1,5 @@
 ﻿using Dooggy;
+using Dooggy.Factory.Console;
 using Dooggy.Factory.Data;
 using Dooggy.Factory.Robot;
 using Dooggy.Lib.Generic;
@@ -17,11 +18,13 @@ namespace Dooggy.Factory
 
         public xJSON args = new xJSON();
 
+        public TestConsole Console;
+
         public TestDataPool Pool = new TestDataPool();
         
-        public TestTrace Trace = new TestTrace();
-
         public TestConfig Config = new TestConfig();
+
+        public TestTrace Trace = new TestTrace();
 
         public TestParameters Parameters = new TestParameters();
 
@@ -30,8 +33,18 @@ namespace Dooggy.Factory
 
             Dados.Setup(this, Pool);
 
+            Console = new TestConsole(this);
+
+            Trace.LogExecutado += TraceExecutado;
+
         }
 
+        public void TraceExecutado()
+        {
+
+            Console.AddLog();
+
+        }
         public bool Setup(string prmParametros, string prmNomeApp, string prmVersaoApp)
         {
 
@@ -43,7 +56,6 @@ namespace Dooggy.Factory
 
         public bool Setup(string prmParametros)
         {
-
 
             if (args.Parse(prmParametros))
                 return (TestDataBase());
@@ -82,7 +94,7 @@ namespace Dooggy.Factory
                 catch
                 {
 
-                    Trace.LogGeneric.msgAviso(string.Format("Método [{0}.{1}] não encontrado. [ error: {2} ]", prmObjeto.GetType().Name, metodo, prmObjeto.GetType().FullName));
+                    Trace.Geral.msgAviso(string.Format("Método [{0}.{1}] não encontrado. [ error: {2} ]", prmObjeto.GetType().Name, metodo, prmObjeto.GetType().FullName));
 
                     vlOk = false;
 

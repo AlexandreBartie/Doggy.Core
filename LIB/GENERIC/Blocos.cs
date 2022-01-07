@@ -163,12 +163,21 @@ namespace Dooggy
         }
 
         public static string GetPrefixoRemove(string prmTexto, string prmPrefixo) => GetPrefixoRemove(prmTexto, prmPrefixo, prmDelimitador: "");
-        public static string GetPrefixoRemove(string prmTexto, string prmPrefixo, string prmDelimitador)
+        public static string GetPrefixoRemove(string prmTexto, string prmPrefixo, bool prmTRIM) => GetPrefixoRemove(prmTexto, prmPrefixo, prmDelimitador: "", prmTRIM);
+        public static string GetPrefixoRemove(string prmTexto, string prmPrefixo, string prmDelimitador) => GetPrefixoRemove(prmTexto, prmPrefixo, prmDelimitador, prmTRIM: false);
+        public static string GetPrefixoRemove(string prmTexto, string prmPrefixo, string prmDelimitador, bool prmTRIM)
         {
 
-            string prefixo = GetPrefixo(prmTexto, prmPrefixo, prmDelimitador);
+            string prefixo;
 
-            return (xString.GetLast(prmTexto, prmTamanho: xInt.GetNegativo(prefixo.Length + 2)));
+            prefixo = GetPrefixo(prmTexto, prmPrefixo, prmDelimitador);
+
+            prefixo = xString.GetLast(prmTexto, prmTamanho: xInt.GetNegativo(prefixo.Length + 2));
+
+            if (prmTRIM)
+                return prefixo.Trim();
+
+            return prefixo;
 
         }
 

@@ -25,17 +25,17 @@ namespace Dooggy.Factory.Console
 
         }
 
-        public void Setup(string prmPathINI)
+        public void SetPathINI(string prmPath)
         {
 
-            ArquivoINI.Setup(prmPathINI);
+            ArquivoINI.SetPath(prmPath);
 
         }
 
-        public void Start(string prmPathINI)
+        public void Start(string prmPath)
         {
 
-            Setup(prmPathINI);
+            SetPathINI(prmPath);
 
             foreach (Arquivo file in ArquivoINI.GetDisponiveis())
                 Play(prmArquivoINI: file.nome_curto);
@@ -80,12 +80,12 @@ namespace Dooggy.Factory.Console
 
         }
 
-        public void Setup(string prmPathINI)
+        public void SetPath(string prmPath)
         {
 
-            DiretorioINI.Setup(prmPathINI);
+            DiretorioINI.Setup(prmPath);
 
-            Trace.LogPath.SetPath(prmContexto: "ConfiguracaoMassaTestes", prmPathINI);
+            Trace.LogPath.SetPath(prmContexto: "OrigemMassaTestes", prmPath);
 
         }
 

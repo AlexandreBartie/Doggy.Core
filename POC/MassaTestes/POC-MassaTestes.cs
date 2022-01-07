@@ -90,17 +90,6 @@ namespace Dooggy.POC.MassaTestes
 
         }
         
-        private void LoginAdm()
-        {
-
-            Dados.AddDataModel(prmTag: "LoginADM|testLoginAdmValido|login, senha, usuarioLogado", prmModelo: @"{'#TABELAS#':'seg.usuario','#CAMPOS#':'cod_usuario as login, ""1234as"" as senha, nom_usuario as usuarioLogado '}");
-
-            Dados.AddDataVariant(prmTag: "=Marli", prmRegra: @"{'#CONDICAO#': 'cod_usuario = ""1016283"" ' }");
-
-            SaveFile(prmTags: "LoginADM");
-
-        }
-
         private void ArqDadosAtendimentoAoAluno()
         {
 

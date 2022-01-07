@@ -5,10 +5,18 @@ using System.Text;
 
 namespace Dooggy.Factory
 {
-    public class TestTrace : TestTraceErro
+
+    public delegate void Notify();
+
+    public class TestTrace : TestTraceWrite
     {
 
-        public TestTraceLog LogGeneric;
+        public event Notify LogExecutado;
+
+
+        public TestTraceLog Geral;
+
+        public TestTraceErro Erro;
 
         public TestTraceLogApp LogApp;
 
@@ -22,10 +30,14 @@ namespace Dooggy.Factory
 
         public TestTraceLogConsole LogConsole;
 
+        public TestTraceMsg Corrente => Msg;
+
         public TestTrace()
         {
 
-            LogGeneric = new TestTraceLog();
+            Geral = new TestTraceLog();
+
+            Erro = new TestTraceErro();
 
             LogApp = new TestTraceLogApp();
 
@@ -39,27 +51,28 @@ namespace Dooggy.Factory
 
             LogConsole = new TestTraceLogConsole();
 
+            Setup(this);
+
+        }
+
+        public void OnLogExecutado()
+        {
+            LogExecutado?.Invoke();
         }
 
     }
-    public class TestTraceLogApp: TestTraceLog
+    public class TestTraceLogApp : TestTraceLog
     {
-        
-        public void ExeRunning(string prmNome, string prmVersao) { msgStart(string.Format("App: {0} - Versão: {1}", prmNome, prmVersao)); }
+
+        public void ExeRunning(string prmNome, string prmVersao) { msgApp(string.Format("-name {0} -version: {1}", prmNome, prmVersao)); }
 
     }
-    public class TestTraceLogData : TestTraceLog
+    public class TestTraceLogData : TestTraceLogData_Fail
     {
 
-        //
-        // Sucess
-        //
-        public void DBConnection(string prmTag, string prmStatus) => msgSQL(string.Format("act# -db:[{0}] -status: {1}", prmTag, prmStatus)); 
+        public void DBConnection(string prmTag, string prmStatus) => msgSQL(string.Format("act# -db:[{0}] -status: {1}", prmTag, prmStatus));
         public void SQLExecution(string prmTag, string prmSQL) => msgSQL(string.Format(@"act# -db:[{0}] -sql: {1}", prmTag, prmSQL));
 
-        //
-        // Sucess or Warning 
-        //
         public void ViewsSelection(string prmTag, int prmQtde)
         {
 
@@ -69,9 +82,11 @@ namespace Dooggy.Factory
                 msgErro(string.Format(@"msg# -view[{0}] -desc: View sem dados", prmTag));
 
         }
-        //
-        // Fails
-        //
+
+    }
+    public class TestTraceLogData_Fail : TestTraceLog
+    {
+
         public void FailDBConnection(string prmTag, string prmStringConexao, Exception prmErro) => FailConnection(prmMSG: "Conexão com Banco de Dados falhou", prmVar: "string", prmTag, prmStringConexao, prmErro);
         public void FailSQLConnection(string prmTag, string prmSQL, Exception prmErro) => FailConnection(prmMSG: "Comando SQL falhou", prmVar: "sql", prmTag, prmSQL, prmErro);
         public void FailSQLNoDataBaseConnection(string prmTag, string prmSQL, Exception prmErro) => FailConnection(prmMSG: "Banco de Dados não está aberto. SQL", prmVar: "sql", prmTag, prmSQL, prmErro);
@@ -92,12 +107,13 @@ namespace Dooggy.Factory
     }
     public class TestTraceLogFile : TestTraceLog
     {
-        public void DataFileImport(string prmArquivo, string prmSubPath) => DataFileAction(prmAcao: "READ", prmContexto: "Importado com sucesso" , prmArquivo, prmSubPath);
+
+        public void DataFileImport(string prmArquivo, string prmSubPath) => DataFileAction(prmAcao: "READ", prmContexto: "Importado com sucesso", prmArquivo, prmSubPath);
         public void DataFileExport(string prmArquivo, string prmSubPath, string prmEncoding) => DataFileAction(prmAcao: "SAVE", prmContexto: "Salvo com sucesso", prmArquivo, prmSubPath, prmEncoding);
         public void DataFileMute(string prmArquivo, string prmSubPath, string prmEncoding) => DataFileAction(prmAcao: "MUTE", prmContexto: "Silenciado com sucesso", prmArquivo, prmSubPath, prmEncoding);
 
         private void DataFileAction(string prmAcao, string prmContexto, string prmArquivo, string prmSubPath) => DataFileAction(prmAcao, prmContexto, prmArquivo, prmSubPath, prmEncoding: "");
-        private void DataFileAction(string prmAcao, string prmContexto, string prmArquivo,  string prmSubPath, string prmEncoding)
+        private void DataFileAction(string prmAcao, string prmContexto, string prmArquivo, string prmSubPath, string prmEncoding)
         {
 
             string msg = string.Format(@"-file: '{0}' -msg: {1}", prmArquivo, prmContexto);
@@ -124,7 +140,6 @@ namespace Dooggy.Factory
         private void FailDataFileOpenDefault(string prmLocal) => msgErro(String.Format("Falha na abertura do arquivo ... {0}", prmLocal));
 
     }
-
     public class TestTraceLogRobot : TestTraceLog
     {
 
@@ -150,10 +165,8 @@ namespace Dooggy.Factory
         public void TargetNotFound(string prmTAG) => msgErro("TARGET NOT FOUND: " + prmTAG);
 
     }
-
     public class TestTraceLogConsole : TestTraceLog
     {
-
         public void WriteKeyWord(string prmKeyWord, string prmTarget) => msgCode(String.Format("{0}: {1}", prmKeyWord, prmTarget));
 
         public void WriteKeyWordArg(string prmArg, string prmParametros) => msgCode(String.Format("  -{0}: {1}", prmArg, prmParametros));
@@ -166,14 +179,14 @@ namespace Dooggy.Factory
 
         public void FailMergeKeyWord(string prmKeyWord, string prmLinha) => msgErro(String.Format("Argumento KeyWord não definido ... -arg:[{0}.{1}]", prmKeyWord, prmLinha));
 
-        public void FailFindValueVariableSQL(string prmVariable, string prmSql) => msgErro(String.Format("Variável não possui valor ... -var:{0} -sql:{1}", prmVariable, prmSql));
+        public void FailFindValueVariable(string prmVariable, string prmTexto) => msgErro(String.Format("Variável não encontrada ... -var:{0} -txt:{1}", prmVariable, prmTexto));
     }
     public class TestTraceLog : TestTraceErro
     {
 
-        public void msgStart(string prmTrace) => Message(prmTipo: "START", prmTrace);
+        public void msgApp(string prmTrace) => Message(prmTipo: "APP", prmTrace);
+        public void msgSession(string prmTrace) => Message(prmTipo: "****", prmTrace);
         public void msgCode(string prmTrace) => Message(prmTipo: "CODE", prmTrace);
-        public void msgPlay(string prmTrace) => Message(prmTipo: "PLAY", prmTrace);
         public void msgTrace(string prmTrace) => Message(prmTipo: "TRACE", prmTrace);
         public void msgSQL(string prmMensagem) => Message(prmTipo: "SQL", prmMensagem);
         public void msgData(string prmMensagem) => Message(prmTipo: "DATA", prmMensagem);
@@ -184,9 +197,9 @@ namespace Dooggy.Factory
         public void msgAviso(string prmAviso) => Message(prmTipo: "AVISO", prmAviso);
         public void msgFalha(string prmAviso) => Message(prmTipo: "FALHA", prmAviso);
 
-    }
 
-    public class TestTraceErro : TestTraceMsg
+    }
+    public class TestTraceErro : TestTraceWrite
     {
 
         public void msgErro(string prmTexto) => Message(prmTipo: "ERRO", prmTexto);
@@ -195,27 +208,99 @@ namespace Dooggy.Factory
 
     }
 
-    public class TestTraceMsg
+    public class TestTraceWrite
     {
 
-        public void Message(string prmTipo, string prmMensagem)
+        protected static TestTrace Trace;
+
+        protected static TestTraceMsg Msg;
+
+        public void Setup(TestTrace prmTrace)
         {
 
-            if (prmTipo == "CODE") return;
-            
-            String texto = String.Format("[{0,4}] {1} ", prmTipo, prmMensagem);
+            Trace = prmTrace;
 
-#if DEBUG
+            Msg = new TestTraceMsg();
 
-            Debug.WriteLine(texto);
+        }
 
-#else
+        protected void Message(string prmTipo, string prmTexto)
+        {
 
-            System.Console.WriteLine(texto);
-
-#endif
+            if (Msg.Exibir(prmTipo, prmTexto))
+                Trace.OnLogExecutado();
 
         }
 
     }
+    public class TestTraceMsg
+    {
+
+        protected TestItemLog Item;
+
+        public string tipo { get => Item.tipo; }
+        public string texto { get => Item.texto; }
+
+        public bool Exibir(string prmTipo, string prmTexto)
+        {
+
+            Item = new TestItemLog(prmTipo, prmTexto);
+
+            if (!Item.IsVisivel()) return false;
+
+#if DEBUG
+
+            Debug.WriteLine(Item.msg);
+
+#else
+
+            System.Console.WriteLine(Item.msg);
+
+#endif
+
+            return true;
+
+        }
+
+    }
+
+    public class TestItemLog
+    {
+
+        public string tipo;
+        public string texto;
+
+        public string msg { get => String.Format("[{0,4}] {1} ", tipo, texto); }
+
+        public bool IsVisivel() => (tipo != "CODE");
+
+        public TestItemLog(string prmTipo, string prmTexto)
+        {
+
+            tipo = prmTipo;
+            texto = prmTexto;
+
+        }
+
+    }
+
+    public class TestDataLog : List<TestItemLog>
+    {
+
+        public bool ativo;
+
+        public void Start() => ativo = true;
+        public void Stop() => ativo = false;
+
+        public void AddLog(string prmTipo, string prmTexto)
+        {
+
+            if (ativo)
+                Add(new TestItemLog(prmTipo, prmTexto));
+
+        }
+
+
+    }
+
 }

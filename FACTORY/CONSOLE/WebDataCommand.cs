@@ -75,7 +75,7 @@ namespace Dooggy.Factory.Console
 
             if (DetectedNewNote())
 
-                _target = Prefixo.GetPrefixoRemove(linha, prmPrefixo: _keyword, prmDelimitador: " ").Trim();
+                _target = Prefixo.GetPrefixoRemove(linha, prmPrefixo: _keyword, prmTRIM: true);
 
             else
             {
@@ -83,7 +83,10 @@ namespace Dooggy.Factory.Console
                 if (!DetectedNewKeyword())
                     return (false);
 
-                _target = Prefixo.GetPrefixoRemove(linha, prmPrefixo: ">", prmDelimitador: ":");
+                if (_keyword == "view")
+                    _target = "";
+
+                _target = Prefixo.GetPrefixoRemove(linha, prmPrefixo: ">", prmDelimitador: ":", prmTRIM: true);
 
             }
 

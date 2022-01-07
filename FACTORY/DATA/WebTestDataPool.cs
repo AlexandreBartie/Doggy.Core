@@ -21,13 +21,6 @@ namespace Dooggy.Factory.Data
         txt = 2
     }
 
-    public enum eTipoFileEncoding : int
-    {
-        json = 0,
-        csv = 1,
-        txt = 2
-    }
-
     public class TestDataPool
     {
 
@@ -39,23 +32,17 @@ namespace Dooggy.Factory.Data
 
         private TestDataVars Vars;
         private TestDataViews Views;
-        private TestDataModels Modelos;
 
         private DateTime ancora;
 
-
         private Path PathDataFiles;
 
-        public TestDataFluxos Fluxos { get => (DataViewCorrente.Fluxos); }
+        public TestDataFluxos Fluxos => (DataViewCorrente.Fluxos);
 
-        public DataBaseConnection DataBaseCorrente { get => (Bases.Corrente); }
+        public DataBaseConnection DataBaseCorrente => (Bases.Corrente);
 
-        public TestDataView DataViewCorrente { get => (Views.Corrente); }
-        public TestDataFluxo DataFluxoCorrente { get => (Fluxos.Corrente); }
-        public TestDataModel DataModelCorrente { get => (Modelos.Corrente); }
-
-        private bool IsBaseCorrente { get => (DataBaseCorrente != null); }
-        private bool IsModelCorrente { get => (DataModelCorrente != null); }
+        public TestDataView DataViewCorrente => (Views.Corrente);
+        public TestDataFluxo DataFluxoCorrente => (Fluxos.Corrente);
 
         public TestDataPool()
         {
@@ -66,13 +53,11 @@ namespace Dooggy.Factory.Data
 
             Bases = new DataBasesConnection();
 
-            Vars = new TestDataVars(this);
-
-            Views = new TestDataViews(this);
-
             Connect = new TestDataConnect(this);
 
             ancora = DateTime.Now;
+
+            Cleanup();
 
         }
 
@@ -83,20 +68,21 @@ namespace Dooggy.Factory.Data
         public string AddDataView(string prmTag) => AddDataView(prmTag, prmMask: "");
         public string AddDataView(string prmTag, string prmMask) => Views.Criar(prmTag, prmMask, DataBaseCorrente);
 
-        public bool AddDataFluxo(string prmTag, string prmSQL) => AddDataFluxo(prmTag, prmSQL, prmMask: "");
         public bool AddDataFluxo(string prmTag, string prmSQL, string prmMask) => DataViewCorrente.Fluxos.Criar(prmTag, prmSQL, prmMask, DataViewCorrente);
-
-        public bool AddDataModel(string prmTag, string prmModelo, string prmMask) => Modelos.Criar(prmTag, prmModelo, prmMask, DataBaseCorrente);
-        public bool AddDataVariant(string prmTag, string prmRegra) => AddDataVariant(prmTag, prmRegra, prmQtde: 1);
-
-        public bool AddDataVariant(string prmTag, string prmRegra, int prmQtde) => DataModelCorrente.CriarVariacao(prmTag, prmRegra, prmQtde);
-
 
         public void SetDataVar(string prmArg, string prmInstrucao) => Vars.SetArgumento(prmArg, prmInstrucao);
         public void SetDataView(string prmArg, string prmInstrucao) => Views.SetArgumento(prmArg, prmInstrucao);
         public void SetDataFluxo(string prmArg, string prmInstrucao) => Fluxos.SetArgumento(prmArg, prmInstrucao);
         public void SetMaskDataFluxo(string prmMask) => Fluxos.SetMask(prmMask);
 
+        public void Cleanup()
+        {
+
+            Views = new TestDataViews(this);
+
+            Vars = new TestDataVars(this);
+
+        }
 
         public bool IsON()
         {
@@ -115,7 +101,7 @@ namespace Dooggy.Factory.Data
 
         }
 
-        public void SetPathDestino(string prmPath)
+        public void SetPathOUT(string prmPath)
         {
 
             PathDataFiles.Setup(prmPath);
@@ -209,16 +195,10 @@ namespace Dooggy.Factory.Data
 
         public string AddDataView(string prmTag) => (AddDataView(prmTag, prmMask: ""));
         public string AddDataView(string prmTag, string prmMask) => (Pool.AddDataView(prmTag, prmMask));
+
         public bool AddDataFluxo(string prmTag) => (AddDataFluxo(prmTag, prmSQL: ""));
         public bool AddDataFluxo(string prmTag, string prmSQL) => (AddDataFluxo(prmTag, prmSQL, prmMask: ""));
         public bool AddDataFluxo(string prmTag, string prmSQL, string prmMask) => (Pool.AddDataFluxo(prmTag, prmSQL, prmMask));
-
-        public void AddDataModel(string prmTag) => AddDataModel(prmTag, prmModelo: "");
-        public void AddDataModel(string prmTag, string prmModelo) => AddDataModel(prmTag, prmModelo, prmMask: "");
-        public void AddDataModel(string prmTag, string prmModelo, string prmMask) => Pool.AddDataModel(prmTag, prmModelo, prmMask);
-
-        public void AddDataVariant(string prmTag) => AddDataVariant(prmTag, prmRegra: "");
-        public void AddDataVariant(string prmTag, string prmRegra) => Pool.AddDataVariant(prmTag, prmRegra);
 
         public string GetOutput(string prmTags, eTipoFileFormat prmTipo)
         {

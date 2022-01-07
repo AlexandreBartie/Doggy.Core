@@ -63,22 +63,22 @@ namespace Dooggy.Factory.Data
 
         }
 
-        public string GetSQLTratado(string prmSQL)
+        public string GetTextoTratado(string prmTexto)
         {
 
-            string sql = prmSQL;
+            string texto = prmTexto;
 
-            sql = GetSQLVariavel(sql);
-            sql = GetSQLFuncoes(sql);
+            texto = GetSQLVariavel(texto);
+            texto = GetSQLFuncoes(texto);
 
-            return (sql);
+            return (texto);
 
         }
 
-        public string GetSQLVariavel(string prmSQL)
+        public string GetSQLVariavel(string prmTexto)
         {
 
-            string sql = prmSQL; string var; string var_extendido; string var_valor;
+            string sql = prmTexto; string var; string var_extendido; string var_valor;
 
             while (true)
             {
@@ -94,7 +94,7 @@ namespace Dooggy.Factory.Data
                 sql = xString.GetSubstituir(sql, var_extendido, var_valor);
 
                 if (var_valor == "")
-                    Trace.LogConsole.FailFindValueVariableSQL(var, prmSQL);
+                    Trace.LogConsole.FailFindValueVariable(var, prmTexto);
 
             }
 
@@ -264,7 +264,7 @@ namespace Dooggy.Factory.Data
 
             }
 
-            retorno = prmView.GetSQLTratado(retorno);
+            retorno = prmView.GetTextoTratado(retorno);
 
             return (retorno);
 
@@ -317,7 +317,6 @@ namespace Dooggy.Factory.Data
 
         }
 
-        public string Criar(string prmTag, DataBaseConnection prmDataBase) => Criar(prmTag, prmMask: "", prmDataBase);
         public string Criar(string prmTag, string prmMask, DataBaseConnection prmDataBase)
         {
 

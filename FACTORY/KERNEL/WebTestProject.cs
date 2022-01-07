@@ -13,19 +13,10 @@ namespace Dooggy.Factory
     {
         public TestDataConnect Connect { get => Pool.Connect; }
 
-        public TestConsole Console;
-
-        public TestDataProject()
-        {
-
-            Console = new TestConsole(this);
-
-        }
-
         public void Start(string prmPathDestino)
         {
 
-            Pool.SetPathDestino(prmPathDestino);
+            Pool.SetPathOUT(prmPathDestino);
 
             Call(this, Parameters.GetDataFactoryBlockCode());
 
@@ -34,7 +25,7 @@ namespace Dooggy.Factory
         public void Start(string prmPathINI, string prmPathDestino)
         {
 
-            Pool.SetPathDestino(prmPathDestino);
+            Pool.SetPathOUT(prmPathDestino);
 
             Console.Start(prmPathINI);
 

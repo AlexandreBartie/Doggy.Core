@@ -102,7 +102,7 @@ namespace Dooggy.Factory.Data
         public string OpenTXT(string prmNome) => OpenTXT(prmNome, prmSubPath: "");
         public string OpenTXT(string prmNome, string prmSubPath) => Input.Open(prmNome, prmSubPath, prmExtensao: "txt");
 
-        public void SetPathDestino(string prmPath) => Pool.SetPathDestino(prmPath);
+        public void SetPathOUT(string prmPath) => Pool.SetPathOUT(prmPath);
 
         public void SaveAll(string prmTags, string prmNome)
         {

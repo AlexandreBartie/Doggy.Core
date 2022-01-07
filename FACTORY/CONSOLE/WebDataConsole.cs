@@ -3,43 +3,45 @@ using Dooggy.Lib.Generic;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using static Dooggy.Factory.TestTraceMsg;
 
 namespace Dooggy.Factory.Console
 {
     public class TestConsole
     {
 
-        public TestDataProject Project;
+        public TestFactory Factory;
 
         private TestConsoleImport Import;
 
         private TestSessions Sessoes;
 
-        public TestDataLocal Dados => Project.Dados;
-        public TestDataPool Pool => Dados.Pool;
-        public TestTrace Trace => Dados.Trace;
+        public TestDataLocal Dados => Factory.Dados;
+        public TestDataPool Pool => Factory.Pool;
+        public TestTrace Trace => Factory.Trace;
 
         private TestConsoleExport Export => Sessoes.Export;
 
         public string output { get => Export.resultado; }
 
-        public TestConsole(TestDataProject prmDataProject)
+        public TestConsole(TestFactory prmFactory)
         {
 
-            Project = prmDataProject;   
+            Factory = prmFactory;
 
             Import = new TestConsoleImport(this);
 
             Sessoes = new TestSessions(this);
+
 
         }
 
         public void Setup(string prmPathINI, string prmPathOUT)
         {
 
-            Import.Setup(prmPathINI);
+            Import.SetPathINI(prmPathINI);
 
-            Pool.SetPathDestino(prmPathOUT);
+            Pool.SetPathOUT(prmPathOUT);
 
         }
         public void SetAncora(DateTime prmAncora) => Pool.SetAncora(prmAncora);
@@ -50,6 +52,8 @@ namespace Dooggy.Factory.Console
         public void Play(string prmBloco) => Play(prmBloco, prmArquivoOUT: "");
         public void Play(string prmBloco, string prmArquivoOUT) => Sessoes.Play(prmBloco, prmArquivoOUT);
         public void Save(string prmData) => Sessoes.Save(prmData);
+
+        public void AddLog() => Sessoes.AddLog();
         
         public string GetArquivoOUT()
         {
@@ -74,6 +78,8 @@ namespace Dooggy.Factory.Console
 
         public TestTrace Trace => Console.Trace;
 
+        public TestDataPool Pool => Console.Pool;
+
         public TestConsoleExport Export => Corrente.Export; 
 
         public TestSessions(TestConsole prmConsole)
@@ -94,6 +100,16 @@ namespace Dooggy.Factory.Console
 
             Add(Corrente);
 
+            Pool.Cleanup();
+
+        }
+
+        public void AddLog()
+        {
+
+            if (Corrente != null)
+                Corrente.AddLog(prmMsg: Trace.Corrente);
+
         }
 
     }
@@ -107,6 +123,8 @@ namespace Dooggy.Factory.Console
 
         public TestConsoleExport Export;
 
+        public TestDataLog Log;
+
         public string output { get => Export.resultado; }
 
         public TestSession(TestConsole prmConsole)
@@ -118,18 +136,31 @@ namespace Dooggy.Factory.Console
 
             Export = new TestConsoleExport();
 
+            Log = new TestDataLog();
+
         }
 
         public void Play(string prmBloco, string prmArquivoOUT)
         {
 
+            Log.Start();
+
             Export.Setup(prmArquivoOUT);
 
             Builder.Play(prmBloco);
 
+            Log.Stop();
+
         }
         
         public void Save(string prmData) => Export.resultado = prmData;
+
+        public void AddLog(TestTraceMsg prmMsg)
+        {
+
+            Log.AddLog(prmTipo: prmMsg.tipo, prmTexto: prmMsg.texto);
+
+        }
 
     }
 

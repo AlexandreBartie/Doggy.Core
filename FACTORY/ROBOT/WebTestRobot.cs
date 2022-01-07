@@ -97,6 +97,8 @@ namespace Dooggy.Factory.Robot
         public TestRobotProject Projeto { get => Motor.Suite.Projeto; }
         public TestTrace Trace { get => Projeto.Trace; }
 
+        public TestTraceErro Erro { get => Trace.Erro; }
+
         public IWebDriver driver { get => Motor.driver; }
 
         public QA_WebElemento Mapping(string prmKey, string prmTarget) => (Page.AddItem(prmKey, prmTarget));
@@ -139,7 +141,7 @@ namespace Dooggy.Factory.Robot
             }
             catch (Exception e)
             {
-                Trace.LogGeneric.msgErro(e);
+                Erro.msgErro(e);
             }
             return (null);
         }
@@ -151,7 +153,7 @@ namespace Dooggy.Factory.Robot
             }
             catch (Exception e)
             {
-                Trace.LogRobot.msgErro(e);
+                Erro.msgErro(e);
             }
             return (null);
         }
@@ -163,7 +165,7 @@ namespace Dooggy.Factory.Robot
             }
             catch (Exception e)
             {
-                Trace.LogRobot.msgErro(e);
+                Erro.msgErro(e);
             }
             return (null);
         }
@@ -175,7 +177,7 @@ namespace Dooggy.Factory.Robot
             }
             catch (Exception e)
             {
-                Trace.LogRobot.msgErro(e);
+                Erro.msgErro(e);
             }
             return (null);
         }
@@ -395,7 +397,7 @@ namespace Dooggy.Factory.Robot
 
             }
 
-            Trace.LogGeneric.msgErro(prmTexto: "AÇÃO não encontrada" + tipo.ToString());
+            Trace.Erro.msgErro(prmTexto: "AÇÃO não encontrada" + tipo.ToString());
 
             return (false);
 
@@ -492,12 +494,12 @@ namespace Dooggy.Factory.Robot
                 foreach (string item in fluxo)
                 {
                     if (!SetFluxo(item))
-                        Trace.msgErro("Domínio não encontrado na lista ... " + item);
+                        Trace.Erro.msgErro("Domínio não encontrado na lista ... " + item);
                 }
 
             }
             else
-                Trace.msgErro("Busca de Domínios falhou ... " + GetXPath());
+                Trace.Erro.msgErro("Busca de Domínios falhou ... " + GetXPath());
 
             return (false);
         }
@@ -721,7 +723,7 @@ namespace Dooggy.Factory.Robot
             IsON = true;
 
             if (!JSON.Save())
-            { Trace.msgErro("ERRO{JSON:Save} " + JSON.fluxo); }
+            { Trace.Erro.msgErro("ERRO{JSON:Save} " + JSON.fluxo); }
 
             return (JSON.IsOK);
 
