@@ -52,7 +52,7 @@ namespace Dooggy
 
             }
   
-            return (0);
+            return (-1);
 
         }
         public static int GetPositivo(int prmValor) => (System.Math.Abs(prmValor));

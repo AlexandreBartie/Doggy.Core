@@ -121,6 +121,8 @@ namespace Dooggy.Factory.Console
 
         private TestBuilder Builder;
 
+        public TestCommands Commands;
+
         public TestConsoleExport Export;
 
         public TestDataLog Log;
@@ -131,6 +133,8 @@ namespace Dooggy.Factory.Console
         {
 
             Console = prmConsole;
+
+            Commands = new TestCommands(this);
 
             Builder = new TestBuilder(this);
 
@@ -147,7 +151,9 @@ namespace Dooggy.Factory.Console
 
             Export.Setup(prmArquivoOUT);
 
-            Builder.Play(prmBloco);
+            Builder.Compile(prmBloco);
+
+            Commands.Play();
 
             Log.Stop();
 
@@ -155,12 +161,7 @@ namespace Dooggy.Factory.Console
         
         public void Save(string prmData) => Export.resultado = prmData;
 
-        public void AddLog(TestTraceMsg prmMsg)
-        {
-
-            Log.AddLog(prmTipo: prmMsg.tipo, prmTexto: prmMsg.texto);
-
-        }
+        public void AddLog(TestTraceMsg prmMsg) => Log.AddLog(prmTipo: prmMsg.tipo, prmTexto: prmMsg.texto);
 
     }
 

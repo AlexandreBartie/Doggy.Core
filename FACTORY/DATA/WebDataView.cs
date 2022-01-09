@@ -143,7 +143,6 @@ namespace Dooggy.Factory.Data
         }
 
     }
-
     public class TestDataFluxo : TestDataSQL
     {
 
@@ -214,7 +213,6 @@ namespace Dooggy.Factory.Data
         }
 
     }
-
     public class TestDataSQL
     {
 
@@ -300,7 +298,6 @@ namespace Dooggy.Factory.Data
         }
 
     }
-
     public class TestDataViews : List<TestDataView>
     {
 
@@ -607,5 +604,38 @@ namespace Dooggy.Factory.Data
         }
 
     }
+    public class TestDataRaws
+    {
 
+        private xLinhas Linhas;
+
+        public TestDataPool Pool;
+
+        private TestTrace Trace { get => Pool.Trace; }
+
+        public TestDataRaws(TestDataPool prmPool)
+        {
+
+            Pool = prmPool;
+
+            Linhas = new xLinhas();
+
+        }
+
+        public void SetArgumento(string prmArg, string prmInstrucao)
+        {
+
+            switch (prmArg)
+            {
+
+                case "":
+                case "line":
+                    Linhas.Add(prmInstrucao);
+                    break;
+
+            }
+
+        }
+
+    }
 }

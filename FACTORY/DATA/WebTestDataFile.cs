@@ -213,12 +213,14 @@ namespace Dooggy.Factory.Data
     public class TestDataEncoding
     {
 
-        private TestDataOutput Ouput;
+        private TestDataOutput Output;
 
-        public TestDataEncoding(TestDataOutput prmOuput)
+        public TestTrace Trace { get => Output.Trace; }
+
+        public TestDataEncoding(TestDataOutput prmOutput)
         {
 
-            Ouput = prmOuput;
+            Output = prmOutput;
 
         }
         public Encoding Find(string prmTipoEncoding)
@@ -251,22 +253,41 @@ namespace Dooggy.Factory.Data
         }
 
         private Encoding FindByCodePage(string prmEncoding)
+
         {
 
             int code_page = xInt.GetNumero(prmEncoding);
 
-            foreach (EncodingInfo info in System.Text.Encoding.GetEncodings())
+            if (code_page != -1)
+
             {
-                if (info.CodePage == code_page)
-                    return info.GetEncoding();
+
+                foreach (EncodingInfo info in System.Text.Encoding.GetEncodings())
+                {
+                    if (info.CodePage == code_page)
+                        return info.GetEncoding();
+                }
+
+                Encoding encode = TryInstallCodePage(prmCodePage: code_page);
+
+                if (encode != null) return (encode);
+  
             }
 
-            Ouput.Trace.LogFile.FailDataFileEncoding(Ouput.path, Ouput.arquivo, prmEncoding);
+            Trace.LogFile.FailDataFileEncoding(Output.path, Output.arquivo, prmEncoding);
 
             return (Encoding.Default);
 
         }
 
+        private Encoding TryInstallCodePage(int prmCodePage)
+        {
+
+            Encoding encode = CodePagesEncodingProvider.Instance.GetEncoding(prmCodePage);
+
+            return (encode);
+
+        }
 
     }
 }

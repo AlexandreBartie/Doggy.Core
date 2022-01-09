@@ -59,7 +59,7 @@ namespace Dooggy.Lib.Files
 
                 try
                 {
-                    File.WriteAllText(prmPath + prmArquivo, prmConteudo, prmEncoding);//, encoding: Encoding.UTF8);
+                    File.WriteAllText(prmPath + prmArquivo, prmConteudo, prmEncoding);
 
                     return (true);
                 }
