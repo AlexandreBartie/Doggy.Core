@@ -243,6 +243,18 @@ namespace Dooggy.Lib.Generic
             return (false);
 
         }
+        public void Set(int prmIndice, string prmTexto)
+        {
+            if (prmIndice <= qtde)
+                (this[prmIndice - 1]) = prmTexto;
+        }
+        public void Add(int prmIndice, string prmTexto)
+        {
+            if (prmIndice <= qtde)
+                (this[prmIndice - 1]) = prmTexto;
+            else
+                Add(prmTexto);
+        }
         public string Item(int prmIndice)
         {
             if (!IsVazio)

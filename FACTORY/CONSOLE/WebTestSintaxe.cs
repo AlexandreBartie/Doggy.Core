@@ -30,7 +30,7 @@ namespace Dooggy.Factory.Console
     public class TestBuilder
     {
 
-        private TestSession Sessao;
+        private TestConsoleSession Sessao;
         
         private TestSintaxe Sintaxe;
 
@@ -40,7 +40,7 @@ namespace Dooggy.Factory.Console
         public TestConsole Console { get => Sessao.Console; }
 
 
-        public TestBuilder(TestSession prmSessao)
+        public TestBuilder(TestConsoleSession prmSessao)
         {
 
             Sessao = prmSessao;
@@ -54,7 +54,7 @@ namespace Dooggy.Factory.Console
             
             foreach (string linha in new xLinhas(prmBloco))
 
-                if (Sintaxe.Parse(linha))
+                if (Sintaxe.IsNewLine(linha))
                 {
 
                     if (Sintaxe.IsNewCommand())
@@ -90,7 +90,7 @@ namespace Dooggy.Factory.Console
 
         }
 
-        public bool Parse(string prmLinha)
+        public bool IsNewLine(string prmLinha)
         {
 
             linha = prmLinha.Trim();
@@ -220,7 +220,7 @@ namespace Dooggy.Factory.Console
                 case "raw":
                 case "data":
                     tipo = eTipoTestCommand.raw;
-                    args = "-:";
+                    args = "header;null;*";
                     break;
 
                 case "var":
@@ -332,6 +332,8 @@ namespace Dooggy.Factory.Console
         private string arg_start = "-";
         private string arg_finish = ":";
 
+        private string arg_default => arg_start + arg_finish;
+
         private bool IsArg() => (key != "");
         public bool IsOk() => lista.IsContem(key);
 
@@ -355,7 +357,7 @@ namespace Dooggy.Factory.Console
 
             }
 
-            parametro = prmLinha;
+            parametro = linha;
 
             return false;
 
@@ -366,7 +368,10 @@ namespace Dooggy.Factory.Console
 
             parametro = "";
 
-            key = Bloco.GetBloco(linha, prmDelimitadorInicial: arg_start, prmDelimitadorFinal: arg_finish);
+            if (linha.StartsWith(arg_default))
+                key = "null";
+            else
+                key = Bloco.GetBloco(linha, prmDelimitadorInicial: arg_start, prmDelimitadorFinal: arg_finish);
 
             return (IsArg());
 

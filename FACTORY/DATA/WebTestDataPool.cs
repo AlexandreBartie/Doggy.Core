@@ -16,9 +16,10 @@ namespace Dooggy.Factory.Data
 
     public enum eTipoFileFormat : int
     {
-        json = 0,
-        csv = 1,
-        txt = 2
+        padrao = 0,
+           txt = 1,
+           csv = 2,
+          json = 3
     }
 
     public class TestDataPool
@@ -30,11 +31,11 @@ namespace Dooggy.Factory.Data
 
         public TestDataConnect Connect;
 
-        private TestDataVars Vars;
-        private TestDataRaws Raws;
-        private TestDataViews Views;
+        public TestDataVars Vars;
+        public TestDataRaws Raws;
+        public TestDataViews Views;
 
-        private DateTime ancora;
+        private TestDataTratamento Tratamento;
 
         private Path PathDataFiles;
 
@@ -56,7 +57,7 @@ namespace Dooggy.Factory.Data
 
             Connect = new TestDataConnect(this);
 
-            ancora = DateTime.Now;
+            Tratamento = new TestDataTratamento(this);
 
             Cleanup();
 
@@ -113,13 +114,65 @@ namespace Dooggy.Factory.Data
             Trace.LogPath.SetPath(prmContexto: "DestinoMassaTestes", prmPath);
 
         }
+        public void SetAncora(DateTime prmAncora) => Tratamento.SetAncora(prmAncora);
+
+        public string GetTextoTratado(string prmTexto) => Tratamento.GetTextoTratado(prmTexto);
+        public string GetNextKeyDataView() => string.Format("x{0},", Views.Count);
+        public string GetPathDestino(string prmSubPath) => PathDataFiles.GetPath(prmSubPath);
+
+        public string txt(string prmTags) => output(prmTags, prmTipo: eTipoFileFormat.txt);
+        public string csv(string prmTags) => output(prmTags, prmTipo: eTipoFileFormat.csv);
+        public string json(string prmTags) => output(prmTags, prmTipo: eTipoFileFormat.json);
+        public string output(string prmTags, eTipoFileFormat prmTipo) => Tratamento.GetOutput(prmTags, prmTipo);
+
+    }
+
+    public class TestDataTratamento
+    {
+
+        private TestDataPool Pool;
+
+        private DateTime ancora;
+
+        private TestDataVars Vars => Pool.Vars;
+        private TestDataRaws Raws => (Pool.Raws);
+        private TestDataViews Views => (Pool.Views);
+
+        private TestTrace Trace => (Pool.Trace);
+
+        public TestDataTratamento(TestDataPool prmPool)
+        {
+
+            Pool = prmPool;
+
+            ancora = DateTime.Now;
+
+        }
+
         public void SetAncora(DateTime prmAncora)
         {
 
             ancora = prmAncora;
 
         }
-        public string GetVariavel(string prmTag)
+        public string GetTextoTratado(string prmTexto)
+        {
+
+            string texto = prmTexto;
+
+            texto = GetSQLVariavel(texto);
+            texto = GetSQLFuncoes(texto);
+
+            return (texto);
+
+        }
+        public string GetOutput(string prmTags, eTipoFileFormat prmTipo)
+        {
+
+            return Raws.GetOutput(prmDados: Views.output(prmTags, prmTipo));
+
+        }
+        private string GetVariavel(string prmTag)
         {
 
             if (Vars.Find(prmTag))
@@ -128,8 +181,7 @@ namespace Dooggy.Factory.Data
             return ("");
 
         }
-
-        public string GetFuncao(string prmFuncao, string prmParametro)
+        private string GetFuncao(string prmFuncao, string prmParametro)
         {
 
             switch (prmFuncao)
@@ -137,13 +189,13 @@ namespace Dooggy.Factory.Data
 
                 case "date":
                     return GetDataDinamica(prmParametro);
- 
+
             }
 
             return ("");
         }
 
-        public string GetDataDinamica(string prmParametro)
+        private string GetDataDinamica(string prmParametro)
         {
 
             DynamicDate Date = new DynamicDate(ancora);
@@ -152,15 +204,65 @@ namespace Dooggy.Factory.Data
 
         }
 
-        public string GetNextKeyDataView() => string.Format("x{0},", Views.Count); 
+        private string GetSQLVariavel(string prmTexto)
+        {
 
-        public string GetPathDestino(string prmSubPath) => PathDataFiles.GetPath(prmSubPath);
+            string sql = prmTexto; string var; string var_extendido; string var_valor;
 
-        public string txt(string prmTags) => Views.Save(prmTags, prmTipo: eTipoFileFormat.txt);
-        public string csv(string prmTags) => Views.Save(prmTags, prmTipo: eTipoFileFormat.csv);
-        public string json(string prmTags) => Views.Save(prmTags, prmTipo: eTipoFileFormat.json);
+            while (true)
+            {
+
+                var_extendido = Bloco.GetBloco(sql, prmDelimitadorInicial: "$(", prmDelimitadorFinal: ")$", prmPreserve: true);
+
+                var = Bloco.GetBloco(sql, prmDelimitadorInicial: "$(", prmDelimitadorFinal: ")$");
+
+                if (var == "") break;
+
+                var_valor = GetVariavel(prmTag: var);
+
+                sql = xString.GetSubstituir(sql, var_extendido, var_valor);
+
+                if (var_valor == "")
+                    Trace.LogConsole.FailFindValueVariable(var, prmTexto);
+
+            }
+
+            return (sql);
+
+        }
+
+        private string GetSQLFuncoes(string prmSQL)
+        {
+
+            string sql = prmSQL; string funcao; string funcao_ext;
+            string prefixo; string parametro; string valor;
+
+            while (true)
+            {
+
+                funcao = Bloco.GetBloco(sql, prmDelimitadorInicial: "$", prmDelimitadorFinal: "(");
+
+                funcao_ext = Bloco.GetBloco(sql, prmDelimitadorInicial: "$", prmDelimitadorFinal: "(", prmPreserve: true);
+
+                prefixo = Bloco.GetBloco(sql, prmDelimitadorInicial: funcao_ext, prmDelimitadorFinal: ")$", prmPreserve: true);
+
+                parametro = Bloco.GetBloco(sql, prmDelimitadorInicial: funcao_ext, prmDelimitadorFinal: ")$");
+
+                if ((xString.IsEmpty(funcao)) || (xString.IsEmpty(parametro))) break;
+
+                valor = GetFuncao(funcao, parametro);
+
+                if (valor != "")
+                    sql = xString.GetSubstituir(sql, prefixo, valor);
+
+            }
+
+            return (sql);
+
+        }
 
     }
+
     public class TestDataLocal
     {
 
@@ -170,8 +272,6 @@ namespace Dooggy.Factory.Data
 
         public TestDataFile File;
 
-        public TestDataKeyDriven KeyDriven;
-
         public TestDataView View { get => Pool.DataViewCorrente; }
 
         public TestTrace Trace { get => Pool.Trace; }
@@ -180,8 +280,6 @@ namespace Dooggy.Factory.Data
         {
 
             File = new TestDataFile(this);
-
-            KeyDriven = new TestDataKeyDriven(Pool);
 
         }
 
@@ -206,43 +304,10 @@ namespace Dooggy.Factory.Data
         public bool AddDataFluxo(string prmTag, string prmSQL) => (AddDataFluxo(prmTag, prmSQL, prmMask: ""));
         public bool AddDataFluxo(string prmTag, string prmSQL, string prmMask) => (Pool.AddDataFluxo(prmTag, prmSQL, prmMask));
 
-        public string GetOutput(string prmTags, eTipoFileFormat prmTipo)
-        {
-
-            switch (prmTipo)
-            {
-
-                case eTipoFileFormat.csv:
-                    return csv(prmTags);
-
-                case eTipoFileFormat.txt:
-                    return txt(prmTags);
-
-            }
-
-            return json(prmTags);
-
-        }
         public string txt(string prmTags) => (Pool.txt(prmTags));
         public string csv(string prmTags) => (Pool.csv(prmTags));
         public string json(string prmTags) => (Pool.json(prmTags));
-
-    }
-
-    public class TestDataKeyDriven
-    {
-
-        public TestDataPool Pool;
-
-        public TestDataKeyDriven(TestDataPool prmPool)
-        {
-
-            Pool = prmPool;
-
-        }
-
-        public void SetMaskDataFluxo(string prmTag, string prmMask) => Pool.SetMaskDataFluxo(prmMask);
-
+        public string output(string prmTags, eTipoFileFormat prmTipo) => (Pool.output(prmTags, prmTipo));
 
     }
 

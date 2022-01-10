@@ -10,13 +10,13 @@ namespace Dooggy.Factory.Console
     public class TestCommands : List<TestCommand>
     {
 
-        private TestSession Sessao;
+        private TestConsoleSession Sessao;
 
         public TestCommand Corrente;
 
         private TestCommandParameters Parametros { get => Corrente.Parametros; }
 
-        public TestCommands(TestSession prmSessao)
+        public TestCommands(TestConsoleSession prmSessao)
         {
 
             Sessao = prmSessao;
@@ -63,6 +63,7 @@ namespace Dooggy.Factory.Console
 
         private TestCommandAction Action;
 
+        public string keyword { get => Sintaxe.keyword; }
         public TestTrace Trace { get => Console.Trace; }
         public TestDataLocal Dados { get => Console.Dados; }
 
@@ -156,13 +157,7 @@ namespace Dooggy.Factory.Console
 
                 PlayParametros();
 
-
-
-
-
             }
-
-
 
         }
 
@@ -217,9 +212,9 @@ namespace Dooggy.Factory.Console
         private void ActionSaveFile(eTipoFileFormat prmTipo)
         {
 
-            Console.Save(prmData: Dados.GetOutput(target, prmTipo));
+            Console.Save(prmData: Dados.output(target, prmTipo));
 
-            Dados.File.SaveFile(prmNome: Console.GetArquivoOUT(), prmConteudo: Console.output, prmTipo, prmEncoding: Sintaxe.opcoes);
+            Dados.File.SaveFile(prmNome: Console.GetArquivoOUT(), prmConteudo: Console.resultado, prmTipo, prmEncoding: Sintaxe.opcoes);
 
         }
 
@@ -290,7 +285,7 @@ namespace Dooggy.Factory.Console
 
             }
             else
-                Trace.LogConsole.FailArgNewKeyWord(prmArg.key, prmArg.parametro);
+                Trace.LogConsole.FailArgNewKeyWord(Command.keyword, prmArg.key, prmArg.linha);
 
         }
 
@@ -305,7 +300,7 @@ namespace Dooggy.Factory.Console
                 return true;
             }
             else
-                Trace.LogConsole.FailArgMergeKeyWord(Command.Sintaxe.keyword, parametro);
+                Trace.LogConsole.FailArgMergeKeyWord(Command.keyword, parametro);
 
             return (false);
 

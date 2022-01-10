@@ -168,7 +168,7 @@ namespace Dooggy.Factory
     public class TestTraceLogConsole : TestTraceLog
     {
         
-        public void PlayCommand(string prmTipo, string prmKeyWord, string prmTarget) => msgTrace(String.Format("Running {0,10} ... -key: {1} -target:{2}", prmTipo, prmKeyWord, prmTarget));
+        public void PlayCommand(string prmTipo, string prmKeyWord, string prmTarget) => msgTrace(String.Format("Running {0,10} ... -key: {1} -target: {2}", prmTipo, prmKeyWord, prmTarget));
 
         public void WriteKeyWord(string prmKeyWord, string prmTarget) => msgCode(String.Format("{0}: {1}", prmKeyWord, prmTarget));
 
@@ -178,11 +178,11 @@ namespace Dooggy.Factory
 
         public void FailActionKeyWord(string prmKeyWord) => msgErro(String.Format("Keyword não executada ... -key: {0}", prmKeyWord));
 
-        public void FailArgNewKeyWord(string prmKeyWord, string prmArg) => msgErro(String.Format("Argumento-Keyword não suportado ... -arg:[{0}.{1}]", prmKeyWord, prmArg));
+        public void FailArgNewKeyWord(string prmKeyWord, string prmArg, string prmLinha) => msgErro(String.Format("Argumento-Keyword não suportado ... -key: {0} -arg: {1} -line: [{2}]", prmKeyWord, prmArg, prmLinha));
 
-        public void FailArgMergeKeyWord(string prmKeyWord, string prmLinha) => msgErro(String.Format("Argumento-Keyword foi ignorado ... -arg:[{0}.{1}]", prmKeyWord, prmLinha));
+        public void FailArgMergeKeyWord(string prmKeyWord, string prmLinha) => msgErro(String.Format("Argumento-Keyword foi ignorado ... -key: {0} -line: [{1}]", prmKeyWord, prmLinha));
 
-        public void FailFindValueVariable(string prmVariable, string prmTexto) => msgErro(String.Format("Variável não encontrada ... -var:{0} -txt:{1}", prmVariable, prmTexto));
+        public void FailFindValueVariable(string prmVariable, string prmTexto) => msgErro(String.Format("Variável não encontrada ... -var: {0} -txt: {1}", prmVariable, prmTexto));
     }
     public class TestTraceLog : TestTraceErro
     {

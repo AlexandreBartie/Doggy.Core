@@ -26,7 +26,7 @@ namespace Dooggy.Factory.Data
         public string tag { get => GetTag(); }
         public string header_txt { get => (descricao + "," + saida); }
 
-        private TestDataPool Pool { get => DataBase.Pool; }
+        public TestDataPool Pool { get => DataBase.Pool; }
 
         private TestTrace Trace { get => Pool.Trace; }
 
@@ -60,75 +60,6 @@ namespace Dooggy.Factory.Data
         {
 
             Fluxos = new TestDataFluxos(Pool);
-
-        }
-
-        public string GetTextoTratado(string prmTexto)
-        {
-
-            string texto = prmTexto;
-
-            texto = GetSQLVariavel(texto);
-            texto = GetSQLFuncoes(texto);
-
-            return (texto);
-
-        }
-
-        public string GetSQLVariavel(string prmTexto)
-        {
-
-            string sql = prmTexto; string var; string var_extendido; string var_valor;
-
-            while (true)
-            {
-
-                var_extendido = Bloco.GetBloco(sql, prmDelimitadorInicial: "$(", prmDelimitadorFinal: ")$", prmPreserve: true);
-
-                var = Bloco.GetBloco(sql, prmDelimitadorInicial: "$(", prmDelimitadorFinal: ")$");
-
-                if (var == "") break;
-
-                var_valor = Pool.GetVariavel(prmTag: var);
-
-                sql = xString.GetSubstituir(sql, var_extendido, var_valor);
-
-                if (var_valor == "")
-                    Trace.LogConsole.FailFindValueVariable(var, prmTexto);
-
-            }
-
-            return (sql);
-
-        }
-
-        public string GetSQLFuncoes(string prmSQL)
-        {
-
-            string sql = prmSQL; string funcao; string funcao_ext;
-            string prefixo; string parametro; string valor;
-
-            while (true)
-            {
-
-                funcao = Bloco.GetBloco(sql, prmDelimitadorInicial: "$", prmDelimitadorFinal: "(");
-
-                funcao_ext = Bloco.GetBloco(sql, prmDelimitadorInicial: "$", prmDelimitadorFinal: "(", prmPreserve: true);
-
-                prefixo = Bloco.GetBloco(sql, prmDelimitadorInicial: funcao_ext, prmDelimitadorFinal: ")$", prmPreserve: true);
-
-                parametro = Bloco.GetBloco(sql, prmDelimitadorInicial: funcao_ext, prmDelimitadorFinal: ")$");
-
-                if ((xString.IsEmpty(funcao)) || (xString.IsEmpty(parametro))) break;
-
-                valor = Pool.GetFuncao(funcao, parametro);
-
-                if (valor != "")
-                    sql = xString.GetSubstituir(sql, prefixo, valor);
-
-            }
-
-            return (sql);
 
         }
 
@@ -262,7 +193,7 @@ namespace Dooggy.Factory.Data
 
             }
 
-            retorno = prmView.GetTextoTratado(retorno);
+            retorno = prmView.Pool.GetTextoTratado(retorno);
 
             return (retorno);
 
@@ -369,7 +300,7 @@ namespace Dooggy.Factory.Data
             }
 
         }
-        public string Save(string prmTags, eTipoFileFormat prmTipo) 
+        public string output(string prmTags, eTipoFileFormat prmTipo) 
         {
 
             TestDataFluxos filtro = new TestDataFluxos(Pool);
@@ -384,7 +315,7 @@ namespace Dooggy.Factory.Data
 
             }
 
-            return filtro.Save(prmTipo);
+            return filtro.output(prmTipo);
 
         }
         private TestDataViews GetFiltro(string prmLista)
@@ -506,17 +437,20 @@ namespace Dooggy.Factory.Data
         public void SetSQL(string prmSQL) => Corrente.SetSQL(prmSQL);
         public void SetMask(string prmMask) => Corrente.SetMask(prmMask);
 
-        public string Save(eTipoFileFormat prmTipo)
+        public string output(eTipoFileFormat prmTipo)
         {
 
             switch (prmTipo)
             {
 
+                case eTipoFileFormat.txt:
+                    return txt();
+
                 case eTipoFileFormat.csv:
                     return csv();
 
-                case eTipoFileFormat.txt:
-                    return txt();
+                case eTipoFileFormat.json:
+                    return json();
 
             }
 
@@ -528,11 +462,11 @@ namespace Dooggy.Factory.Data
         private string txt(string prmSeparador, bool prmColunaExtra)
         {
 
-            string corpo = ""; string header = ""; string tag_view = ""; int cont = 0; 
+            string header = ""; string tag_view = ""; int cont = 0;
 
-            string linha; string coluna_extra = "";
+            string corpo = ""; string linha; string coluna_extra = "";
 
-            if (prmColunaExtra)
+             if (prmColunaExtra)
                 coluna_extra = prmSeparador;
 
             foreach (TestDataFluxo Fluxo in this)
@@ -604,21 +538,24 @@ namespace Dooggy.Factory.Data
         }
 
     }
+
     public class TestDataRaws
     {
 
-        private xLinhas Linhas;
+        private xMemo Itens;
 
         public TestDataPool Pool;
 
         private TestTrace Trace { get => Pool.Trace; }
+
+        private string output { get => Itens.memo(prmSeparador: Environment.NewLine) + Environment.NewLine ; }
 
         public TestDataRaws(TestDataPool prmPool)
         {
 
             Pool = prmPool;
 
-            Linhas = new xLinhas();
+            Itens = new xMemo();
 
         }
 
@@ -628,14 +565,44 @@ namespace Dooggy.Factory.Data
             switch (prmArg)
             {
 
-                case "":
-                case "line":
-                    Linhas.Add(prmInstrucao);
+                case "null":
+                    Itens.Add(prmInstrucao);
                     break;
+
+                case "*":
+                    break;
+
+            }
+
+        }
+        public string GetOutput(string prmDados)
+        {
+
+            Merge(prmDados);
+
+            return (Pool.GetTextoTratado(output));
+
+        }
+
+        private void Merge(string prmDados)
+        {
+
+            int cont = 0;
+
+            xLista Dados = new xLista(prmDados, prmSeparador: Environment.NewLine);
+
+            foreach (string linha in Dados)
+            {
+
+                cont++;
+
+                if (Dados.qtde > cont)
+                    Itens.Add(cont, linha);
 
             }
 
         }
 
     }
+
 }
