@@ -12,7 +12,9 @@ namespace Dooggy.Factory.Console
 
         public TestFactory Factory;
 
-        private TestConsoleInput Input;
+        public TestConsoleInput Input;
+
+        public TestConsoleOutput Output;
 
         private TestConsoleSessions Sessoes;
 
@@ -20,10 +22,14 @@ namespace Dooggy.Factory.Console
         public TestDataPool Pool => Factory.Pool;
         public TestTrace Trace => Factory.Trace;
 
-        private TestConsoleOutput Output => Sessoes.Output;
+        public TestConsoleResult Result => Sessoes.Result;
 
         public string log { get => Sessoes.GetLog(); }
-        public string resultado { get => Output.resultado; }
+        public string resultado { get => Result.resultado; }
+
+        public Arquivos ScriptsINI() => Input.ScriptINI.ScriptsINI();
+
+        public void SetAncora(DateTime prmAncora) => Pool.SetAncora(prmAncora);
 
         public TestConsole(TestFactory prmFactory)
         {
@@ -32,42 +38,37 @@ namespace Dooggy.Factory.Console
 
             Input = new TestConsoleInput(this);
 
-            Sessoes = new TestConsoleSessions(this);
+            Output = new TestConsoleOutput(this);
 
+            Sessoes = new TestConsoleSessions(this);
 
         }
 
         public void Setup(string prmPathINI, string prmPathOUT)
         {
 
-            Input.SetPathINI(prmPathINI);
+            Input.SetPath(prmPathINI);
 
-            Pool.SetPathOUT(prmPathOUT);
+            Output.SetPath(prmPathOUT);
 
         }
-        public void SetAncora(DateTime prmAncora) => Pool.SetAncora(prmAncora);
-        public void Start(string prmPathINI) => Input.Start(prmPathINI);
+        public void Start(string prmPathINI, string prmPathOUT)
+        {
 
-        public void Import(string prmArquivoINI) => Input.Play(prmArquivoINI);
+            Setup(prmPathINI, prmPathOUT);
+
+            Input.Start(prmPathINI); ;
+
+        }
+        
+        public void Import(string prmScriptINI) => Input.Play(prmScriptINI);
 
         public void Play(string prmBloco) => Play(prmBloco, prmArquivoOUT: "");
         public void Play(string prmBloco, string prmArquivoOUT) => Sessoes.Play(prmBloco, prmArquivoOUT);
         public void Save(string prmData) => Sessoes.Save(prmData);
 
         public void AddLog() => Sessoes.AddLog();
-        
-        public string GetArquivoOUT()
-        {
-            
-            string nome = Input.ArquivoINI.nome;
-
-            if (xString.IsStringOK(nome))
-                return(nome);
-
-            return (Output.nome);
-
-        }
-
+       
     }
 
     public class TestConsoleInput
@@ -75,43 +76,108 @@ namespace Dooggy.Factory.Console
 
         private TestConsole Console;
 
-        public TestConsoleArquivoINI ArquivoINI;
+        public TestConsoleScriptINI ScriptINI;
 
         public TestConsoleInput(TestConsole prmConsole)
         {
 
             Console = prmConsole;
 
-            ArquivoINI = new TestConsoleArquivoINI(Console);
+            ScriptINI = new TestConsoleScriptINI(Console);
 
         }
 
-        public void SetPathINI(string prmPath)
+        public void SetPath(string prmPath)
         {
 
-            ArquivoINI.SetPath(prmPath);
+            ScriptINI.SetPath(prmPath);
 
         }
 
         public void Start(string prmPath)
         {
 
-            SetPathINI(prmPath);
-
-            foreach (Arquivo file in ArquivoINI.GetDisponiveis())
-                Play(prmArquivoINI: file.nome_curto);
+            foreach (Arquivo file in Console.ScriptsINI())
+                Play(prmScriptINI: file.nome_curto);
 
         }
 
-        public void Play(string prmArquivoINI) => Play(prmArquivoINI, prmSubPath: "");
+        public void Play(string prmScriptINI) => Play(prmScriptINI, prmSubPath: "");
 
-        public void Play(string prmArquivoINI, string prmSubPath) => Console.Play(prmBloco: Open(prmArquivoINI, prmSubPath));
+        public void Play(string prmScriptINI, string prmSubPath) => Console.Play(prmBloco: Open(prmScriptINI, prmSubPath));
 
-        private string Open(string prmArquivoINI, string prmSubPath) => ArquivoINI.Open(prmArquivoINI, prmSubPath);
+        private string Open(string prmScriptINI, string prmSubPath) => ScriptINI.Open(prmScriptINI, prmSubPath);
 
     }
 
     public class TestConsoleOutput
+    {
+
+        private TestConsole Console;
+
+        private Path PathDataFiles;
+
+        private TestConsoleInput Input => Console.Input;
+        private TestConsoleResult Result => Console.Result;
+
+        public TestTrace Trace => Console.Trace;
+
+        public TestConsoleOutput(TestConsole prmConsole)
+        {
+
+            Console = prmConsole;
+
+            PathDataFiles = new Path();
+
+        }
+
+        public void SetPath(string prmPath)
+        {
+
+            PathDataFiles.Setup(prmPath);
+
+            Trace.LogPath.SetPath(prmContexto: "DestinoMassaTestes", prmPath);
+
+        }
+        public string GetScriptOrigem()
+        {
+
+            string nome = Input.ScriptINI.nome;
+
+            if (xString.IsStringOK(nome))
+                return (nome);
+
+            return (Console.Result.nome);
+
+        }
+
+        public string GetFullPath(eTipoFileFormat prmTipo)
+        {
+
+            return (GetPath(prmSubPath: GetExtensao(prmTipo)));
+
+        }
+        public string GetExtensao(eTipoFileFormat prmTipo)
+        {
+
+            switch (prmTipo)
+            {
+
+                case eTipoFileFormat.csv:
+                    return "csv";
+
+                case eTipoFileFormat.txt:
+                    return "txt";
+
+            }
+
+            return "json";
+
+        }
+        public string GetPath(string prmSubPath) => (PathDataFiles.GetPath(prmSubPath));
+    }
+
+    public class TestConsoleResult
     {
 
         public string nome;
@@ -122,7 +188,7 @@ namespace Dooggy.Factory.Console
 
     }
 
-    public class TestConsoleArquivoINI
+    public class TestConsoleScriptINI
     {
 
         private TestConsole Console;
@@ -141,11 +207,11 @@ namespace Dooggy.Factory.Console
 
         private string extensao = "ini";
 
-        public Arquivos GetDisponiveis() => DiretorioINI.files.GetFiltro("*.ini");
+        public Arquivos ScriptsINI() => DiretorioINI.files.GetFiltro("*.ini");
 
         private TestTrace Trace => Console.Trace;
 
-        public TestConsoleArquivoINI(TestConsole prmConsole)
+        public TestConsoleScriptINI(TestConsole prmConsole)
         {
 
             Console = prmConsole;
@@ -157,14 +223,15 @@ namespace Dooggy.Factory.Console
 
             DiretorioINI.Setup(prmPath);
 
+
             Trace.LogPath.SetPath(prmContexto: "OrigemMassaTestes", prmPath);
 
         }
 
-        public string Open(string prmArquivoINI, string prmSubPath)
+        public string Open(string prmScriptINI, string prmSubPath)
         {
 
-            nome = prmArquivoINI; sub_path = prmSubPath;
+            nome = prmScriptINI; sub_path = prmSubPath;
 
             File = new FileTXT();
 
@@ -198,7 +265,7 @@ namespace Dooggy.Factory.Console
 
         public TestDataPool Pool => Console.Pool;
 
-        public TestConsoleOutput Output => Corrente.Output;
+        public TestConsoleResult Result => Corrente.Result;
 
         public TestConsoleSessions(TestConsole prmConsole)
         {
@@ -251,11 +318,11 @@ namespace Dooggy.Factory.Console
 
         public TestCommands Commands;
 
-        public TestConsoleOutput Output;
+        public TestConsoleResult Result;
 
         public TestDataLog Log;
 
-        public string output { get => Output.resultado; }
+        public string output { get => Result.resultado; }
 
         public TestConsoleSession(TestConsole prmConsole)
         {
@@ -266,7 +333,7 @@ namespace Dooggy.Factory.Console
 
             Builder = new TestBuilder(this);
 
-            Output = new TestConsoleOutput();
+            Result = new TestConsoleResult();
 
             Log = new TestDataLog();
 
@@ -277,7 +344,7 @@ namespace Dooggy.Factory.Console
 
             Log.Start();
 
-            Output.Setup(prmArquivoOUT);
+            Result.Setup(prmArquivoOUT);
 
             Builder.Compile(prmBloco);
 
@@ -287,7 +354,7 @@ namespace Dooggy.Factory.Console
 
         }
 
-        public void Save(string prmData) => Output.resultado = prmData;
+        public void Save(string prmData) => Result.resultado = prmData;
 
         public void AddLog(TestTraceMsg prmMsg) => Log.AddLog(prmTipo: prmMsg.tipo, prmTexto: prmMsg.texto);
 

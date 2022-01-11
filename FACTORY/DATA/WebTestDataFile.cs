@@ -27,99 +27,71 @@ namespace Dooggy.Factory.Data
 
          }
 
-        public bool Save(eTipoFileFormat prmTipo, string prmTags, string prmNome, string prmSubPath)
+        public bool Save(eTipoFileFormat prmTipo, string prmTags, string prmNome, string prmPath)
         {
 
             switch (prmTipo)
             {
 
                 case eTipoFileFormat.csv:
-                    return SaveCSV(prmTags, prmNome, prmSubPath);
+                    return SaveCSV(prmTags, prmNome, prmPath);
 
                 case eTipoFileFormat.txt:
-                    return SaveTXT(prmTags, prmNome, prmSubPath);
+                    return SaveTXT(prmTags, prmNome, prmPath);
 
             }
 
-            return SaveJSON(prmTags, prmNome, prmSubPath);
+            return SaveJSON(prmTags, prmNome, prmPath);
 
         }
 
-        public string Open(eTipoFileFormat prmTipo, string prmNome, string prmSubPath)
+        public string Open(eTipoFileFormat prmTipo, string prmNome, string prmPath)
         {
 
             switch (prmTipo)
             {
 
                 case eTipoFileFormat.csv:
-                    return OpenCSV(prmNome, prmSubPath);
+                    return OpenCSV(prmNome, prmPath);
 
                 case eTipoFileFormat.txt:
-                    return OpenTXT(prmNome, prmSubPath);
+                    return OpenTXT(prmNome, prmPath);
 
             }
 
-            return OpenJSON(prmNome, prmSubPath);
+            return OpenJSON(prmNome, prmPath);
 
         }
 
-        public string GetExtensao(eTipoFileFormat prmTipo)
-        {
+        private bool SaveJSON(string prmTags, string prmNome, string prmPath) => SaveFile(prmNome, prmPath, prmConteudo: Dados.json(prmTags), prmExtensao: "json");
+        private bool SaveCSV(string prmTags, string prmNome, string prmPath) => SaveFile(prmNome, prmPath, prmConteudo: Dados.csv(prmTags), prmExtensao: "csv");
+        private bool SaveTXT(string prmTags, string prmNome, string prmPath) => SaveFile(prmNome, prmPath, prmConteudo: Dados.txt(prmTags), prmExtensao: "txt");
 
-            switch (prmTipo)
-            {
+        private bool SaveFile(string prmNome, string prmPath, string prmConteudo, string prmExtensao) => Output.Save(prmNome, prmPath, prmConteudo, prmExtensao);
+        public bool SaveFile(string prmNome, string prmPath, string prmConteudo, string prmExtensao, string prmEncoding) => Output.Save(prmNome, prmPath, prmConteudo, prmExtensao, prmEncoding);
 
-                case eTipoFileFormat.csv:
-                    return "csv";
 
-                case eTipoFileFormat.txt:
-                    return "txt";
 
-            }
+        public string OpenJSON(string prmNome, string prmPath) => Input.Open(prmNome, prmPath, prmExtensao: "json");
+        public string OpenCSV(string prmNome, string prmPath) => Input.Open(prmNome, prmPath, prmExtensao: "csv");
+        public string OpenTXT(string prmNome, string prmPath) => Input.Open(prmNome, prmPath, prmExtensao: "txt");
 
-            return "json";
+        //public void SaveAll(string prmTags, string prmNome)
+        //{
 
-        }
+        //    // Formato JSON
 
-        public bool SaveFile(string prmNome, string prmConteudo, eTipoFileFormat prmTipo, string prmEncoding) => SaveFile(prmNome, prmSubPath: "", prmConteudo, prmTipo, prmEncoding);
-        public bool SaveFile(string prmNome, string prmSubPath, string prmConteudo, eTipoFileFormat prmTipo, string prmEncoding) => Output.Save(prmNome, prmSubPath, prmConteudo, prmExtensao: GetExtensao(prmTipo), prmEncoding);
+        //    Dados.File.SaveJSON(prmTags, prmNome, prmPath: "json");
 
-        public bool SaveJSON(string prmTags, string prmNome) => SaveJSON(prmTags, prmNome, prmSubPath: "");
-        public bool SaveJSON(string prmTags, string prmNome, string prmSubPath) => Output.Save(prmNome, prmSubPath, prmConteudo: Dados.json(prmTags), prmExtensao: "json");
+        //    // Formato CSV
 
-        public bool SaveCSV(string prmTags, string prmNome) => SaveCSV(prmTags, prmNome, prmSubPath: "");
-        public bool SaveCSV(string prmTags, string prmNome, string prmSubPath) => Output.Save(prmNome, prmSubPath, prmConteudo: Dados.csv(prmTags), prmExtensao: "csv");
+        //    Dados.File.SaveCSV(prmTags, prmNome, prmPath: "csv");
 
-        public bool SaveTXT(string prmTags, string prmNome) => SaveTXT(prmTags, prmNome, prmSubPath: "");
-        public bool SaveTXT(string prmTags, string prmNome, string prmSubPath) => Output.Save(prmNome, prmSubPath, prmConteudo: Dados.txt(prmTags), prmExtensao: "txt");
+        //    // Formato TXT com cabeçalho e coluna adicional ...
 
-        public string OpenJSON(string prmNome) => OpenJSON(prmNome, prmSubPath: "");
-        public string OpenJSON(string prmNome, string prmSubPath) => Input.Open(prmNome, prmSubPath, prmExtensao: "json");
+        //    Dados.File.SaveTXT(prmTags, prmNome, prmPath: "txt");
 
-        public string OpenCSV(string prmNome) => OpenCSV(prmNome, prmSubPath: "");
-        public string OpenCSV(string prmNome, string prmSubPath) => Input.Open(prmNome, prmSubPath, prmExtensao: "csv");
-
-        public string OpenTXT(string prmNome) => OpenTXT(prmNome, prmSubPath: "");
-        public string OpenTXT(string prmNome, string prmSubPath) => Input.Open(prmNome, prmSubPath, prmExtensao: "txt");
-
-        public void SetPathOUT(string prmPath) => Pool.SetPathOUT(prmPath);
-
-        public void SaveAll(string prmTags, string prmNome)
-        {
-
-            // Formato JSON
-
-            Dados.File.SaveJSON(prmTags, prmNome, prmSubPath: "json");
-
-            // Formato CSV
-
-            Dados.File.SaveCSV(prmTags, prmNome, prmSubPath: "csv");
-
-            // Formato TXT com cabeçalho e coluna adicional ...
-
-            Dados.File.SaveTXT(prmTags, prmNome, prmSubPath: "txt");
-
-        }
+        //}
 
     }
 
@@ -133,21 +105,19 @@ namespace Dooggy.Factory.Data
 
         }
 
-        public string Open(string prmNome, string prmSubPath, string prmExtensao)
+        public string Open(string prmNome, string prmPath, string prmExtensao)
         {
 
-            string path = GetPath(prmSubPath);
-
-            if (File.Open(path, prmNome, prmExtensao))
+            if (File.Open(prmPath, prmNome, prmExtensao))
                 return File.txt();
-            
-            Trace.LogFile.FailDataFileOpen(path, prmArquivo: prmNome + "." + prmExtensao);
+
+            Trace.LogFile.FailDataFileOpen(prmPath, prmArquivo: prmNome + "." + prmExtensao);
 
             return ("");
 
         }
 
-        public string GetPath(string prmSubPath) => Dados.Pool.GetPathDestino(prmSubPath);
+        //public string GetPath(string prmSubPath) => Dados.Pool.GetPathDestino(prmSubPath);
 
     }
     public class TestDataOutput : TestDataPath
@@ -166,21 +136,21 @@ namespace Dooggy.Factory.Data
 
         }
 
-        public bool Save(string prmNome, string prmSubPath, string prmConteudo, string prmExtensao) => Save(prmNome, prmSubPath, prmConteudo, prmExtensao, prmEncoding: "");
-        public bool Save(string prmNome, string prmSubPath, string prmConteudo, string prmExtensao, string prmEncoding)
+        public bool Save(string prmNome, string prmPath, string prmConteudo, string prmExtensao) => Save(prmNome, prmPath, prmConteudo, prmExtensao, prmEncoding: "");
+        public bool Save(string prmNome, string prmPath, string prmConteudo, string prmExtensao, string prmEncoding)
         {
 
             if (xString.IsStringOK(prmNome))
             {
 
-                path = GetPath(prmSubPath);
+                path = prmPath;
 
                 arquivo = prmNome + "." + prmExtensao;
 
                 if (File.Save(path, arquivo, prmConteudo, prmEncoding: Encode.Find(prmEncoding)))
                 {
 
-                    Trace.LogFile.DataFileExport(arquivo, prmSubPath, prmEncoding);
+                    Trace.LogFile.DataFileExport(arquivo, prmPath, prmEncoding);
 
                     return (true);
 
@@ -195,7 +165,7 @@ namespace Dooggy.Factory.Data
             return (false);
         }
 
-        public string GetPath(string prmSubPath) => Dados.Pool.GetPathDestino(prmSubPath);
+        //public string GetPath(string prmSubPath) => Dados.Pool.GetPathDestino(prmSubPath);
 
 
     }

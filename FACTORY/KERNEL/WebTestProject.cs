@@ -13,21 +13,19 @@ namespace Dooggy.Factory
     {
         public TestDataConnect Connect { get => Pool.Connect; }
 
-        public void Start(string prmPathDestino)
+        //public void Start(string prmPathINI, string prmPathOUT)
+        //{
+
+        //    Pool.SetPathOUT(prmPathDestino);
+
+        //    Call(this, Parameters.GetDataFactoryBlockCode());
+
+        //}
+
+        public void Start(string prmPathINI, string prmPathOUT)
         {
 
-            Pool.SetPathOUT(prmPathDestino);
-
-            Call(this, Parameters.GetDataFactoryBlockCode());
-
-        }
-
-        public void Start(string prmPathINI, string prmPathDestino)
-        {
-
-            Pool.SetPathOUT(prmPathDestino);
-
-            Console.Start(prmPathINI);
+            Console.Start(prmPathINI, prmPathOUT);
 
         }
 

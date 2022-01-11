@@ -95,6 +95,8 @@ namespace Dooggy.Factory.Console
 
         private TestConsole Console { get => Command.Console; }
 
+        private TestConsoleOutput Output { get => Console.Output; }
+
         private eTipoTestCommand tipo { get => Sintaxe.tipo; }
 
         private TestTrace Trace { get => Sintaxe.Trace; }
@@ -214,7 +216,7 @@ namespace Dooggy.Factory.Console
 
             Console.Save(prmData: Dados.output(target, prmTipo));
 
-            Dados.File.SaveFile(prmNome: Console.GetArquivoOUT(), prmConteudo: Console.resultado, prmTipo, prmEncoding: Sintaxe.opcoes);
+            Dados.File.SaveFile(prmNome: Output.GetScriptOrigem(), prmPath: Output.GetFullPath(prmTipo), prmConteudo: Console.resultado, prmExtensao: Output.GetExtensao(prmTipo), prmEncoding: Sintaxe.opcoes);
 
         }
 

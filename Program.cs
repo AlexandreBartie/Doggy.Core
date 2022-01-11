@@ -54,7 +54,9 @@ namespace Dooggy
 
             MassaTestesByScript = new POC_GeracaoMassaScripts();
 
-            string path_ini = @"c:\MassaTestes\POC\Scripts\INI";
+            string path_ini = @"c:\MassaTestes\POC\Console\INI\";
+            string path_out = @"c:\MassaTestes\POC\Console\OUT\GeradorFake\";
+
             string parametros = @"{ 'branch': '1085', 'port': '1521' }";
 
             //    Console.WriteLine("Por favor, informe o path + parâmetros do banco de dados (branch, porta) no formato json ...");
@@ -64,7 +66,7 @@ namespace Dooggy
 
             MassaTestesByScript.Setup(parametros, prmNomeApp: Application.ProductName, prmVersaoApp: Application.ProductVersion);
 
-            MassaTestesByScript.Start(path_ini);
+            MassaTestesByScript.Start(path_ini, path_out);
 
         }
         static void AutomacaoTestesScripts()

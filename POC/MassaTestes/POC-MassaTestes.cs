@@ -13,12 +13,12 @@ namespace Dooggy.POC.MassaTestes
     public class POC_GeracaoMassaConsole : TestDataProject
     {
 
-        public void Run(string prmPathINI, string prmPathDestino)
+        public void Run(string prmPathINI, string prmPathOUT)
         {
 
             ConectarDataBase();
 
-            Start(prmPathINI, prmPathDestino);
+            Start(prmPathINI, prmPathOUT);
 
         }
 
@@ -107,7 +107,7 @@ namespace Dooggy.POC.MassaTestes
         private void SaveFile(string prmTags, [System.Runtime.CompilerServices.CallerMemberName] string prmNome = "")
         {
 
-            Dados.File.SaveTXT(prmTags, prmNome);
+            //Dados.File.SaveTXT(prmTags, prmNome);
 
         }
 

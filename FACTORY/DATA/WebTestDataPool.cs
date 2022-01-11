@@ -37,8 +37,6 @@ namespace Dooggy.Factory.Data
 
         public TestDataTratamento Tratamento;
 
-        private Path PathDataFiles;
-
         public TestDataFluxos Fluxos => (DataViewCorrente.Fluxos);
 
         public DataBaseConnection DataBaseCorrente => (Bases.Corrente);
@@ -50,8 +48,6 @@ namespace Dooggy.Factory.Data
         {
 
             Trace = new TestTrace();
-
-            PathDataFiles = new Path();
 
             Bases = new DataBasesConnection();
 
@@ -106,20 +102,12 @@ namespace Dooggy.Factory.Data
 
         }
 
-        public void SetPathOUT(string prmPath)
-        {
-
-            PathDataFiles.Setup(prmPath);
-
-            Trace.LogPath.SetPath(prmContexto: "DestinoMassaTestes", prmPath);
-
-        }
         public void SetAncora(DateTime prmAncora) => Tratamento.SetAncora(prmAncora);
 
         public bool IsSQLDataException(string prmTexto) => Tratamento.IsSQLDataException(prmTexto);
         public string GetTextoTratado(string prmTexto) => Tratamento.GetTextoTratado(prmTexto);
         public string GetNextKeyDataView() => string.Format("x{0},", Views.Count);
-        public string GetPathDestino(string prmSubPath) => PathDataFiles.GetPath(prmSubPath);
+        //public string GetPathDestino(string prmSubPath) => PathDataFiles.GetPath(prmSubPath);
 
         public string txt(string prmTags) => output(prmTags, prmTipo: eTipoFileFormat.txt);
         public string csv(string prmTags) => output(prmTags, prmTipo: eTipoFileFormat.csv);
