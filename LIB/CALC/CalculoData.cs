@@ -108,9 +108,9 @@ namespace Dooggy
 
         public void SetFormat(string prmFormat) => Format.Setup(prmFormat);
 
-        private bool IsTipoDataOK(string prmTipoData) => (xString.IsContem("DMA", prmTipoData));
+        private bool IsTipoDataOK(string prmTipoData) => (xString.IsContido(prmTipoData, "DMA"));
 
-        private bool IsTipoOperadorOK(string prmTipoOperador) => (xString.IsContem("=+-", prmTipoOperador));
+        private bool IsTipoOperadorOK(string prmTipoOperador) => (xString.IsContido(prmTipoOperador, "=+-"));
 
     }
     public class DynamicDateFormat

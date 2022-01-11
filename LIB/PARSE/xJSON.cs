@@ -114,7 +114,7 @@ namespace Dooggy.Lib.Parse
 
         }
 
-        public string fluxo { get => (Fluxos.txt); } 
+        public string fluxo { get => (Fluxos.output); } 
 
         public string tuplas { get => (GetTuplas()); }
 
@@ -183,7 +183,7 @@ namespace Dooggy.Lib.Parse
             try
             {
 
-                doc = JsonDocument.Parse(Fluxos.txt);
+                doc = JsonDocument.Parse(Fluxos.output);
 
                 Corpo = root.EnumerateArray();
 
@@ -301,7 +301,7 @@ namespace Dooggy.Lib.Parse
 
         }
 
-        public string txt
+        public string output
         {
             get
 

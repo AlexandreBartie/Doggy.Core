@@ -506,7 +506,7 @@ namespace Dooggy.Factory.Robot
         private bool SetFluxo(string prmFluxo)
         {
 
-            int indice = lista.GetContain(prmFluxo.Trim());
+            int indice = lista.GetContem(prmFluxo.Trim());
 
             if (IsIndiceOk(indice))
             {

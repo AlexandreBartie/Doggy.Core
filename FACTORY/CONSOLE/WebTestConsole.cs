@@ -22,6 +22,7 @@ namespace Dooggy.Factory.Console
 
         private TestConsoleOutput Output => Sessoes.Output;
 
+        public string log { get => Sessoes.GetLog(); }
         public string resultado { get => Output.resultado; }
 
         public TestConsole(TestFactory prmFactory)
@@ -227,6 +228,16 @@ namespace Dooggy.Factory.Console
             if (Corrente != null)
                 Corrente.AddLog(prmMsg: Trace.Corrente);
 
+        }
+
+        public string GetLog()
+        {
+
+            if (Corrente != null)
+                return Corrente.Log.txt;
+
+
+            return ("");
         }
 
     }

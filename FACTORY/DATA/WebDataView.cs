@@ -1,4 +1,5 @@
-﻿using Dooggy.Factory;
+﻿using Dooggy;
+using Dooggy.Factory;
 using Dooggy.Factory.Data;
 using Dooggy.Lib.Data;
 using Dooggy.Lib.Generic;
@@ -8,7 +9,7 @@ using System.Text;
 
 namespace Dooggy.Factory.Data
 {
-    public class TestDataView : TestDataSQL
+    public class TestDataView : TestDataSQLBase
     {
 
         public DataBaseConnection DataBase;
@@ -81,6 +82,8 @@ namespace Dooggy.Factory.Data
 
         public TestDataView View;
 
+        private TestDataTratamento Tratamento { get => View.Pool.Tratamento; }
+
         public DataBaseConnection DataBase { get => View.DataBase; }
 
         // internal
@@ -128,9 +131,8 @@ namespace Dooggy.Factory.Data
 
         public bool Fechar() => Cursor.Fechar();
 
-
-        public string csv(string prmSeparador) => Cursor.GetCSV(prmSeparador);
-        public string csv() => Cursor.GetCSV();
+        public string csv() => csv(prmSeparador: ",");
+        public string csv(string prmSeparador) => GetCSV(prmSeparador);
         public string json() => Cursor.GetJSON();
 
         private string GetMask()
@@ -143,44 +145,51 @@ namespace Dooggy.Factory.Data
 
         }
 
+        private string GetCSV(string prmSeparador)
+        {
+            if (TemSQL() || View.TemEstrutura())
+            {
+
+                string memo = Cursor.GetCSV(prmSeparador);
+
+                if (memo != "")
+                    return memo;
+                else
+                    return Tratamento.dataSQL_ZeroItens;
+
+            }
+
+            return Tratamento.dataSQL_NoCommand;
+
+        }
+
     }
-    public class TestDataSQL
+    public class TestDataSQL : TestDataSQLBase
     {
-
+        
         public string sql;
-
-        public string tabelas;
-
-        public string campos;
-
-        public string relacoes;
 
         public string filtro;
 
         public string ordem;
 
-        public string mask;
-
-        private bool TemSQL() => (xString.IsStringOK(sql));
-        private bool TemCombinacoes() => TemRelacoes() && TemFiltro();
-        private bool TemCondicoes() => TemRelacoes() || TemFiltro();
-        private bool TemRelacoes() => (xString.IsStringOK(relacoes));
-        private bool TemFiltro() => (xString.IsStringOK(filtro));
-        private bool TemOrdem() => (xString.IsStringOK(ordem));
         public void SetSQL(string prmSQL) => sql = prmSQL;
-        public void SetTabelas(string prmTabelas) => tabelas = prmTabelas;
-        public void SetCampos(string prmCampos) => campos = prmCampos;
-        public void SetRelacoes(string prmRelacoes) => relacoes = prmRelacoes;
         public void SetFiltro(string prmFiltro) => filtro = prmFiltro;
         public void SetOrdem(string prmOrdem) => ordem = prmOrdem;
-        public void SetMask(string prmMask) => mask = prmMask;
+
+        public bool TemSQL() => (TemSQLMontada() || TemEstrutura());
+        public bool TemSQLMontada() => (xString.IsStringOK(sql));
+        private bool TemCombinacoes() => TemRelacoes() && TemFiltro();
+        private bool TemCondicoes() => TemRelacoes() || TemFiltro();
+        private bool TemFiltro() => (xString.IsStringOK(filtro));
+        private bool TemOrdem() => (xString.IsStringOK(ordem));
 
         public string GetSQL(TestDataView prmView)
         {
 
-            string retorno= sql;
+            string comando_sql = sql;
 
-            if (!TemSQL())
+            if (!TemSQLMontada())
             {
 
                 tabelas = prmView.tabelas;
@@ -189,39 +198,43 @@ namespace Dooggy.Factory.Data
 
                 relacoes = prmView.relacoes;
 
-                retorno = GetSQL();
+                comando_sql = GetSQL();
 
             }
 
-            retorno = prmView.Pool.GetTextoTratado(retorno);
-
-            return (retorno);
+            return (prmView.Pool.GetTextoTratado(comando_sql));
 
         }
 
         private string GetSQL()
         {
 
-            string sql = String.Format("SELECT {0} FROM {1}", campos, tabelas);
+            string condicoes = ""; string ordenacao = ""; string sql = "";
 
-            string condicoes = ""; string ordenacao = "";
+            if (TemEstrutura())
+            {
 
-            if (TemCombinacoes())
-                condicoes = String.Format("({0}) AND ({1})", relacoes, filtro);
+                sql = String.Format("SELECT {0} FROM {1}", campos, tabelas);
 
-            else if (TemRelacoes())
-                condicoes = relacoes;
+                if (TemCombinacoes())
+                    condicoes = String.Format("({0}) AND ({1})", relacoes, filtro);
 
-            else if (TemFiltro())
-                condicoes = filtro;
+                else if (TemRelacoes())
+                    condicoes = relacoes;
 
-            if (TemCondicoes())
-                condicoes = String.Format(" WHERE {0}", condicoes);
+                else if (TemFiltro())
+                    condicoes = filtro;
 
-            if (TemOrdem())
-                ordenacao = String.Format(" ORDER BY {0}", ordem);
+                if (TemCondicoes())
+                    condicoes = String.Format(" WHERE {0}", condicoes);
 
-            sql += condicoes + ordenacao;
+                if (TemOrdem())
+                    ordenacao = String.Format(" ORDER BY {0}", ordem);
+
+                sql += condicoes + ordenacao;
+
+            }
+
 
             return (sql.Trim());
 
@@ -229,6 +242,30 @@ namespace Dooggy.Factory.Data
         }
 
     }
+
+    public class TestDataSQLBase
+    {
+
+        public string tabelas;
+
+        public string campos;
+
+        public string relacoes;
+
+        public string mask;
+
+        public void SetTabelas(string prmTabelas) => tabelas = prmTabelas;
+        public void SetCampos(string prmCampos) => campos = prmCampos;
+        public void SetRelacoes(string prmRelacoes) => relacoes = prmRelacoes;
+        public void SetMask(string prmMask) => mask = prmMask;
+
+        public bool TemEstrutura() => TemTabelas() && TemCampos();
+        protected bool TemTabelas() => (xString.IsStringOK(tabelas));
+        protected bool TemCampos() => (xString.IsStringOK(campos));
+        protected bool TemRelacoes() => (xString.IsStringOK(relacoes));
+
+    }
+
     public class TestDataViews : List<TestDataView>
     {
 
@@ -575,31 +612,53 @@ namespace Dooggy.Factory.Data
             }
 
         }
-        public string GetOutput(string prmDados)
+        public string GetOutput(string prmDados, eTipoFileFormat prmTipo)
         {
 
-            Merge(prmDados);
+            if (prmTipo == eTipoFileFormat.json)
+                return(prmDados);
 
-            return (Pool.GetTextoTratado(output));
+            return Pool.GetTextoTratado(Merge(prmDados));
 
         }
 
-        private void Merge(string prmDados)
+        private string Merge(string prmDados)
         {
 
             int cont = 0;
 
             xLista Dados = new xLista(prmDados, prmSeparador: Environment.NewLine);
 
-            foreach (string linha in Dados)
+            foreach (string dado in Dados)
             {
 
                 cont++;
 
                 if (Dados.qtde > cont)
-                    Itens.Add(cont, linha);
+                    AtualizaLinha(cont, prmLinhaNova: dado);
 
             }
+
+            return (output);
+
+        }
+
+        private void AtualizaLinha(int prmIndice, string prmLinhaNova)
+        {
+
+            string texto = Itens.Get(prmIndice);
+
+            Itens.Add(prmIndice, prmTexto: GetLinhaTratada(prmLinhaNova, prmLinhaAtual: texto));
+
+        }
+
+        private string GetLinhaTratada(string prmLinhaNova, string prmLinhaAtual)
+        {
+
+            if (Pool.IsSQLDataException(prmLinhaNova))
+                return prmLinhaAtual;
+
+            return prmLinhaNova;
 
         }
 

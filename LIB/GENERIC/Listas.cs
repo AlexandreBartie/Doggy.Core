@@ -248,6 +248,14 @@ namespace Dooggy.Lib.Generic
             if (prmIndice <= qtde)
                 (this[prmIndice - 1]) = prmTexto;
         }
+
+        public string Get(int prmIndice) => Get(prmIndice, prmPadrao: "");
+        public string Get(int prmIndice, string prmPadrao)
+        {
+            if (prmIndice <= qtde)
+                return (this[prmIndice - 1]);
+            return prmPadrao;
+        }
         public void Add(int prmIndice, string prmTexto)
         {
             if (prmIndice <= qtde)
@@ -264,7 +272,7 @@ namespace Dooggy.Lib.Generic
         }
 
         public bool IsEqual(string prmTexto) => (GetEqual(prmTexto));
-        public bool IsContem(string prmTexto) => (GetContain(prmTexto) != 0);
+        public bool IsContem(string prmTexto) => (GetContem(prmTexto) != 0);
 
         public string GetRemove() => GetRemove(prmIndice: 1);
 
@@ -305,15 +313,17 @@ namespace Dooggy.Lib.Generic
             }
             return (false);
         }
-        
-        public int GetContain(string prmTexto)
+
+        public int GetContem(string prmTexto) => GetContain(prmTexto, prmInverter: false);
+        public int GetContido(string prmTexto) => GetContain(prmTexto, prmInverter: true);
+        private int GetContain(string prmTexto, bool prmInverter)
         {
             int cont = 0;
 
             foreach (string vlItem in this)
             {
                 cont++;
-                if (xString.IsContem(vlItem, prmTexto))
+                if (xString.IsContain(vlItem, prmTexto, prmInverter))
                 { return (cont); }
             }
             return (0);
@@ -372,6 +382,8 @@ namespace Dooggy.Lib.Generic
 
             return lista;
         }
+
+        public string txt() => memo(prmSeparador: Environment.NewLine);
 
     }
     public class xMask

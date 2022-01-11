@@ -20,11 +20,22 @@ namespace Dooggy
 
         public static bool IsEqual(string prmTextoA, string prmTextoB) => GetLower(prmTextoA) == GetLower(prmTextoB);
 
-        public static bool IsContem(string prmTextoA, string prmTextoB)
+        public static bool IsContem(string prmTextoA, string prmTextoB) => IsContain(prmTextoA, prmTextoB, prmInverter: false);
+
+        public static bool IsContido(string prmTextoA, string prmTextoB) => IsContain(prmTextoA, prmTextoB, prmInverter: true);
+
+        public static bool IsContain(string prmTextoA, string prmTextoB, bool prmInverter)
         {
 
-            if (xString.IsStringOK(prmTextoA) && xString.IsStringOK(prmTextoB))
-                return GetLower(prmTextoA).Contains(GetLower(prmTextoB));
+            string textoA; string textoB;
+
+            if (prmInverter)
+                { textoA = prmTextoB; textoB = prmTextoA; }
+            else
+                { textoA = prmTextoA; textoB = prmTextoB; }
+
+            if (xString.IsStringOK(textoA) && xString.IsStringOK(textoB))
+                return GetLower(textoA).Contains(GetLower(textoB));
 
             return (false);
 

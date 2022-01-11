@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Text;
+using Dooggy.Lib.Generic;
 
 namespace Dooggy.Factory
 {
@@ -87,16 +88,16 @@ namespace Dooggy.Factory
     public class TestTraceLogData_Fail : TestTraceLog
     {
 
-        public void FailDBConnection(string prmTag, string prmStringConexao, Exception prmErro) => FailConnection(prmMSG: "Conexão com Banco de Dados falhou", prmVar: "string", prmTag, prmStringConexao, prmErro);
-        public void FailSQLConnection(string prmTag, string prmSQL, Exception prmErro) => FailConnection(prmMSG: "Comando SQL falhou", prmVar: "sql", prmTag, prmSQL, prmErro);
-        public void FailSQLNoDataBaseConnection(string prmTag, string prmSQL, Exception prmErro) => FailConnection(prmMSG: "Banco de Dados não está aberto. SQL", prmVar: "sql", prmTag, prmSQL, prmErro);
+        public void FailDBConnection(string prmTag, string prmStringConexao, Exception prmErro) => FailConnection(prmMSG: "Conexão com Banco de Dados falhou", prmVar: "-string", prmTag, prmStringConexao, prmErro);
+        public void FailSQLConnection(string prmTag, string prmSQL, Exception prmErro) => FailConnection(prmMSG: "Comando SQL falhou", prmVar: "-sql", prmTag, prmSQL, prmErro);
+        public void FailSQLNoDataBaseConnection(string prmTag, string prmSQL, Exception prmErro) => FailConnection(prmMSG: "Banco de Dados não está aberto. SQL", prmVar: "-sql", prmTag, prmSQL, prmErro);
 
         public void FailSQLDataModelConnection(string prmTag, string prmModel, Exception prmErro) => FailConnection(prmMSG: "Model View não foi criado adequadamente.", prmTag, prmModel, prmErro);
 
         public void FailNoDataViewDetected(string prmTag) => msgErro(prmTexto: string.Format("Data View não foi identificado ... >>> fluxo: [{0}] não executou o SQL ...", prmTag));
 
         private void FailConnection(string prmMSG, string prmTag, string prmFluxo, Exception prmErro) => msgErro(String.Format(@"{0} >>> tag:[{1}] {2}:", prmMSG, prmTag, prmFluxo), prmErro);
-        private void FailConnection(string prmMSG, string prmVar, string prmTag, string prmSQL, Exception prmErro) => msgErro(String.Format(@"{0} >>> tag:[{2}] {1}: ""{3}""", prmMSG, prmVar, prmTag, prmSQL), prmErro);
+        private void FailConnection(string prmMSG, string prmVar, string prmTag, string prmSQL, Exception prmErro) => msgErro(String.Format(@"{0} >>> tag:[{2}] {1}: {3}", prmMSG, prmVar, prmTag, prmSQL), prmErro);
 
     }
 
@@ -143,7 +144,7 @@ namespace Dooggy.Factory
     public class TestTraceLogRobot : TestTraceLog
     {
 
-        public void ActionTag(string prmTag, string prmConteudo) => msgTrace(String.Format("{0,7} <{1}>", prmTag, prmConteudo));
+        public void ActionTag(string prmTag, string prmConteudo) => msgPlay(String.Format("{0,7} <{1}>", prmTag, prmConteudo));
 
         public void ActionElement(string prmAcao, string prmElemento) => ActionElement(prmAcao, prmElemento, prmValor: null);
         public void ActionElement(string prmAcao, string prmElemento, string prmValor)
@@ -168,7 +169,7 @@ namespace Dooggy.Factory
     public class TestTraceLogConsole : TestTraceLog
     {
         
-        public void PlayCommand(string prmTipo, string prmKeyWord, string prmTarget) => msgTrace(String.Format("Running {0,10} ... -key: {1} -target: {2}", prmTipo, prmKeyWord, prmTarget));
+        public void PlayCommand(string prmTipo, string prmKeyWord, string prmTarget) => msgPlay(String.Format("Running {0,10} ... -key: {1} -target: {2}", prmTipo, prmKeyWord, prmTarget));
 
         public void WriteKeyWord(string prmKeyWord, string prmTarget) => msgCode(String.Format("{0}: {1}", prmKeyWord, prmTarget));
 
@@ -190,7 +191,7 @@ namespace Dooggy.Factory
         public void msgApp(string prmTrace) => Message(prmTipo: "APP", prmTrace);
         public void msgSession(string prmTrace) => Message(prmTipo: "****", prmTrace);
         public void msgCode(string prmTrace) => Message(prmTipo: "CODE", prmTrace);
-        public void msgTrace(string prmTrace) => Message(prmTipo: "TRACE", prmTrace);
+        public void msgPlay(string prmTrace) => Message(prmTipo: "PLAY", prmTrace);
         public void msgSQL(string prmMensagem) => Message(prmTipo: "SQL", prmMensagem);
         public void msgData(string prmMensagem) => Message(prmTipo: "DATA", prmMensagem);
         public void msgPath(string prmMensagem) => Message(prmTipo: "PATH", prmMensagem);
@@ -275,7 +276,7 @@ namespace Dooggy.Factory
 
         public string msg { get => String.Format("[{0,4}] {1} ", tipo, texto); }
 
-        public bool IsVisivel() => (tipo != "CODE");
+        public bool IsVisivel() => ((tipo != "CODE") && (tipo != "PLAY"));
 
         public TestItemLog(string prmTipo, string prmTexto)
         {
@@ -295,6 +296,8 @@ namespace Dooggy.Factory
         public void Start() => ativo = true;
         public void Stop() => ativo = false;
 
+        public string txt { get => GetLog(); }
+
         public void AddLog(string prmTipo, string prmTexto)
         {
 
@@ -303,7 +306,16 @@ namespace Dooggy.Factory
 
         }
 
+        private string GetLog()
+        {
+
+            xMemo memo = new xMemo();
+
+            foreach (TestItemLog item in this)
+                memo.Add(item.msg);
+
+            return (memo.txt() + Environment.NewLine);
+        }
 
     }
-
 }

@@ -200,7 +200,6 @@ namespace Dooggy.Lib.Data
 
         }
 
-        public string GetCSV() => GetCSV(prmSeparador: ",");
         public string GetCSV(string prmSeparador)
         {
             string memo = "";
@@ -209,6 +208,8 @@ namespace Dooggy.Lib.Data
 
             if (IsResult)
             {
+
+
                 for (int cont = 0; cont < reader.VisibleFieldCount; cont++)
                 {
                     if (IsDBNull(cont))
@@ -224,7 +225,8 @@ namespace Dooggy.Lib.Data
 
             }
 
-            return (memo);
+            return memo;
+
         }
         public string GetJSON()
         {

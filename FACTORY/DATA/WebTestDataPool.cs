@@ -35,7 +35,7 @@ namespace Dooggy.Factory.Data
         public TestDataRaws Raws;
         public TestDataViews Views;
 
-        private TestDataTratamento Tratamento;
+        public TestDataTratamento Tratamento;
 
         private Path PathDataFiles;
 
@@ -116,6 +116,7 @@ namespace Dooggy.Factory.Data
         }
         public void SetAncora(DateTime prmAncora) => Tratamento.SetAncora(prmAncora);
 
+        public bool IsSQLDataException(string prmTexto) => Tratamento.IsSQLDataException(prmTexto);
         public string GetTextoTratado(string prmTexto) => Tratamento.GetTextoTratado(prmTexto);
         public string GetNextKeyDataView() => string.Format("x{0},", Views.Count);
         public string GetPathDestino(string prmSubPath) => PathDataFiles.GetPath(prmSubPath);
@@ -127,7 +128,7 @@ namespace Dooggy.Factory.Data
 
     }
 
-    public class TestDataTratamento
+    public class TestDataTratamento : TestDataException
     {
 
         private TestDataPool Pool;
@@ -169,7 +170,7 @@ namespace Dooggy.Factory.Data
         public string GetOutput(string prmTags, eTipoFileFormat prmTipo)
         {
 
-            return Raws.GetOutput(prmDados: Views.output(prmTags, prmTipo));
+            return Raws.GetOutput(prmDados: Views.output(prmTags, prmTipo), prmTipo);
 
         }
         private string GetVariavel(string prmTag)
@@ -260,6 +261,36 @@ namespace Dooggy.Factory.Data
             return (sql);
 
         }
+
+    }
+
+    public class TestDataException
+    {
+
+        private xLista Dominio;
+
+        public string dataSQL_ZeroItens { get => GetTag("ZeroItensSQL"); }
+        public string dataSQL_NoCommand { get => GetTag("NoCommandSQL"); }
+
+        public bool IsSQLDataException(string prmItem) => (Dominio.GetContido(prmItem) != 0);
+
+        public TestDataException()
+        {
+
+            PopularDominio();
+
+        }
+
+        private void PopularDominio()
+        {
+            Dominio = new xLista();
+
+            Dominio.Add(dataSQL_ZeroItens);
+            Dominio.Add(dataSQL_NoCommand);
+
+        }
+
+        private string GetTag(string prmTexto) => string.Format("<#$#{0}#$#>", prmTexto);
 
     }
 
