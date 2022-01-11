@@ -155,11 +155,11 @@ namespace Dooggy.Factory.Data
                 if (memo != "")
                     return memo;
                 else
-                    return Tratamento.dataSQL_ZeroItens;
+                    return Tratamento.GetZeroItens();
 
             }
 
-            return Tratamento.dataSQL_NoCommand;
+            return Tratamento.GetNoCommand();
 
         }
 
@@ -348,7 +348,13 @@ namespace Dooggy.Factory.Data
             {
 
                 if (xString.IsEmpty(prmTags) || lista.IsEqual(View.tag))
+                {
+                    
                     filtro.AddItens(View.Fluxos);
+
+                    Trace.LogData.SQLViewsSelection(View.tag, prmQtde: View.Fluxos.Count);
+
+                }
 
             }
 
@@ -377,7 +383,7 @@ namespace Dooggy.Factory.Data
 
                 }
 
-                Trace.LogData.ViewsSelection(tag, prmQtde: cont);
+                Trace.LogData.SQLViewsSelection(tag, prmQtde: cont);
 
             }
 

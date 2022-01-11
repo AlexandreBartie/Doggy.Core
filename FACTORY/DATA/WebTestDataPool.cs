@@ -131,15 +131,11 @@ namespace Dooggy.Factory.Data
     public class TestDataTratamento : TestDataException
     {
 
-        private TestDataPool Pool;
-
         private DateTime ancora;
 
         private TestDataVars Vars => Pool.Vars;
         private TestDataRaws Raws => (Pool.Raws);
         private TestDataViews Views => (Pool.Views);
-
-        private TestTrace Trace => (Pool.Trace);
 
         public TestDataTratamento(TestDataPool prmPool)
         {
@@ -267,12 +263,18 @@ namespace Dooggy.Factory.Data
     public class TestDataException
     {
 
+        public TestDataPool Pool;
+
         private xLista Dominio;
 
-        public string dataSQL_ZeroItens { get => GetTag("ZeroItensSQL"); }
-        public string dataSQL_NoCommand { get => GetTag("NoCommandSQL"); }
+        private string dataSQL_ZeroItens { get => GetTag("ZeroItensSQL"); }
+        private string dataSQL_NoCommand { get => GetTag("NoCommandSQL"); }
 
         public bool IsSQLDataException(string prmItem) => (Dominio.GetContido(prmItem) != 0);
+
+        private string GetTag(string prmTexto) => string.Format("<#$#{0}#$#>", prmTexto);
+
+        public TestTrace Trace => (Pool.Trace);
 
         public TestDataException()
         {
@@ -290,8 +292,21 @@ namespace Dooggy.Factory.Data
 
         }
 
-        private string GetTag(string prmTexto) => string.Format("<#$#{0}#$#>", prmTexto);
+        public string GetZeroItens()
+        {
 
+            return (dataSQL_ZeroItens);
+
+        }
+
+        public string GetNoCommand()
+        {
+
+            Trace.LogData.SQLNoCommand();
+
+            return (dataSQL_NoCommand);
+
+        }
     }
 
     public class TestDataLocal

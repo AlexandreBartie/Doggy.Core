@@ -106,7 +106,7 @@ namespace Dooggy.Lib.Data
 
         public bool IsMask { get => (Mask != null); }
 
-        public bool IsResult;
+        public bool TemDados;
 
         public TestTrace Trace => DataBase.Trace;
 
@@ -142,9 +142,9 @@ namespace Dooggy.Lib.Data
 
                 reader = (vlSql.ExecuteReader());
 
-                IsResult = Start();
+                TemDados = Start();
 
-                Trace.LogData.SQLExecution(DataBase.tag, prmSQL);
+                Trace.LogData.SQLExecution(DataBase.tag, prmSQL, TemDados);
 
             }
             catch (Exception e)
@@ -206,7 +206,7 @@ namespace Dooggy.Lib.Data
             string texto = "";
             string separador = "";
 
-            if (IsResult)
+            if (TemDados)
             {
 
 
@@ -233,7 +233,7 @@ namespace Dooggy.Lib.Data
             string memo = "";
             string separador = "";
 
-            if (IsResult)
+            if (TemDados)
             {
                 for (int cont = 0; cont < reader.VisibleFieldCount; cont++)
                 {

@@ -72,15 +72,26 @@ namespace Dooggy.Factory
     {
 
         public void DBConnection(string prmTag, string prmStatus) => msgSQL(string.Format("act# -db:[{0}] -status: {1}", prmTag, prmStatus));
-        public void SQLExecution(string prmTag, string prmSQL) => msgSQL(string.Format(@"act# -db:[{0}] -sql: {1}", prmTag, prmSQL));
+        public void SQLExecution(string prmTag, string prmSQL, bool prmTemDados) => GetSQLExecution(prmMsg: string.Format(@"act# -db:[{0}] -sql: {1}", prmTag, prmSQL), prmTemDados);
+        public void SQLNoCommand() => msgSQL("Nenhum comando SQL foi encontrado para esse item.");
 
-        public void ViewsSelection(string prmTag, int prmQtde)
+        public void SQLViewsSelection(string prmTag, int prmQtde)
         {
 
             if (prmQtde > 0)
                 msgData(string.Format(@"act# -view:[{0}] -itens: {1}", prmTag, prmQtde));
             else
                 msgErro(string.Format(@"msg# -view[{0}] -desc: View sem dados", prmTag));
+
+        }
+
+        private void GetSQLExecution(string prmMsg, bool prmTemDados)
+        {
+
+            if (prmTemDados)
+                msgSQL(prmMsg);
+            else
+                msgZero(prmMsg);
 
         }
 
@@ -93,7 +104,6 @@ namespace Dooggy.Factory
         public void FailSQLNoDataBaseConnection(string prmTag, string prmSQL, Exception prmErro) => FailConnection(prmMSG: "Banco de Dados não está aberto. SQL", prmVar: "-sql", prmTag, prmSQL, prmErro);
 
         public void FailSQLDataModelConnection(string prmTag, string prmModel, Exception prmErro) => FailConnection(prmMSG: "Model View não foi criado adequadamente.", prmTag, prmModel, prmErro);
-
         public void FailNoDataViewDetected(string prmTag) => msgErro(prmTexto: string.Format("Data View não foi identificado ... >>> fluxo: [{0}] não executou o SQL ...", prmTag));
 
         private void FailConnection(string prmMSG, string prmTag, string prmFluxo, Exception prmErro) => msgErro(String.Format(@"{0} >>> tag:[{1}] {2}:", prmMSG, prmTag, prmFluxo), prmErro);
@@ -189,7 +199,7 @@ namespace Dooggy.Factory
     {
 
         public void msgApp(string prmTrace) => Message(prmTipo: "APP", prmTrace);
-        public void msgSession(string prmTrace) => Message(prmTipo: "****", prmTrace);
+        public void msgZero(string prmTrace) => Message(prmTipo: "ZERO", prmTrace);
         public void msgCode(string prmTrace) => Message(prmTipo: "CODE", prmTrace);
         public void msgPlay(string prmTrace) => Message(prmTipo: "PLAY", prmTrace);
         public void msgSQL(string prmMensagem) => Message(prmTipo: "SQL", prmMensagem);
