@@ -18,7 +18,7 @@ namespace Dooggy.POC.MassaTestes
 
             ConectarDataBase();
 
-            Start(prmPathINI, prmPathOUT);
+            Setup(prmPathINI, prmPathOUT, prmStart: true);
 
         }
 

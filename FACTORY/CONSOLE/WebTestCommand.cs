@@ -10,16 +10,16 @@ namespace Dooggy.Factory.Console
     public class TestCommands : List<TestCommand>
     {
 
-        private TestConsoleSession Sessao;
+        private TestConsoleScript Script;
 
         public TestCommand Corrente;
 
         private TestCommandParameters Parametros { get => Corrente.Parametros; }
 
-        public TestCommands(TestConsoleSession prmSessao)
+        public TestCommands(TestConsoleScript prmScript)
         {
 
-            Sessao = prmSessao;
+            Script = prmScript;
 
         }
 
@@ -216,7 +216,7 @@ namespace Dooggy.Factory.Console
 
             Console.Save(prmData: Dados.output(target, prmTipo));
 
-            Dados.File.SaveFile(prmNome: Output.GetScriptOrigem(), prmPath: Output.GetFullPath(prmTipo), prmConteudo: Console.resultado, prmExtensao: Output.GetExtensao(prmTipo), prmEncoding: Sintaxe.opcoes);
+            Dados.File.SaveFile(prmNome: Output.GetScriptOrigem(), prmPath: Output.GetFullPath(prmTipo), prmConteudo: Console.Log.resultado, prmExtensao: Output.GetExtensao(prmTipo), prmEncoding: Sintaxe.opcoes);
 
         }
 

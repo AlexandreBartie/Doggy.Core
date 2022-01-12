@@ -119,7 +119,7 @@ namespace Dooggy.Factory
     public class TestTraceLogFile : TestTraceLog
     {
 
-        public void DataFileImport(string prmArquivo, string prmSubPath) => DataFileAction(prmAcao: "READ", prmContexto: "Importado com sucesso", prmArquivo, prmSubPath);
+        public void DataFileImport(string prmArquivo) => DataFileAction(prmAcao: "READ", prmContexto: "Importado com sucesso", prmArquivo, prmSubPath: "");
         public void DataFileExport(string prmArquivo, string prmSubPath, string prmEncoding) => DataFileAction(prmAcao: "SAVE", prmContexto: "Salvo com sucesso", prmArquivo, prmSubPath, prmEncoding);
         public void DataFileMute(string prmArquivo, string prmSubPath, string prmEncoding) => DataFileAction(prmAcao: "MUTE", prmContexto: "Silenciado com sucesso", prmArquivo, prmSubPath, prmEncoding);
 
@@ -133,7 +133,7 @@ namespace Dooggy.Factory
                 msg += @" -encoding: " + prmEncoding;
 
             if (xString.IsStringOK(prmSubPath))
-                msg += @" -path: ..\" + prmSubPath;
+                msg += @" -path: " + prmSubPath;
 
             msgFile(prmAcao, msg);
 

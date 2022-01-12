@@ -17,7 +17,7 @@ namespace Dooggy
 
         private bool TemTerminal { get => xString.GetLast(path) == @"\"; }
 
-        public bool Setup(string prmPath)
+        public bool SetPath(string prmPath)
         {
 
             if (xString.IsStringOK(prmPath))
@@ -36,7 +36,7 @@ namespace Dooggy
         public bool Criar(string prmPath)
         {
 
-            if (Setup(prmPath))
+            if (SetPath(prmPath))
             {
 
                 try
@@ -108,7 +108,7 @@ namespace Dooggy
         public Diretorio(string prmPath)
         {
 
-            Setup(prmPath);
+            SetPath(prmPath);
 
             files = new Arquivos(this);
 

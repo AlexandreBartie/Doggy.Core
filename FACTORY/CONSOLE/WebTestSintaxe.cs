@@ -30,29 +30,33 @@ namespace Dooggy.Factory.Console
     public class TestBuilder
     {
 
-        private TestConsoleSession Sessao;
+        private TestConsoleScript Script;
         
         private TestSintaxe Sintaxe;
 
-        private TestCommands Commands { get => Sessao.Commands; }
+        public TestConsole Console { get => Script.Console; }
+
+        private TestCommands Commands { get => Script.Commands; }
 
         public TestTrace Trace { get => Console.Trace; }
-        public TestConsole Console { get => Sessao.Console; }
 
+        public TestConsoleLog Log { get => Script.Log; }
 
-        public TestBuilder(TestConsoleSession prmSessao)
+        public TestBuilder(TestConsoleScript prmScript)
         {
 
-            Sessao = prmSessao;
+            Script = prmScript;
 
             Sintaxe = new TestSintaxe(this);
 
         }
 
-        public void Compile(string prmBloco)
+        public void Compile(string prmCode)
         {
-            
-            foreach (string linha in new xLinhas(prmBloco))
+
+            Log.SetCode(prmCode);
+
+            foreach (string linha in new xLinhas(prmCode))
 
                 if (Sintaxe.IsNewLine(linha))
                 {

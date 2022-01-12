@@ -45,7 +45,7 @@ namespace Dooggy.Factory
             Console.AddLog();
 
         }
-        public bool Setup(string prmParametros, string prmNomeApp, string prmVersaoApp)
+        public bool SetApp(string prmParametros, string prmNomeApp, string prmVersaoApp)
         {
 
             Trace.LogApp.ExeRunning(prmNome: Application.ProductName, prmVersao: Application.ProductVersion);
