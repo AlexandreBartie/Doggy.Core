@@ -46,8 +46,6 @@ namespace Dooggy.Lib.Data
 
                 conexao = new OracleConnection(prmConexao);
 
-                Trace.LogData.DBConnection(tag, "INICIADO");
-
                 return (true);
 
             }
@@ -273,6 +271,8 @@ namespace Dooggy.Lib.Data
 
         public DataBaseConnection Corrente;
 
+        public bool IsOK => GetIsOK();
+
         public bool Criar(string prmTag, string prmConexao, TestDataPool prmPool)
         {
 
@@ -281,6 +281,22 @@ namespace Dooggy.Lib.Data
             Add(Corrente);
 
             return (Corrente.IsOK);
+
+        }
+
+        private bool GetIsOK()
+        {
+
+            bool ok = false;
+
+            foreach (DataBaseConnection db in this)
+                if (db.IsOK)
+                    ok = true;
+                else
+                    break;
+            
+            
+            return ok;
 
         }
 

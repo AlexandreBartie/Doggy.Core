@@ -23,7 +23,6 @@ namespace Dooggy.Lib.Files
 
         public Diretorio Diretorio { get { if (_diretorio == null) _diretorio = new Diretorio(); return _diretorio; } }
 
-        public virtual bool Open(string prmPath, string prmName, string prmExtensao) => Open(prmPath, prmName + "." + prmExtensao);
         public virtual bool Open(string prmPath, string prmName) => Open(prmArquivo: prmPath + prmName);
         public virtual bool Open(string prmArquivo)
         {

@@ -133,7 +133,7 @@ namespace Dooggy
             return (0);
 
         }
-        public static string GetSubstring(string prmTexto, int prmIndice) => GetSubstring(prmTexto, prmIndice, prmTamanho: prmTexto.Length - prmIndice);
+        public static string GetSubstring(string prmTexto, int prmIndice) => GetSubstring(prmTexto, prmIndice, prmTamanho: prmTexto.Length - prmIndice + 1);
         public static string GetSubstring(string prmTexto, int prmIndice, int prmTamanho)
         {
 
@@ -182,69 +182,7 @@ namespace Dooggy
             return ("");
         }
         
-        public static string GetMask(string prmTexto, string prmMask)
-        {
-
-            int cont = 0; int indice = 0; char simbolo = '#'; bool IsEnd = false; string resto;
-
-            // Verifica se existe uma formatação a ser aplicada 
-
-            if (prmMask == "")
-                return prmTexto;
-
-            // Inverter Valores
-
-            string valor = GetReverse(prmTexto);
-            string mask = GetReverse(prmMask);
-
-            string texto = "";
-
-            try
-            {
-
-                foreach (char item in mask)
-                {
-
-                    indice++;
-
-                    if (!IsEnd)
-                    {
-
-                        if (item == simbolo)
-                        { texto = valor[cont] + texto; cont++; }
-                        else
-                            texto = item + texto;
-
-                        if (cont == valor.Length) IsEnd = true;
-
-                    }
-                    else
-                    {
-                        if (item != simbolo)
-                        {
-
-                            resto = GetSubstring(mask, indice);
-
-                            if (!resto.Contains(simbolo))
-                                texto = item + texto;
-
-                        }
-
-
-                    }
-
-                }
-
-                return (texto);
-
-            }
-            catch (IndexOutOfRangeException e)
-            {
-
-                throw new Exception("Value too short to substitute all substitute characters in the mask", e);
-            }
-        }
-
     }
+
 
 }

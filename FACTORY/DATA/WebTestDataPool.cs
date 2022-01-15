@@ -44,6 +44,8 @@ namespace Dooggy.Factory.Data
         public TestDataView DataViewCorrente => (Views.Corrente);
         public TestDataFluxo DataFluxoCorrente => (Fluxos.Corrente);
 
+        public bool IsDbOK => (Bases.IsOK);
+
         public TestDataPool()
         {
 
@@ -106,8 +108,7 @@ namespace Dooggy.Factory.Data
 
         public bool IsSQLDataException(string prmTexto) => Tratamento.IsSQLDataException(prmTexto);
         public string GetTextoTratado(string prmTexto) => Tratamento.GetTextoTratado(prmTexto);
-        public string GetNextKeyDataView() => string.Format("x{0},", Views.Count);
-        //public string GetPathDestino(string prmSubPath) => PathDataFiles.GetPath(prmSubPath);
+        public string GetNextKeyDataView() => string.Format("null_{0},", Views.Count);
 
         public string txt(string prmTags) => output(prmTags, prmTipo: eTipoFileFormat.txt);
         public string csv(string prmTags) => output(prmTags, prmTipo: eTipoFileFormat.csv);

@@ -99,9 +99,9 @@ namespace Dooggy.Factory
     public class TestTraceLogData_Fail : TestTraceLog
     {
 
-        public void FailDBConnection(string prmTag, string prmStringConexao, Exception prmErro) => FailConnection(prmMSG: "Conexão com Banco de Dados falhou", prmVar: "-string", prmTag, prmStringConexao, prmErro);
+        public void FailDBConnection(string prmTag, string prmStringConexao, Exception prmErro) => FailConnection(prmMSG: "Conexão DB falhou", prmVar: "-string", prmTag, prmStringConexao, prmErro);
         public void FailSQLConnection(string prmTag, string prmSQL, Exception prmErro) => FailConnection(prmMSG: "Comando SQL falhou", prmVar: "-sql", prmTag, prmSQL, prmErro);
-        public void FailSQLNoDataBaseConnection(string prmTag, string prmSQL, Exception prmErro) => FailConnection(prmMSG: "Banco de Dados não está aberto. SQL", prmVar: "-sql", prmTag, prmSQL, prmErro);
+        public void FailSQLNoDataBaseConnection(string prmTag, string prmSQL, Exception prmErro) => FailConnection(prmMSG: "DB não conectado", prmVar: "-sql", prmTag, prmSQL, prmErro);
 
         public void FailSQLDataModelConnection(string prmTag, string prmModel, Exception prmErro) => FailConnection(prmMSG: "Model View não foi criado adequadamente.", prmTag, prmModel, prmErro);
         public void FailNoDataViewDetected(string prmTag) => msgErro(prmTexto: string.Format("Data View não foi identificado ... >>> fluxo: [{0}] não executou o SQL ...", prmTag));
@@ -119,12 +119,14 @@ namespace Dooggy.Factory
     public class TestTraceLogFile : TestTraceLog
     {
 
-        public void DataFileImport(string prmArquivo) => DataFileAction(prmAcao: "READ", prmContexto: "Importado com sucesso", prmArquivo, prmSubPath: "");
-        public void DataFileExport(string prmArquivo, string prmSubPath, string prmEncoding) => DataFileAction(prmAcao: "SAVE", prmContexto: "Salvo com sucesso", prmArquivo, prmSubPath, prmEncoding);
-        public void DataFileMute(string prmArquivo, string prmSubPath, string prmEncoding) => DataFileAction(prmAcao: "MUTE", prmContexto: "Silenciado com sucesso", prmArquivo, prmSubPath, prmEncoding);
+        public void DataFileOpen(string prmArquivo, string prmPath) => DataFileAction(prmAcao: "READ", prmContexto: "Importado com sucesso", prmArquivo, prmPath);
 
-        private void DataFileAction(string prmAcao, string prmContexto, string prmArquivo, string prmSubPath) => DataFileAction(prmAcao, prmContexto, prmArquivo, prmSubPath, prmEncoding: "");
-        private void DataFileAction(string prmAcao, string prmContexto, string prmArquivo, string prmSubPath, string prmEncoding)
+        public void DataFileSave(string prmArquivo, string prmPath) => DataFileAction(prmAcao: "CODE", prmContexto: "Script salvo com sucesso", prmArquivo, prmPath, prmEncoding: "default");
+        public void DataFileSave(string prmArquivo, string prmPath, string prmEncoding) => DataFileAction(prmAcao: "SAVE", prmContexto: "Salvo com sucesso", prmArquivo, prmPath, prmEncoding);
+        public void DataFileMute(string prmArquivo, string prmPath, string prmEncoding) => DataFileAction(prmAcao: "MUTE", prmContexto: "Silenciado com sucesso", prmArquivo, prmPath, prmEncoding);
+
+        private void DataFileAction(string prmAcao, string prmContexto, string prmArquivo, string prmPath) => DataFileAction(prmAcao, prmContexto, prmArquivo, prmPath, prmEncoding: "");
+        private void DataFileAction(string prmAcao, string prmContexto, string prmArquivo, string prmPath, string prmEncoding)
         {
 
             string msg = string.Format(@"-file: '{0}' -msg: {1}", prmArquivo, prmContexto);
@@ -132,8 +134,8 @@ namespace Dooggy.Factory
             if (xString.IsStringOK(prmEncoding))
                 msg += @" -encoding: " + prmEncoding;
 
-            if (xString.IsStringOK(prmSubPath))
-                msg += @" -path: " + prmSubPath;
+            if (xString.IsStringOK(prmPath))
+                msg += @" -path: " + prmPath;
 
             msgFile(prmAcao, msg);
 
@@ -143,9 +145,9 @@ namespace Dooggy.Factory
         public void DataFileFormatCSV(string prmConteudo) => msgFile(prmTipo: "CSV", prmConteudo);
         public void DataFileFormatJSON(string prmConteudo) => msgFile(prmTipo: "JSON", prmConteudo);
 
-        public void FailDataFileEncoding(string prmPath, string prmArquivo, string prmEncoding) => msgErro(String.Format("Falha no formato encoding [{2}] ... -file: {0} -path: {1}", prmArquivo, prmPath, prmEncoding));
-        public void FailDataFileExport(string prmPath, string prmArquivo) => msgErro(String.Format("Falha na criação do arquivo ... -file: {0} -path: {1}", prmArquivo, prmPath));
-        public void FailDataFileOpen(string prmPath, string prmArquivo) => FailDataFileOpenDefault(prmLocal: String.Format("-file: {0} -path: {1}", prmArquivo, prmPath));
+        public void FailDataFileEncoding(string prmEncoding) => msgErro(String.Format("Formato encoding [{0}] não encontrado ...", prmEncoding));
+        public void FailDataFileSave(string prmArquivo, string prmPath) => msgErro(String.Format("Falha na criação do arquivo ... -file: {0} -path: {1}", prmArquivo, prmPath));
+        public void FailDataFileOpen(string prmArquivo, string prmPath) => FailDataFileOpenDefault(prmLocal: String.Format("-file: {0} -path: {1}", prmArquivo, prmPath));
         public void FailJSONFormat(string prmContexto, string prmFluxo, Exception prmErro) => msgErro(prmTexto: String.Format(@"Fluxo JSON: [invalid format] ... contexto: {0} fluxo: {1}", prmContexto, prmFluxo));
 
         private void FailDataFileOpenDefault(string prmLocal) => msgErro(String.Format("Falha na abertura do arquivo ... {0}", prmLocal));
@@ -298,7 +300,7 @@ namespace Dooggy.Factory
 
     }
 
-    public class TestDataLog : List<TestItemLog>
+    public class TestItensLog : List<TestItemLog>
     {
 
         public bool ativo;
@@ -306,7 +308,7 @@ namespace Dooggy.Factory
         public void Start() => ativo = true;
         public void Stop() => ativo = false;
 
-        public string txt { get => GetLog(); }
+        public string txt { get => GetTXT(); }
 
         public void AddLog(string prmTipo, string prmTexto)
         {
@@ -316,7 +318,7 @@ namespace Dooggy.Factory
 
         }
 
-        private string GetLog()
+        private string GetTXT()
         {
 
             xMemo memo = new xMemo();

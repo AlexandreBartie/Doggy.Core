@@ -391,6 +391,8 @@ namespace Dooggy.Lib.Generic
 
         private xJSON lista;
 
+        private Mask mask;
+
         public bool IsOK { get => (lista.IsOK); }
 
         public xMask(string prmMask)
@@ -398,14 +400,16 @@ namespace Dooggy.Lib.Generic
 
             lista = new xJSON(prmMask);
 
+            mask = new Mask();
+
         }
 
         public string GetValor(string prmValor, string prmKey)
         {
 
-            string mask = lista.GetValor(prmKey);
+            string formato = lista.GetValor(prmKey);
 
-            return xString.GetMask(prmValor, mask);
+            return mask.Get(prmValor, formato);
 
         }
 
@@ -429,4 +433,5 @@ namespace Dooggy.Lib.Generic
 
 
     }
+
 }

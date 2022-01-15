@@ -65,7 +65,7 @@ namespace Dooggy.Factory.Console
 
         public string keyword { get => Sintaxe.keyword; }
         public TestTrace Trace { get => Console.Trace; }
-        public TestDataLocal Dados { get => Console.Dados; }
+        private TestDataLocal Dados { get => Console.Dados; }
 
         public TestCommand(TestSintaxe prmSintaxe, TestConsole prmConsole)
         {
@@ -100,7 +100,8 @@ namespace Dooggy.Factory.Console
         private eTipoTestCommand tipo { get => Sintaxe.tipo; }
 
         private TestTrace Trace { get => Sintaxe.Trace; }
-        private TestDataLocal Dados { get => Command.Dados; }
+
+        private TestDataLocal Dados { get => Console.Dados; }
 
         private TestDataPool Pool { get => Dados.Pool; }
 
@@ -211,14 +212,7 @@ namespace Dooggy.Factory.Console
         private void ActionAddDataFluxo() => Dados.AddDataFluxo(prmTag: target);
         private void ActionSetDataFluxo(string prmArg, string prmInstrucao) => Pool.SetDataFluxo(prmArg, prmInstrucao);
 
-        private void ActionSaveFile(eTipoFileFormat prmTipo)
-        {
-
-            Console.Save(prmData: Dados.output(target, prmTipo));
-
-            Dados.File.SaveFile(prmNome: Output.GetScriptOrigem(), prmPath: Output.GetFullPath(prmTipo), prmConteudo: Console.Log.resultado, prmExtensao: Output.GetExtensao(prmTipo), prmEncoding: Sintaxe.opcoes);
-
-        }
+        private void ActionSaveFile(eTipoFileFormat prmTipo) => Console.Save(prmData: Dados.output(target, prmTipo), prmTipo, Sintaxe.opcoes);
 
     }
 

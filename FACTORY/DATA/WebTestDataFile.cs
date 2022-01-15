@@ -1,4 +1,6 @@
-﻿using Dooggy.Lib.Files;
+﻿using Dooggy;
+using Dooggy.Factory;
+using Dooggy.Lib.Files;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -10,187 +12,110 @@ namespace Dooggy.Factory.Data
 
         private TestDataLocal Dados;
 
-        private TestDataInput Input;
+        private TestDataFileIO File;
 
-        private TestDataOutput Output;
+        public TestTrace Trace => Dados.Trace;
 
-        public TestDataPool Pool { get => Dados.Pool; }
+        private string extensao_ini = "ini";
 
         public TestDataFile(TestDataLocal prmDados)
         {
 
             Dados = prmDados;
 
-            Input = new TestDataInput(Dados);
-
-            Output = new TestDataOutput(Dados);
-
-         }
-
-        public bool Save(eTipoFileFormat prmTipo, string prmTags, string prmNome, string prmPath)
-        {
-
-            switch (prmTipo)
-            {
-
-                case eTipoFileFormat.csv:
-                    return SaveCSV(prmTags, prmNome, prmPath);
-
-                case eTipoFileFormat.txt:
-                    return SaveTXT(prmTags, prmNome, prmPath);
-
-            }
-
-            return SaveJSON(prmTags, prmNome, prmPath);
+            File = new TestDataFileIO(this);
 
         }
 
-        public string Open(eTipoFileFormat prmTipo, string prmNome, string prmPath)
-        {
+        public string Open(string prmNome, string prmPath) => Open(prmNome, prmPath, prmExtensao: extensao_ini);
+        public string Open(string prmNome, string prmPath, string prmExtensao) => File.Open(prmPath, GetArquivo(prmNome, prmExtensao));
+        
+        public bool Save(string prmNome, string prmPath, string prmConteudo) => Save(prmNome, prmPath, prmConteudo, prmExtensao: extensao_ini);
+        public bool Save(string prmNome, string prmPath, string prmConteudo, string prmExtensao) => Save(prmNome, prmPath, prmConteudo, prmExtensao, prmEncoding: "");
+        public bool Save(string prmNome, string prmPath, string prmConteudo, string prmExtensao, string prmEncoding) => File.Save(prmPath, GetArquivo(prmNome, prmExtensao), prmConteudo, prmEncoding);
 
-            switch (prmTipo)
-            {
-
-                case eTipoFileFormat.csv:
-                    return OpenCSV(prmNome, prmPath);
-
-                case eTipoFileFormat.txt:
-                    return OpenTXT(prmNome, prmPath);
-
-            }
-
-            return OpenJSON(prmNome, prmPath);
-
-        }
-
-        private bool SaveJSON(string prmTags, string prmNome, string prmPath) => SaveFile(prmNome, prmPath, prmConteudo: Dados.json(prmTags), prmExtensao: "json");
-        private bool SaveCSV(string prmTags, string prmNome, string prmPath) => SaveFile(prmNome, prmPath, prmConteudo: Dados.csv(prmTags), prmExtensao: "csv");
-        private bool SaveTXT(string prmTags, string prmNome, string prmPath) => SaveFile(prmNome, prmPath, prmConteudo: Dados.txt(prmTags), prmExtensao: "txt");
-
-        private bool SaveFile(string prmNome, string prmPath, string prmConteudo, string prmExtensao) => Output.Save(prmNome, prmPath, prmConteudo, prmExtensao);
-        public bool SaveFile(string prmNome, string prmPath, string prmConteudo, string prmExtensao, string prmEncoding) => Output.Save(prmNome, prmPath, prmConteudo, prmExtensao, prmEncoding);
-
-
-
-        public string OpenJSON(string prmNome, string prmPath) => Input.Open(prmNome, prmPath, prmExtensao: "json");
-        public string OpenCSV(string prmNome, string prmPath) => Input.Open(prmNome, prmPath, prmExtensao: "csv");
-        public string OpenTXT(string prmNome, string prmPath) => Input.Open(prmNome, prmPath, prmExtensao: "txt");
-
-        //public void SaveAll(string prmTags, string prmNome)
-        //{
-
-        //    // Formato JSON
-
-        //    Dados.File.SaveJSON(prmTags, prmNome, prmPath: "json");
-
-        //    // Formato CSV
-
-        //    Dados.File.SaveCSV(prmTags, prmNome, prmPath: "csv");
-
-        //    // Formato TXT com cabeçalho e coluna adicional ...
-
-        //    Dados.File.SaveTXT(prmTags, prmNome, prmPath: "txt");
-
-        //}
+        private string GetArquivo(string prmNome, string prmExtensao) => prmNome + "." + prmExtensao;
 
     }
 
-    public class TestDataInput : TestDataPath
+    public class TestDataFileIO
     {
 
-        public TestDataInput(TestDataLocal prmDados)
+        private TestDataFile DataFile;
+
+        private FileTXT File;
+
+        private TestDataEncoding Encode;
+
+        public TestTrace Trace { get => DataFile.Trace; }
+
+
+        public TestDataFileIO(TestDataFile prmDataFile)
         {
 
-            Dados = prmDados;
+            DataFile = prmDataFile;
+
+            Encode = new TestDataEncoding(prmDataFile);
 
         }
-
-        public string Open(string prmNome, string prmPath, string prmExtensao)
+        public string Open(string prmPath, string prmArquivo)
         {
 
-            if (File.Open(prmPath, prmNome, prmExtensao))
+            File = new FileTXT();
+
+            if (File.Open(prmPath, prmArquivo))
+            {
+
+                Trace.LogFile.DataFileOpen(prmArquivo, prmPath);
+
                 return File.txt();
 
-            Trace.LogFile.FailDataFileOpen(prmPath, prmArquivo: prmNome + "." + prmExtensao);
+            }
+
+            Trace.LogFile.FailDataFileOpen(prmArquivo, prmPath);
 
             return ("");
 
         }
-
-        //public string GetPath(string prmSubPath) => Dados.Pool.GetPathDestino(prmSubPath);
-
-    }
-    public class TestDataOutput : TestDataPath
-    {
-        public string path;
-        public string arquivo;
-
-        private TestDataEncoding Encode;
-
-        public TestDataOutput(TestDataLocal prmDados)
+        public bool Save(string prmPath, string prmArquivo, string prmConteudo, string prmEncoding)
         {
 
-            Dados = prmDados;
-
-            Encode = new TestDataEncoding(this);
-
-        }
-
-        public bool Save(string prmNome, string prmPath, string prmConteudo, string prmExtensao) => Save(prmNome, prmPath, prmConteudo, prmExtensao, prmEncoding: "");
-        public bool Save(string prmNome, string prmPath, string prmConteudo, string prmExtensao, string prmEncoding)
-        {
-
-            if (xString.IsStringOK(prmNome))
+            if (xString.IsStringOK(prmArquivo))
             {
 
-                path = prmPath;
+                File = new FileTXT();
 
-                arquivo = prmNome + "." + prmExtensao;
-
-                if (File.Save(path, arquivo, prmConteudo, prmEncoding: Encode.Find(prmEncoding)))
+                if (File.Save(prmPath, prmArquivo, prmConteudo, prmEncoding: Encode.Find(prmEncoding)))
                 {
 
-                    Trace.LogFile.DataFileExport(arquivo, prmPath, prmEncoding);
+                    Trace.LogFile.DataFileSave(prmArquivo, prmPath, prmEncoding);
 
                     return (true);
 
                 }
 
-                Trace.LogFile.FailDataFileExport(path, arquivo);
+                Trace.LogFile.DataFileSave(prmPath, prmArquivo);
 
             }
             else
-                Trace.LogFile.DataFileMute(path, arquivo, prmEncoding);
+                Trace.LogFile.DataFileMute(prmPath, prmArquivo, prmEncoding);
 
             return (false);
         }
-
-        //public string GetPath(string prmSubPath) => Dados.Pool.GetPathDestino(prmSubPath);
-
-
-    }
-    public class TestDataPath
-    {
-
-        public TestDataLocal Dados;
-
-        public FileTXT File = new FileTXT();
-
-        public TestTrace Trace { get => Dados.Trace; }
 
     }
 
     public class TestDataEncoding
     {
 
-        private TestDataOutput Output;
+        private TestDataFile File;
 
-        public TestTrace Trace { get => Output.Trace; }
+        public TestTrace Trace { get => File.Trace; }
 
-        public TestDataEncoding(TestDataOutput prmOutput)
+        public TestDataEncoding(TestDataFile prmFile)
         {
 
-            Output = prmOutput;
+            File = prmFile;
 
         }
         public Encoding Find(string prmTipoEncoding)
@@ -241,10 +166,10 @@ namespace Dooggy.Factory.Data
                 Encoding encode = TryInstallCodePage(prmCodePage: code_page);
 
                 if (encode != null) return (encode);
-  
+
             }
 
-            Trace.LogFile.FailDataFileEncoding(Output.path, Output.arquivo, prmEncoding);
+            Trace.LogFile.FailDataFileEncoding(prmEncoding);
 
             return (Encoding.Default);
 
@@ -260,4 +185,5 @@ namespace Dooggy.Factory.Data
         }
 
     }
+
 }
