@@ -40,7 +40,7 @@ namespace Dooggy.Factory.Console
 
         public TestTrace Trace { get => Console.Trace; }
 
-        public TestConsoleLog Log { get => Script.Log; }
+        public TestConsoleResult Result { get => Script.Result; }
 
         public TestBuilder(TestConsoleScript prmScript)
         {
@@ -53,8 +53,8 @@ namespace Dooggy.Factory.Console
 
         public void Compile(string prmCode)
         {
-
-            Log.SetCode(prmCode);
+           
+            Result.SetCode(prmCode);
 
             foreach (string linha in new xLinhas(prmCode))
 

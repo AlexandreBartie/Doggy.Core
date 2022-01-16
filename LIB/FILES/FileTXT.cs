@@ -15,13 +15,15 @@ namespace Dooggy.Lib.Files
 
         private Encoding encoding = null;
 
-        private bool _IsOK;
+        private bool IsErro;
 
-        public bool IsOK { get => _IsOK; }
+        public bool IsOK => !IsErro;
 
         public void SetEncoding(Encoding prmEncoding) => encoding = prmEncoding;
 
         public Diretorio Diretorio { get { if (_diretorio == null) _diretorio = new Diretorio(); return _diretorio; } }
+
+        public virtual bool IsValidName(string prmArquivo) => (xString.GetFirst(prmArquivo, prmDelimitador: ".") != "");
 
         public virtual bool Open(string prmPath, string prmName) => Open(prmArquivo: prmPath + prmName);
         public virtual bool Open(string prmArquivo)
@@ -35,17 +37,17 @@ namespace Dooggy.Lib.Files
                 else
                     lines = System.IO.File.ReadAllLines(prmArquivo, encoding);
 
-                _IsOK = true;
+                IsErro = false;
 
             }
             catch
             {
 
-                _IsOK = false;
+                IsErro = true;
 
             }
 
-            return (_IsOK);
+            return (IsOK);
 
         }
 
@@ -58,6 +60,7 @@ namespace Dooggy.Lib.Files
 
                 try
                 {
+
                     File.WriteAllText(prmPath + prmArquivo, prmConteudo, prmEncoding);
 
                     return (true);

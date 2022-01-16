@@ -37,6 +37,8 @@ namespace Dooggy.Factory.Data
 
         public TestDataTratamento Tratamento;
 
+        private bool bloqueado = false;
+
         public TestDataFluxos Fluxos => (DataViewCorrente.Fluxos);
 
         public DataBaseConnection DataBaseCorrente => (Bases.Corrente);
@@ -44,7 +46,9 @@ namespace Dooggy.Factory.Data
         public TestDataView DataViewCorrente => (Views.Corrente);
         public TestDataFluxo DataFluxoCorrente => (Fluxos.Corrente);
 
+
         public bool IsDbOK => (Bases.IsOK);
+        public bool IsDbBlocked => bloqueado;
 
         public TestDataPool()
         {
@@ -60,6 +64,8 @@ namespace Dooggy.Factory.Data
             Cleanup();
 
         }
+
+        public bool TestConnect() => Bases.Testar();
 
         public bool AddDataBase(string prmTag, string prmConexao) => Bases.Criar(prmTag, prmConexao, this);
 
@@ -87,23 +93,7 @@ namespace Dooggy.Factory.Data
 
         }
 
-        public bool IsON()
-        {
-
-            bool retorno = false;
-
-            foreach (DataBaseConnection Base in Bases)
-            {
-                if (!Base.IsON)
-                { return (false); }
-
-                retorno = true;
-            }
-
-            return (retorno);
-
-        }
-
+        public void SetDBStatus(bool prmBloqueado) => bloqueado = prmBloqueado;
         public void SetAncora(DateTime prmAncora) => Tratamento.SetAncora(prmAncora);
 
         public bool IsSQLDataException(string prmTexto) => Tratamento.IsSQLDataException(prmTexto);
@@ -326,6 +316,9 @@ namespace Dooggy.Factory.Data
             Pool = prmPool;
 
         }
+
+        public bool TestConnect() => Pool.TestConnect();
+
         public bool AddDataBase(string prmTag, string prmConexao) => (Pool.AddDataBase(prmTag, prmConexao));
 
         public string AddDataVar(string prmTag) => (Pool.AddDataVar(prmTag));

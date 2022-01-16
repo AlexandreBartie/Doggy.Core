@@ -19,7 +19,9 @@ namespace Dooggy.Lib.Data
 
         public string tag;
 
-        public OracleConnection conexao;
+        public string str_conection;
+
+        public OracleConnection Conexao;
 
         public Exception erro;
 
@@ -30,39 +32,52 @@ namespace Dooggy.Lib.Data
 
             Pool = prmPool;
 
-            Abrir(prmConexao);
+            str_conection = prmConexao;
+
+            Abrir();
 
         }
 
-        public TestTrace Trace { get => (Pool.Trace); }
-        public bool IsON { get => (conexao != null); }
-        public bool IsOK { get { if (IsON) return (conexao.State == ConnectionState.Open); return (false); } }
+        public TestTrace Trace => (Pool.Trace);
 
-        private bool Criar(string prmConexao)
+        public bool IsON => (Conexao != null);
+        public bool IsOK { get { if (IsON) return (IsOpen); return (false); } }
+        private bool IsOpen => (Conexao.State == ConnectionState.Open);
+
+        public bool Testar() => Abrir();
+        private bool Conectar()
         {
 
             try
             {
 
-                conexao = new OracleConnection(prmConexao);
+                Conexao = new OracleConnection(str_conection);
 
                 return (true);
 
             }
 
             catch (Exception e)
-            { Trace.LogData.FailDBConnection(tag, prmConexao, e); erro = e; }
+            { Trace.LogData.FailDBConnection(tag, str_conection, e); erro = e; }
 
             return (false);
         }
-        public bool Abrir(string prmConexao)
+        public bool Abrir()
         {
+
+            // used to do unit-testing ...
+            if (Pool.IsDbBlocked)
+            {
+                Trace.LogData.FailDBBlocked(tag, str_conection);
+
+                return (false);
+            }
 
             try
             {
 
-                if (Criar(prmConexao))
-                    conexao.Open();
+                if (Conectar())
+                    Conexao.Open();
 
                 Trace.LogData.DBConnection(tag, "CONECTADO");
 
@@ -71,15 +86,14 @@ namespace Dooggy.Lib.Data
             }
 
             catch (Exception e)
-            { Trace.LogData.FailDBConnection(tag, prmConexao, e); erro = e; }
+            { Trace.LogData.FailDBConnection(tag, str_conection, e); erro = e; }
 
             return (false);
         }
-
         public void Fechar()
         {
             try
-            { conexao.Close(); }
+            { Conexao.Close(); }
 
             catch (Exception e)
             { erro = e; }
@@ -136,7 +150,7 @@ namespace Dooggy.Lib.Data
 
             try
             {
-                OracleCommand vlSql = new OracleCommand(prmSQL, DataBase.conexao);
+                OracleCommand vlSql = new OracleCommand(prmSQL, DataBase.Conexao);
 
                 reader = (vlSql.ExecuteReader());
 
@@ -283,6 +297,16 @@ namespace Dooggy.Lib.Data
             return (Corrente.IsOK);
 
         }
+        public bool Testar()
+        {
+
+            foreach (DataBaseConnection db in this)
+                if (!db.Testar())
+                    return false;
+
+            return true;
+
+        }
 
         private bool GetIsOK()
         {
@@ -294,7 +318,6 @@ namespace Dooggy.Lib.Data
                     ok = true;
                 else
                     break;
-            
             
             return ok;
 

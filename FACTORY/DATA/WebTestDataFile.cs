@@ -29,7 +29,7 @@ namespace Dooggy.Factory.Data
 
         public string Open(string prmNome, string prmPath) => Open(prmNome, prmPath, prmExtensao: extensao_ini);
         public string Open(string prmNome, string prmPath, string prmExtensao) => File.Open(prmPath, GetArquivo(prmNome, prmExtensao));
-        
+
         public bool Save(string prmNome, string prmPath, string prmConteudo) => Save(prmNome, prmPath, prmConteudo, prmExtensao: extensao_ini);
         public bool Save(string prmNome, string prmPath, string prmConteudo, string prmExtensao) => Save(prmNome, prmPath, prmConteudo, prmExtensao, prmEncoding: "");
         public bool Save(string prmNome, string prmPath, string prmConteudo, string prmExtensao, string prmEncoding) => File.Save(prmPath, GetArquivo(prmNome, prmExtensao), prmConteudo, prmEncoding);
@@ -80,10 +80,10 @@ namespace Dooggy.Factory.Data
         public bool Save(string prmPath, string prmArquivo, string prmConteudo, string prmEncoding)
         {
 
-            if (xString.IsStringOK(prmArquivo))
-            {
+            File = new FileTXT();
 
-                File = new FileTXT();
+            if (File.IsValidName(prmArquivo))
+            {
 
                 if (File.Save(prmPath, prmArquivo, prmConteudo, prmEncoding: Encode.Find(prmEncoding)))
                 {
@@ -94,11 +94,11 @@ namespace Dooggy.Factory.Data
 
                 }
 
-                Trace.LogFile.DataFileSave(prmPath, prmArquivo);
+                Trace.LogFile.DataFileSave(prmArquivo, prmPath);
 
             }
             else
-                Trace.LogFile.DataFileMute(prmPath, prmArquivo, prmEncoding);
+                Trace.LogFile.DataFileMute(prmArquivo, prmPath, prmEncoding);
 
             return (false);
         }
