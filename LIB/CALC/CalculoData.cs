@@ -28,9 +28,9 @@ namespace Dooggy
 
         }
 
-        public string View(string prmSintaxe) => Rules.View(prmSintaxe);
         public DateTime Calc(string prmSintaxe) => (Rules.Calc(prmSintaxe));
-
+        public string View(string prmSintaxe) => Rules.View(prmSintaxe);
+        public string Static(string prmSintaxe) => Rules.View(":" + prmSintaxe);
 
     }
     public class DynamicDateRules

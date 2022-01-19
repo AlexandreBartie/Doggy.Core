@@ -19,11 +19,15 @@ namespace Dooggy.Lib.Data
 
         public string tag;
 
+        public string status;
+
         public string str_conection;
 
         public OracleConnection Conexao;
 
         public Exception erro;
+
+        private bool _isOpen;
 
         public DataBaseConnection(string prmTag, string prmConexao, TestDataPool prmPool)
         {
@@ -40,28 +44,14 @@ namespace Dooggy.Lib.Data
 
         public TestTrace Trace => (Pool.Trace);
 
-        public bool IsON => (Conexao != null);
-        public bool IsOK { get { if (IsON) return (IsOpen); return (false); } }
-        private bool IsOpen => (Conexao.State == ConnectionState.Open);
+        //private bool IsON => (Conexao != null);
+        public bool IsOK => _isOpen;
+        public string log => string.Format("{0}: {1}", tag, status);
+
+        private string SetStatus(string prmStatus) { status = prmStatus; _isOpen = (prmStatus == "CONECTADO");  return prmStatus; }
 
         public bool Testar() => Abrir();
-        private bool Conectar()
-        {
 
-            try
-            {
-
-                Conexao = new OracleConnection(str_conection);
-
-                return (true);
-
-            }
-
-            catch (Exception e)
-            { Trace.LogData.FailDBConnection(tag, str_conection, e); erro = e; }
-
-            return (false);
-        }
         public bool Abrir()
         {
 
@@ -79,25 +69,44 @@ namespace Dooggy.Lib.Data
                 if (Conectar())
                     Conexao.Open();
 
-                Trace.LogData.DBConnection(tag, "CONECTADO");
+                Trace.LogData.DBConnection(tag, SetStatus("CONECTADO"));
 
                 return (true);
 
             }
 
             catch (Exception e)
-            { Trace.LogData.FailDBConnection(tag, str_conection, e); erro = e; }
+            { Trace.LogData.FailDBConnection(tag, str_conection, e); erro = e; SetStatus("ERRO"); }
 
             return (false);
         }
         public void Fechar()
         {
             try
-            { Conexao.Close(); }
+            { Conexao.Close(); status = "FECHADO";  }
 
             catch (Exception e)
             { erro = e; }
 
+        }
+        private bool Conectar()
+        {
+
+            SetStatus("-");
+
+            try
+            {
+
+                Conexao = new OracleConnection(str_conection);
+
+                return (true);
+
+            }
+
+            catch (Exception e)
+            { Trace.LogData.FailDBConnection(tag, str_conection, e); erro = e; SetStatus("ERRO"); }
+
+            return (false);
         }
 
     }
@@ -297,6 +306,16 @@ namespace Dooggy.Lib.Data
             return (Corrente.IsOK);
 
         }
+        public bool DoConnect()
+        {
+
+            foreach (DataBaseConnection db in this)
+                if (!db.Abrir())
+                    return false;
+
+            return true;
+
+        }
         public bool Testar()
         {
 
@@ -320,6 +339,17 @@ namespace Dooggy.Lib.Data
                     break;
             
             return ok;
+
+        }
+        public string log()
+        {
+
+            string memo = "";
+
+            foreach (DataBaseConnection db in this)
+                memo += db.log + Environment.NewLine;
+
+            return memo;
 
         }
 

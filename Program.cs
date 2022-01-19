@@ -42,7 +42,6 @@ namespace Dooggy
 
             string parametros = @"{ 'branch': '1085', 'port': '1521' }";
 
-
             MassaTestesByConsole.SetApp(parametros,prmNomeApp: Application.ProductName, prmVersaoApp: Application.ProductVersion);
 
             MassaTestesByConsole.Run(path_ini, path_out);

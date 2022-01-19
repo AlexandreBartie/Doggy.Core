@@ -28,7 +28,7 @@ namespace Dooggy.Lib.Generic
 
         public string memo { get => GetMemo(); }
 
-        private bool TemDados { get => xString.IsStringOK(tag + valor); }
+        private bool TemDados { get => xString.IsFull(tag + valor); }
         private bool TemDescricao { get => (descricao != ""); }
 
         public xTupla()
@@ -137,7 +137,7 @@ namespace Dooggy.Lib.Generic
         public virtual void Parse(string prmLista, string prmSeparador)
         {
 
-            if (xString.IsStringOK(prmLista))
+            if (xString.IsFull(prmLista))
             {
 
                 foreach (string item in new xLista(prmLista, prmSeparador))
@@ -207,7 +207,7 @@ namespace Dooggy.Lib.Generic
 
             separador = prmSeparador;
 
-            if (xString.IsStringOK(prmLista))
+            if (xString.IsFull(prmLista))
                 foreach (string item in prmLista.Split(separador))
                 {
                     this.Add(item.Trim());
@@ -299,7 +299,7 @@ namespace Dooggy.Lib.Generic
         {
             foreach (string vlItem in this)
             {
-                if (vlItem.StartsWith(prmTexto))
+                if (xString.IsStartsWith(vlItem, prmTexto))
                 { return (vlItem); }
             }
             return ("");
@@ -430,7 +430,6 @@ namespace Dooggy.Lib.Generic
         }
 
         private void Setup() => separador = Environment.NewLine;
-
 
     }
 

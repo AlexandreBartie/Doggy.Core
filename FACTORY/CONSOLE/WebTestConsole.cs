@@ -1,6 +1,8 @@
 ﻿using Dooggy.Factory.Data;
+using Dooggy.Lib.Data;
 using Dooggy.Lib.Files;
 using Dooggy.Lib.Generic;
+using Dooggy.Lib.Parse;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -17,6 +19,8 @@ namespace Dooggy.Factory.Console
 
         public TestConsoleOutput Output;
 
+        public TestConsoleConfig Config;
+
         public TestConsoleScripts Scripts;
 
         public TestDataLocal Dados => Factory.Dados;
@@ -27,8 +31,8 @@ namespace Dooggy.Factory.Console
 
         public TestConsoleScript Script { get => Scripts.Corrente; }
 
+        public bool IsOK => Config.IsOK;
         public bool IsDbOK => Pool.IsDbOK;
-
         public TestConsole(TestFactory prmFactory)
         {
 
@@ -38,9 +42,13 @@ namespace Dooggy.Factory.Console
 
             Output = new TestConsoleOutput(this);
 
+            Config = new TestConsoleConfig(this);
+
             Scripts = new TestConsoleScripts(this);
 
         }
+
+        public bool Setup(string prmArquivoCFG) => Config.Setup(prmArquivoCFG);
 
         public void Setup(string prmPathINI, string prmPathOUT) => Setup(prmPathINI, prmPathOUT, prmStart: false);
         public void Setup(string prmPathINI, string prmPathOUT, bool prmStart)
@@ -55,7 +63,10 @@ namespace Dooggy.Factory.Console
 
         }
 
-        public void SetAncora(DateTime prmAncora) => Pool.SetAncora(prmAncora);
+        public void SetAnchor(DateTime prmAncora) => Config.Anchor.SetDate(prmAncora);
+        public void SetAnchor(string prmAncora) => Config.Anchor.SetDate(prmAncora);
+
+
         public void SetDBStatus(bool prmBloqueado) => Pool.SetDBStatus(prmBloqueado);
         public void AddLog() => Scripts.AddLog();
 
@@ -63,20 +74,21 @@ namespace Dooggy.Factory.Console
         public void Load() => Load(prmPlay: false);
         public void Load(bool prmPlay) => Input.Load(prmPlay);
 
-        public void Load(string prmArquivoINI) => Scripts.Load(prmArquivoINI, prmPlay: false);
-        public void Import(string prmArquivoINI) => Scripts.Load(prmArquivoINI, prmPlay: true);
+        public void Import(string prmArquivoINI) => Load(prmArquivoINI, prmPlay: true);
+        public void Load(string prmArquivoINI) => Load(prmArquivoINI, prmPlay: false);
+        public void Load(string prmArquivoINI, bool prmPlay) => Scripts.Load(prmArquivoINI, prmPlay);
 
         public void Play(string prmCode) => Play(prmCode, prmArquivoOUT: "");
         public void Play(string prmCode, string prmArquivoOUT) => Scripts.Play(prmCode, prmArquivoOUT);
 
-        public void Save(string prmData, eTipoFileFormat prmTipo, string prmEncoding) => Scripts.Save(prmData, prmTipo, prmEncoding);
+        public void Save(string prmData, eTipoFileFormat prmTipo, string prmEncoding) => Output.SaveOUT(prmData, prmTipo, prmEncoding);
+        public bool SaveCode(string prmCode) => Input.SaveINI(prmCode);
+        public void SetCode(string prmCode) => Script.SetCode(prmCode);
+        public void UndoCode() => Script.Result.UndoCode();
 
         public bool SetScript(string prmKey) => Scripts.FindScript(prmKey);
 
-        public bool SaveCode(string prmCode) => Scripts.SaveCode(prmCode);
-
     }
-
     public class TestConsoleScripts : List<TestConsoleScript>
     {
 
@@ -100,10 +112,6 @@ namespace Dooggy.Factory.Console
         public void Load(string prmArquivoINI, bool prmPlay) { GetScript(prmArquivoINI); Corrente.Load(prmArquivoINI, prmPlay); }
 
         public void Play(string prmCode, string prmArquivoOUT) { GetScript(prmArquivoOUT); Corrente.Play(prmCode, prmArquivoOUT); }
-
-        public void Save(string prmData, eTipoFileFormat prmTipo, string prmEncoding) => Corrente.Save(prmData, prmTipo, prmEncoding);
-
-        public bool SaveCode(string prmCode) => Corrente.SaveINI(prmCode);
 
         public void AddLog()
         {
@@ -180,7 +188,7 @@ namespace Dooggy.Factory.Console
 
             Builder = new TestBuilder(this);
 
-            Result = new TestConsoleResult();
+            Result = new TestConsoleResult(this);
 
         }
         public void Load(string prmArquivoINI, bool prmPlay)
@@ -190,31 +198,14 @@ namespace Dooggy.Factory.Console
 
             Result.Setup(prmArquivoINI);
 
-            Build(prmCode: Open(prmArquivoINI), prmArquivoINI, prmPlay);
+            Build(prmCode: Input.GetCode(prmArquivoINI), prmArquivoINI, prmPlay);
 
         }
 
-        private string Open(string prmArquivoINI) => Dados.File.Open(prmArquivoINI, Input.GetPath());
+        public void SetCode(string prmCode) => Result.SetCode(prmCode);
 
         public void Play(string prmCode, string prmArquivoOUT) => Build(prmCode, prmArquivoOUT, prmPlay: true);
 
-        public bool Save(string prmData, eTipoFileFormat prmTipo, string prmEncoding)
-        {
-
-            Result.SetData(prmData);
-
-            return Dados.File.Save(prmNome: Output.GetScriptOrigem(), prmPath: Output.GetPathFull(prmTipo), prmConteudo: prmData, prmExtensao: Output.GetExtensao(prmTipo), prmEncoding);
-
-        }
-        public bool SaveINI(string prmCode)
-        {
-
-            Result.SetCode(prmCode);
-
-            return Dados.File.Save(prmNome: Output.GetScriptOrigem(), prmPath: Input.GetPath(), prmConteudo: prmCode);
-
-        }
-        
         private void Build(string prmCode, string prmArquivoOUT, bool prmPlay)
         {
 
@@ -222,14 +213,10 @@ namespace Dooggy.Factory.Console
             
             Result.LogStart(prmArquivoOUT);
 
-            if (Dados.TestConnect())
-            {
+            Builder.Compile(prmCode);
 
-                Builder.Compile(prmCode);
-
-                if (prmPlay)
-                    Commands.Play();
-            }
+            if (Dados.DoConnect() && prmPlay)
+                Commands.Play();
 
             Result.LogStop();
 
@@ -241,20 +228,35 @@ namespace Dooggy.Factory.Console
     public class TestConsoleResult
     {
 
+        private TestConsoleScript Script;
+        private TestConsoleInput Input => Script.Console.Input;
+
+
         public string name_INI;
 
         public string name_OUT;
 
-        public string code;
+        private string _codeZero;
 
-        public string data;
+        private string _code;
+        private string _data;
 
-        private TestConsoleLog Log;
+        public string code { get => _code; }
+        public string data { get => _data; }
 
         public string log => Log.txt;
 
-        public TestConsoleResult()
+        public bool IsChanged => (xString.IsNoEqual(_code,_codeZero));
+        public bool IsData => (xString.IsFull(data));
+        public bool IsError => Log.erro;
+
+        private TestConsoleLog Log;
+
+
+        public TestConsoleResult(TestConsoleScript prmScript)
         {
+
+            Script = prmScript;
 
             Log = new TestConsoleLog();
 
@@ -266,34 +268,26 @@ namespace Dooggy.Factory.Console
             name_INI = prmArquivoINI;
 
         }
-        public void LogStart(string prmArquivoOUT)
-        {
 
-            name_OUT = prmArquivoOUT;
-
-            Reset();
-
-            Log.Start();
-
-        }
-
-        private void Reset() => Log.Clear();
-
-        public void SetCode(string prmCode) => code = prmCode;
-
-        public void SetData(string prmData) => data = prmData;
-
+        public void LogStart(string prmArquivoOUT) { Log.Start(); name_OUT = prmArquivoOUT;  }
         public void LogStop() => Log.Stop();
 
         public void AddLog(string prmTipo, string prmTexto) => Log.AddNew(prmTipo, prmTexto);
 
+        public void SetCodeZero(string prmCode) { _codeZero = prmCode; SetCode(prmCode); _data = ""; }
+        public void SetCode(string prmCode) => _code = prmCode;
+        public void SetData(string prmData) => _data = prmData;
+        public void UndoCode() => SetCode(prmCode: Script.Console.Input.GetCode(name_INI));
+
     }
     public class TestConsoleLog : List<TestItemLog>
     {
-
+       
         public bool ativo;
 
-        public void Start() => ativo = true;
+        public bool erro = false;
+
+        public void Start() { Clear(); ativo = true; erro = false;  }
         public void Stop() => ativo = false;
 
         private xMemo memo;
@@ -302,29 +296,22 @@ namespace Dooggy.Factory.Console
 
         public TestConsoleLog()
         {
-
             memo = new xMemo();
-
         }
 
         public void AddNew(string prmTipo, string prmTexto)
         {
-
             if (ativo)
             {
-
                 Add(new TestItemLog(prmTipo, prmTexto));
 
-                Debug.WriteLine(String.Format("line: {0,3} -txt: {1}", this.Count, prmTexto));
-
+                erro = erro || xString.IsEqual(prmTipo, "erro");
             }
 
         }
 
         private string GetTXT()
         {
-
-            int a = this.Count;
 
             memo.Clear();
 
@@ -335,16 +322,15 @@ namespace Dooggy.Factory.Console
         }
 
     }
-
     public class TestConsoleInput : TestConsoleIO
     {
 
-        private TestConsole Console;
+        private TestConsoleOutput Output => Console.Output;
 
         private Diretorio PathINI;
-        private TestTrace Trace => Console.Trace;
 
         public string GetPath() => (PathINI.path);
+
         public Arquivos GetArquivosINI() => PathINI.files.GetFiltro("*.ini");
 
         public TestConsoleInput(TestConsole prmConsole)
@@ -354,7 +340,7 @@ namespace Dooggy.Factory.Console
 
             PathINI = new Diretorio();
 
-    }
+        }
 
         public void SetPath(string prmPath)
         {
@@ -367,31 +353,31 @@ namespace Dooggy.Factory.Console
 
         public void Start()
         {
-
             foreach (Arquivo file in GetArquivosINI())
                 Console.Import(prmArquivoINI: file.nome_curto);
-
         }
 
         public void Load(bool prmPlay)
         {
-
             foreach (Arquivo file in GetArquivosINI())
                 Console.Load(prmArquivoINI: file.nome_curto);
+        }
+        public bool SaveINI(string prmCode)
+        {
+
+            Result.SetCode(prmCode);
+
+            return Dados.File.Save(prmNome: Output.GetScriptOrigem(), prmPath: GetPath(), prmConteudo: prmCode);
 
         }
+
+        public string GetCode(string prmArquivoINI) => Dados.File.Open(prmArquivoINI, GetPath());
 
     }
     public class TestConsoleOutput : TestConsoleIO
     {
 
-        private TestConsole Console;
-
         private Path PathOUT;
-
-        private TestConsoleOutput Output => Console.Output;
-
-        public TestTrace Trace => Console.Trace;
 
         public TestConsoleOutput(TestConsole prmConsole)
         {
@@ -399,6 +385,15 @@ namespace Dooggy.Factory.Console
             Console = prmConsole;
 
             PathOUT = new Path();
+
+        }
+
+        public bool SaveOUT(string prmData, eTipoFileFormat prmTipo, string prmEncoding)
+        {
+
+            Result.SetData(prmData);
+
+            return Dados.File.Save(prmNome: GetScriptOrigem(), prmPath: GetPathFull(prmTipo), prmConteudo: prmData, prmExtensao: GetExtensao(prmTipo), prmEncoding);
 
         }
 
@@ -415,7 +410,7 @@ namespace Dooggy.Factory.Console
 
             string nome = Console.Result.name_OUT;
 
-            if (xString.IsStringOK(nome))
+            if (xString.IsFull(nome))
                 return (nome);
 
             return (Console.Result.name_INI);
@@ -424,12 +419,17 @@ namespace Dooggy.Factory.Console
 
         public string GetPath() => (PathOUT.path);
         public string GetPath(string prmSubPath) => (PathOUT.GetPath(prmSubPath));
-
-        public string GetPathFull(eTipoFileFormat prmTipo) => (GetPath(prmSubPath: Output.GetExtensao(prmTipo)));
+        public string GetPathFull(eTipoFileFormat prmTipo) => (GetPath(prmSubPath: GetExtensao(prmTipo)));
 
     }
     public class TestConsoleIO
     {
+
+        internal TestConsole Console;
+        internal TestConsoleScript Script => Console.Script;
+        internal TestConsoleResult Result => Script.Result;
+        internal TestDataLocal Dados => Console.Dados;
+        internal TestTrace Trace => Console.Trace;
 
         public string GetExtensao(eTipoFileFormat prmTipo) => GetObtemExtensao(prmTipo);
 
@@ -451,9 +451,7 @@ namespace Dooggy.Factory.Console
 
         }
 
-
     }
 
-
-
 }
+

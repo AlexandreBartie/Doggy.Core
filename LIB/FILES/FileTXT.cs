@@ -11,6 +11,8 @@ namespace Dooggy.Lib.Files
 
         public string[] lines;
 
+        public string arquivo;
+
         private Diretorio _diretorio;
 
         private Encoding encoding = null;
@@ -32,10 +34,12 @@ namespace Dooggy.Lib.Files
             try
             {
 
+                arquivo = prmArquivo;
+
                 if ((encoding == null))
-                    lines = System.IO.File.ReadAllLines(prmArquivo);
+                    lines = System.IO.File.ReadAllLines(arquivo);
                 else
-                    lines = System.IO.File.ReadAllLines(prmArquivo, encoding);
+                    lines = System.IO.File.ReadAllLines(arquivo, encoding);
 
                 IsErro = false;
 
@@ -61,7 +65,9 @@ namespace Dooggy.Lib.Files
                 try
                 {
 
-                    File.WriteAllText(prmPath + prmArquivo, prmConteudo, prmEncoding);
+                    arquivo = prmPath + prmArquivo;
+
+                    File.WriteAllText(arquivo, prmConteudo, prmEncoding);
 
                     return (true);
                 }

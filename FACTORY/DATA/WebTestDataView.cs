@@ -178,11 +178,11 @@ namespace Dooggy.Factory.Data
         public void SetOrdem(string prmOrdem) => ordem = prmOrdem;
 
         public bool TemSQL() => (TemSQLMontada() || TemEstrutura());
-        public bool TemSQLMontada() => (xString.IsStringOK(sql));
+        public bool TemSQLMontada() => (xString.IsFull(sql));
         private bool TemCombinacoes() => TemRelacoes() && TemFiltro();
         private bool TemCondicoes() => TemRelacoes() || TemFiltro();
-        private bool TemFiltro() => (xString.IsStringOK(filtro));
-        private bool TemOrdem() => (xString.IsStringOK(ordem));
+        private bool TemFiltro() => (xString.IsFull(filtro));
+        private bool TemOrdem() => (xString.IsFull(ordem));
 
         public string GetSQL(TestDataView prmView)
         {
@@ -260,9 +260,9 @@ namespace Dooggy.Factory.Data
         public void SetMask(string prmMask) => mask = prmMask;
 
         public bool TemEstrutura() => TemTabelas() && TemCampos();
-        protected bool TemTabelas() => (xString.IsStringOK(tabelas));
-        protected bool TemCampos() => (xString.IsStringOK(campos));
-        protected bool TemRelacoes() => (xString.IsStringOK(relacoes));
+        protected bool TemTabelas() => (xString.IsFull(tabelas));
+        protected bool TemCampos() => (xString.IsFull(campos));
+        protected bool TemRelacoes() => (xString.IsFull(relacoes));
 
     }
 

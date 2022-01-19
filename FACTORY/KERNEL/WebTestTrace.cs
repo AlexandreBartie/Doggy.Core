@@ -151,7 +151,7 @@ namespace Dooggy.Factory
 
             string msg = string.Format("act# -{0}: {1}.", txt, prmContexto);
 
-            if (xString.IsStringOK(prmEncoding))
+            if (xString.IsFull(prmEncoding))
                 msg += @" -encoding: " + prmEncoding;
             
             if (xString.GetFirst(prmArquivo, prmDelimitador: ".") != "")

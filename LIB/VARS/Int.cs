@@ -42,7 +42,7 @@ namespace Dooggy
             try
             {
 
-                if (xString.IsStringOK(prmValor))
+                if (xString.IsFull(prmValor))
                     return (Convert.ToInt32(prmValor));
 
             }

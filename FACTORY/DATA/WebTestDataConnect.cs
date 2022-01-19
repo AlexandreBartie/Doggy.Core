@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Dooggy.Lib.Parse;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -7,25 +8,21 @@ namespace Dooggy.Factory.Data
     public class TestDataConnect
     {
 
-        private TestDataPool Pool;
+        public TestDataPool Pool;
 
         private DataBaseOracle _Oracle;
 
-        public DataBaseOracle Oracle { get { if (_Oracle == null) _Oracle = new DataBaseOracle(Pool); return _Oracle; } }
+        public DataBaseOracle Oracle { get { if (_Oracle == null) _Oracle = new DataBaseOracle(this); return _Oracle; } }
 
         public TestDataConnect(TestDataPool prmPool)
         {
-
             Pool = prmPool;
-
         }
 
 
     }
-    public class DataBaseOracle
+    public class DataBaseOracle : DataBaseOracleDefault
     {
-
-        private TestDataPool Pool;
 
         private string model = @"Data Source=(DESCRIPTION =(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(Host = {0})(PORT = {1})))(CONNECT_DATA =(SERVICE_NAME = {2})));User ID={3};Password={4}";
 
@@ -36,15 +33,11 @@ namespace Dooggy.Factory.Data
         public string port;
         public string service;
 
-        public DataBaseOracle(TestDataPool prmPool)
+        public DataBaseOracle(TestDataConnect prmConexao)
         {
 
-            Pool = prmPool;
+            Connect = prmConexao;
 
-        }
-
-        public DataBaseOracle()
-        {
         }
 
         public bool Add(string prmTag) => Pool.AddDataBase(prmTag, GetString());
@@ -52,4 +45,44 @@ namespace Dooggy.Factory.Data
         public string GetString() => String.Format(model, host, port, service, user, password);
 
     }
+    public class DataBaseOracleDefault
+    {
+
+        public TestDataConnect Connect;
+        public TestDataPool Pool => Connect.Pool;
+
+        private xJSON Args;
+
+        public void AddJSON(string prmTag, string prmDados)
+        {
+
+            Args = new xJSON(prmDados);
+
+            Connect.Oracle.user = Args.GetValor("user", prmPadrao: "desenvolvedor_sia");
+            Connect.Oracle.password = Args.GetValor("password", prmPadrao: "asdfg");
+
+            Connect.Oracle.host = Args.GetValor("host", prmPadrao: "10.250.1.35");
+            Connect.Oracle.port = Args.GetValor("port", prmPadrao: "1521");
+
+            string service = Args.GetValor("service", prmPadrao: "");
+            string stage = Args.GetValor("stage", prmPadrao: "");
+
+            if (service != "")
+                Connect.Oracle.service = Args.GetValor("service");
+
+            else if (stage != "")
+                Connect.Oracle.service = GetStage(prmStage: Args.GetValor("stage"));
+
+            else
+                Connect.Oracle.service = GetBranch(prmBranch: Args.GetValor("branch", prmPadrao: "1085"));
+
+            Connect.Oracle.Add(prmTag: Args.GetValor("tag", prmPadrao: "SIA"));
+
+        }
+
+        private string GetBranch(string prmBranch) => GetStage(prmStage: string.Format("branch_{0}", prmBranch));
+        private string GetStage(string prmStage) => prmStage + ".prod01.redelocal.oraclevcn.com";
+
+    }
+
 }

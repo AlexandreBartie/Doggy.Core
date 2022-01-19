@@ -20,7 +20,7 @@ namespace Dooggy
         public bool SetPath(string prmPath)
         {
 
-            if (xString.IsStringOK(prmPath))
+            if (xString.IsFull(prmPath))
             {
                 
                 path = prmPath;
@@ -69,7 +69,7 @@ namespace Dooggy
 
             string retorno = path;
 
-            if (xString.IsStringOK(prmSubPath))
+            if (xString.IsFull(prmSubPath))
             {
                 if (!TemTerminal)
                     retorno += @"\";
@@ -78,12 +78,12 @@ namespace Dooggy
 
             }
 
-            if (xString.IsStringOK(prmNome))
+            if (xString.IsFull(prmNome))
             {
 
                 retorno += prmNome;
 
-                if (xString.IsStringOK(prmExtensao))
+                if (xString.IsFull(prmExtensao))
                     retorno += "." + prmExtensao;
 
             }

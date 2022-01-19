@@ -15,7 +15,7 @@ namespace Dooggy
 
             string retorno = "";
 
-            if (xString.IsStringOK(prmTexto))
+            if (xString.IsFull(prmTexto))
             {
 
                 int inicio = prmTexto.IndexOf(prmDelimitadorInicial);
@@ -56,12 +56,12 @@ namespace Dooggy
         public static string GetBlocoAntes(string prmTexto, string prmDelimitador, bool prmTRIM)
         {
 
-            if (xString.IsStringOK(prmTexto))
+            if (xString.IsFull(prmTexto))
             {
 
                 string retorno = prmTexto;
 
-                if (xString.IsStringOK(prmDelimitador))
+                if (xString.IsFull(prmDelimitador))
                 {
 
                     int indice = prmTexto.IndexOf(prmDelimitador);
@@ -84,7 +84,7 @@ namespace Dooggy
         public static string GetBlocoDepois(string prmTexto, string prmDelimitador, bool prmTRIM)
         {
 
-            if (xString.IsStringOK(prmTexto) && xString.IsStringOK(prmDelimitador))
+            if (xString.IsFull(prmTexto) && xString.IsFull(prmDelimitador))
             {
 
                 int indice = prmTexto.IndexOf(prmDelimitador);
@@ -145,7 +145,7 @@ namespace Dooggy
 
             string retorno = "";
 
-            if (xString.IsStringOK(prmTexto) && IsPrefixo(prmTexto, prmPrefixo))
+            if (xString.IsFull(prmTexto) && IsPrefixo(prmTexto, prmPrefixo))
             {
 
                 if (xString.GetFind(prmTexto, prmDelimitador))

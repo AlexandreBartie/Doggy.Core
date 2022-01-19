@@ -25,7 +25,7 @@ namespace Dooggy.Factory.Data
     public class TestDataPool
     {
 
-        private DataBasesConnection Bases;
+        public DataBasesConnection Bases;
 
         public TestTrace Trace;
 
@@ -46,7 +46,6 @@ namespace Dooggy.Factory.Data
         public TestDataView DataViewCorrente => (Views.Corrente);
         public TestDataFluxo DataFluxoCorrente => (Fluxos.Corrente);
 
-
         public bool IsDbOK => (Bases.IsOK);
         public bool IsDbBlocked => bloqueado;
 
@@ -65,7 +64,7 @@ namespace Dooggy.Factory.Data
 
         }
 
-        public bool TestConnect() => Bases.Testar();
+        public bool DoConnect() => Bases.DoConnect();
 
         public bool AddDataBase(string prmTag, string prmConexao) => Bases.Criar(prmTag, prmConexao, this);
 
@@ -94,7 +93,6 @@ namespace Dooggy.Factory.Data
         }
 
         public void SetDBStatus(bool prmBloqueado) => bloqueado = prmBloqueado;
-        public void SetAncora(DateTime prmAncora) => Tratamento.SetAncora(prmAncora);
 
         public bool IsSQLDataException(string prmTexto) => Tratamento.IsSQLDataException(prmTexto);
         public string GetTextoTratado(string prmTexto) => Tratamento.GetTextoTratado(prmTexto);
@@ -110,7 +108,7 @@ namespace Dooggy.Factory.Data
     public class TestDataTratamento : TestDataException
     {
 
-        private DateTime ancora;
+        public DateTime anchor = DateTime.Now;
 
         private TestDataVars Vars => Pool.Vars;
         private TestDataRaws Raws => (Pool.Raws);
@@ -120,15 +118,6 @@ namespace Dooggy.Factory.Data
         {
 
             Pool = prmPool;
-
-            ancora = DateTime.Now;
-
-        }
-
-        public void SetAncora(DateTime prmAncora)
-        {
-
-            ancora = prmAncora;
 
         }
         public string GetTextoTratado(string prmTexto)
@@ -166,6 +155,10 @@ namespace Dooggy.Factory.Data
                 case "date":
                     return GetDataDinamica(prmParametro);
 
+                case "now":
+                case "today":
+                    return GetDataDinamica(prmParametro);
+
             }
 
             return ("");
@@ -174,12 +167,20 @@ namespace Dooggy.Factory.Data
         private string GetDataDinamica(string prmParametro)
         {
 
-            DynamicDate Date = new DynamicDate(ancora);
+            DynamicDate Date = new DynamicDate(anchor);
 
             return (Date.View(prmSintaxe: prmParametro));
 
         }
 
+        private string GetDataEstatica(string prmParametro)
+        {
+
+            DynamicDate Date = new DynamicDate(anchor);
+
+            return (Date.Static(prmSintaxe: prmParametro));
+
+        }
         private string GetSQLVariavel(string prmTexto)
         {
 
@@ -317,7 +318,7 @@ namespace Dooggy.Factory.Data
 
         }
 
-        public bool TestConnect() => Pool.TestConnect();
+        public bool DoConnect() => Pool.DoConnect();
 
         public bool AddDataBase(string prmTag, string prmConexao) => (Pool.AddDataBase(prmTag, prmConexao));
 
@@ -336,6 +337,8 @@ namespace Dooggy.Factory.Data
         public string csv(string prmTags) => (Pool.csv(prmTags));
         public string json(string prmTags) => (Pool.json(prmTags));
         public string output(string prmTags, eTipoFileFormat prmTipo) => (Pool.output(prmTags, prmTipo));
+
+        public string log => Pool.Bases.log();
 
     }
 

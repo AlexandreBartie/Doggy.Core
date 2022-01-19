@@ -54,7 +54,7 @@ namespace Dooggy.Factory.Console
         public void Compile(string prmCode)
         {
            
-            Result.SetCode(prmCode);
+            Result.SetCodeZero(prmCode);
 
             foreach (string linha in new xLinhas(prmCode))
 

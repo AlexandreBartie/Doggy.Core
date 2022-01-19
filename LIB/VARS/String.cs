@@ -8,7 +8,7 @@ namespace Dooggy
     public static class xString
     {
 
-        public static bool IsStringOK(string prmTexto)
+        public static bool IsFull(string prmTexto)
         {
             if (prmTexto != null)
                 return (prmTexto.Trim() != "");
@@ -16,9 +16,14 @@ namespace Dooggy
 
         }
 
-        public static bool IsEmpty(string prmTexto) => !(IsStringOK(prmTexto));
+        public static bool IsEmpty(string prmTexto) => !(IsFull(prmTexto));
 
         public static bool IsEqual(string prmTextoA, string prmTextoB) => GetLower(prmTextoA) == GetLower(prmTextoB);
+        public static bool IsNoEqual(string prmTextoA, string prmTextoB) => !IsEqual(prmTextoA,prmTextoB);
+
+
+        public static bool IsStartsWith(string prmTextoA, string prmTextoB) => GetLower(prmTextoA).StartsWith(GetLower(prmTextoB));
+
 
         public static bool IsContem(string prmTextoA, string prmTextoB) => IsContain(prmTextoA, prmTextoB, prmInverter: false);
 
@@ -34,7 +39,7 @@ namespace Dooggy
             else
                 { textoA = prmTextoA; textoB = prmTextoB; }
 
-            if (xString.IsStringOK(textoA) && xString.IsStringOK(textoB))
+            if (xString.IsFull(textoA) && xString.IsFull(textoB))
                 return GetLower(textoA).Contains(GetLower(textoB));
 
             return (false);
@@ -44,7 +49,7 @@ namespace Dooggy
         public static string GetLower(string prmTexto)
         {
 
-            if (IsStringOK(prmTexto))
+            if (IsFull(prmTexto))
                 return (prmTexto.ToLower().Trim());
 
             return ("");
@@ -56,7 +61,7 @@ namespace Dooggy
         public static string GetFirst(string prmTexto) => GetChar(prmTexto, prmIndice: 1);
         public static string GetFirst(string prmTexto, int prmTamanho)
         {
-            if (IsStringOK(prmTexto))
+            if (IsFull(prmTexto))
                 return GetSubstring(prmTexto, prmIndice: 1, prmTamanho);
 
             return ("");
@@ -64,7 +69,7 @@ namespace Dooggy
         }
         public static string GetFirst(string prmTexto, string prmDelimitador)
         {
-            if (IsStringOK(prmTexto))
+            if (IsFull(prmTexto))
             {
 
                 int indice = GetPosicao(prmTexto, prmDelimitador);
@@ -81,7 +86,7 @@ namespace Dooggy
         }
         public static string GetLast(string prmTexto)
             {
-                if (IsStringOK(prmTexto))
+                if (IsFull(prmTexto))
                     return GetChar(prmTexto, prmIndice: prmTexto.Length);
 
                 return ("");
@@ -93,7 +98,7 @@ namespace Dooggy
 
             int tamanho = prmTamanho;
 
-            if (IsStringOK(prmTexto))
+            if (IsFull(prmTexto))
             {
 
                 if (prmTamanho < 0)
@@ -107,7 +112,7 @@ namespace Dooggy
         }
         public static string GetLast(string prmTexto, string prmDelimitador)
         {
-            if (IsStringOK(prmTexto))
+            if (IsFull(prmTexto))
             {
                 
                 int indice = GetPosicao(prmTexto, prmDelimitador);
@@ -124,7 +129,7 @@ namespace Dooggy
         public static bool GetFind(string prmTexto, string prmParte) => (GetPosicao(prmTexto, prmParte) != 0);
         public static int GetPosicao(string prmTexto, string prmParte)
         {
-            if (IsStringOK(prmTexto))
+            if (IsFull(prmTexto))
             {
 
                 return (prmTexto.IndexOf(prmParte)) + 1;
@@ -139,7 +144,7 @@ namespace Dooggy
 
             int indice = prmIndice - 1;
 
-            if ((prmTamanho >= 1) && IsStringOK(prmTexto))
+            if ((prmTamanho >= 1) && IsFull(prmTexto))
 
                 if ((indice >= 0) && (prmTexto.Length >= indice + prmTamanho))
                     return (prmTexto.Substring(indice, prmTamanho));
@@ -152,7 +157,7 @@ namespace Dooggy
         public static string GetSubstituir(string prmTexto, string prmVelho, string prmNovo)
         {
 
-            if (IsStringOK(prmTexto))
+            if (IsFull(prmTexto))
                 return (prmTexto.Replace(prmVelho, prmNovo));
 
             return ("");
@@ -168,7 +173,7 @@ namespace Dooggy
         public static string GetReverse(string prmTexto)
         {
 
-            if (IsStringOK(prmTexto))
+            if (IsFull(prmTexto))
                 return (new string(prmTexto.Reverse().ToArray()));
 
             return ("");
@@ -176,7 +181,7 @@ namespace Dooggy
         public static string GetNoBlank(string prmTexto)
         {
 
-            if (IsStringOK(prmTexto))
+            if (IsFull(prmTexto))
                 return (GetRemove(prmTexto, " "));
 
             return ("");
