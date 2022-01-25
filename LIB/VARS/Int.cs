@@ -38,20 +38,13 @@ namespace Dooggy
         }
         public static int GetNumero(string prmValor)
         {
-
             try
             {
-
                 if (xString.IsFull(prmValor))
                     return (Convert.ToInt32(prmValor));
-
             }
             catch
-            {
-
-
-            }
-  
+            { }
             return (-1);
 
         }

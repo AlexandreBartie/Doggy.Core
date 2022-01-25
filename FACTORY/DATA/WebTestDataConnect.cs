@@ -12,6 +12,8 @@ namespace Dooggy.Factory.Data
 
         private DataBaseOracle _Oracle;
 
+        public int command_timeout = 20;
+
         public DataBaseOracle Oracle { get { if (_Oracle == null) _Oracle = new DataBaseOracle(this); return _Oracle; } }
 
         public TestDataConnect(TestDataPool prmPool)
@@ -19,12 +21,13 @@ namespace Dooggy.Factory.Data
             Pool = prmPool;
         }
 
+        public void SetCommandTimeOut(int prmSegundos) => command_timeout = prmSegundos;
 
     }
     public class DataBaseOracle : DataBaseOracleDefault
     {
 
-        private string model = @"Data Source=(DESCRIPTION =(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(Host = {0})(PORT = {1})))(CONNECT_DATA =(SERVICE_NAME = {2})));User ID={3};Password={4}";
+        private string model = @"Data Source=(DESCRIPTION =(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(Host = {0})(PORT = {1})))(CONNECT_DATA =(SERVICE_NAME = {2})));User ID={3};Password={4};Connection Timeout={5}";
 
         public string user;
         public string password;
@@ -32,6 +35,8 @@ namespace Dooggy.Factory.Data
         public string host;
         public string port;
         public string service;
+
+        public string timeout;
 
         public DataBaseOracle(TestDataConnect prmConexao)
         {
@@ -42,7 +47,7 @@ namespace Dooggy.Factory.Data
 
         public bool Add(string prmTag) => Pool.AddDataBase(prmTag, GetString());
 
-        public string GetString() => String.Format(model, host, port, service, user, password);
+        public string GetString() => String.Format(model, host, port, service, user, password, timeout);
 
     }
     public class DataBaseOracleDefault
@@ -58,25 +63,17 @@ namespace Dooggy.Factory.Data
 
             Args = new xJSON(prmDados);
 
-            Connect.Oracle.user = Args.GetValor("user", prmPadrao: "desenvolvedor_sia");
-            Connect.Oracle.password = Args.GetValor("password", prmPadrao: "asdfg");
-
             Connect.Oracle.host = Args.GetValor("host", prmPadrao: "10.250.1.35");
             Connect.Oracle.port = Args.GetValor("port", prmPadrao: "1521");
 
-            string service = Args.GetValor("service", prmPadrao: "");
-            string stage = Args.GetValor("stage", prmPadrao: "");
+            Connect.Oracle.service = Args.GetValor("service");
 
-            if (service != "")
-                Connect.Oracle.service = Args.GetValor("service");
+            Connect.Oracle.user = Args.GetValor("user", prmPadrao: "desenvolvedor_sia");
+            Connect.Oracle.password = Args.GetValor("password", prmPadrao: "asdfg");
 
-            else if (stage != "")
-                Connect.Oracle.service = GetStage(prmStage: Args.GetValor("stage"));
+            Connect.Oracle.timeout = Args.GetValor("timeout", prmPadrao: "10");
 
-            else
-                Connect.Oracle.service = GetBranch(prmBranch: Args.GetValor("branch", prmPadrao: "1085"));
-
-            Connect.Oracle.Add(prmTag: Args.GetValor("tag", prmPadrao: "SIA"));
+            Connect.Oracle.Add(prmTag.ToUpper());
 
         }
 

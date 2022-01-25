@@ -82,41 +82,35 @@ namespace Dooggy.Factory
 
         public void SQLViewsSelection(string prmTag, int prmQtde)
         {
-
             if (prmQtde > 0)
                 msgSet(string.Format(@"-view:[{0}] -itens: {1}", prmTag, prmQtde));
             else
                 msgErro(string.Format(@"msg# -view[{0}] -desc: View sem dados", prmTag));
-
         }
 
         private void GetSQLExecution(string prmMsg, bool prmTemDados)
         {
-
             if (prmTemDados)
                 msgSQL(prmMsg);
             else
-                msgZero(prmMsg);
-
+                msgErro(prmMsg, prmErro: "ZERO Results");
         }
 
     }
     public class TestTraceLogData_Fail : TestTraceLog
     {
 
-        public void FailDBBlocked(string prmTag, string prmConexao) => FailConnection(prmMSG: "Conexão DB bloqueado", prmTag, prmVar: "-string", prmConexao, prmErro: @"APENAS para testes unitários.");
-        public void FailDBConnection(string prmTag, string prmConexao, Exception prmErro) => FailConnection(prmMSG: "Conexão DB falhou", prmTag, prmVar: "-string", prmConexao, prmErro);
-        public void FailSQLConnection(string prmTag, string prmSQL, Exception prmErro) => FailConnection(prmMSG: "Comando SQL falhou", prmTag, prmVar: "-sql", prmSQL, prmErro);
-        public void FailSQLNoDataBaseConnection(string prmTag, string prmSQL, Exception prmErro) => FailConnection(prmMSG: "DB foi desconectado", prmTag, prmVar: "-sql", prmSQL, prmErro);
-
-        public void FailSQLDataModelConnection(string prmTag, string prmModel, Exception prmErro) => FailConnection(prmMSG: "Model View não foi criado adequadamente.", prmTag, prmModel, prmErro);
-        public void FailNoDataViewDetected(string prmTag) => msgErro(prmTexto: string.Format("Data View não foi identificado ... >>> fluxo: [{0}] não executou o SQL ...", prmTag));
+        public void FailDBBlocked(string prmTag, string prmConexao) => FailConnection(prmMSG: "Conexão bloqueada", prmTag, prmVar: "-string", prmConexao, prmErro: @"APENAS para testes unitários.");
+        public void FailDBConnection(string prmTag, string prmConexao, Exception prmErro) => FailConnection(prmMSG: "Conexão falhou", prmTag, prmVar: "-string", prmConexao, prmErro);
+        public void FailSQLConnection(string prmTag, string prmSQL, Exception prmErro) => FailConnection(prmMSG: "SQL falhou", prmTag, prmVar: "-sql", prmSQL, prmErro);
+        public void FailSQLNoDataBaseConnection(string prmTag, string prmSQL, Exception prmErro) => FailConnection(prmMSG: "DB Desconectado", prmTag, prmVar: "-sql", prmSQL, prmErro);
+        public void FailNoDataViewDetected(string prmTag) => msgErro(prmTexto: string.Format("Data View não identificada ... >>> fluxo: [{0}] não executou o SQL ...", prmTag));
 
         private void FailConnection(string prmMSG, string prmTag, string prmVar, Exception prmErro) => FailConnection(prmMSG, prmTag, prmVar, GetMsgErro(prmErro));
         private void FailConnection(string prmMSG, string prmTag, string prmVar, string prmErro) => msgErro(String.Format(@"{0} >>> tag:[{1}] {2}", prmMSG, prmTag, prmVar), prmErro);
 
         private void FailConnection(string prmMSG, string prmTag, string prmVar, string prmSQL, Exception prmErro) => FailConnection(prmMSG, prmTag, prmVar, prmSQL, GetMsgErro(prmErro));
-        private void FailConnection(string prmMSG, string prmTag, string prmVar, string prmSQL, string prmErro) => msgErro(String.Format(@"{0}. -error: {1} >>> tag:[{2}] {3}: {4}", prmMSG, prmErro, prmTag, prmVar, prmSQL));
+        private void FailConnection(string prmMSG, string prmTag, string prmVar, string prmSQL, string prmErro) => msgErro(String.Format(@">>>> [{0}] -db:[{1}] {2}: {3} -error: {4}", prmMSG, prmTag, prmVar, prmSQL, prmErro));
 
         private string GetMsgErro(Exception prmErro) { if (prmErro != null) return (prmErro.Message); return (""); }
 
@@ -227,7 +221,6 @@ namespace Dooggy.Factory
     {
 
         public void msgApp(string prmTrace) => Message(prmTipo: "APP", prmTrace);
-        public void msgZero(string prmTrace) => Message(prmTipo: "ZERO", prmTrace);
         public void msgCode(string prmTrace) => Message(prmTipo: "CODE", prmTrace);
         public void msgSet(string prmTrace) => Message(prmTipo: "SET", prmTrace, prmPrefixo: "def" );
         public void msgPlay(string prmTrace) => Message(prmTipo: "PLAY", prmTrace);
@@ -249,8 +242,7 @@ namespace Dooggy.Factory
         public void msgErro(Exception e) => Message(prmTipo: "ERRO", e.Message);
 
         public void msgErro(string prmTexto, Exception e) => msgErro(prmTexto, prmErro: e.Message);
-        public void msgErro(string prmTexto, string prmErro) => Message(prmTipo: "ERRO", String.Format("{0} >>> Error: [{1}]", prmTexto, prmErro));
-
+        public void msgErro(string prmTexto, string prmErro) => Message(prmTipo: "ERRO", String.Format(">>>> [{0}] {1}", prmErro, prmTexto));
     }
 
     public class TestTraceWrite
@@ -265,13 +257,16 @@ namespace Dooggy.Factory
 
         }
 
-        protected void Message(string prmTipo, string prmTexto, string prmPrefixo) => Message(prmTipo, prmPrefixo + "# " + prmTexto);
-        protected void Message(string prmTipo, string prmTexto)
+        protected void Message(string prmTipo, string prmTexto) => Message(prmTipo, prmTexto, prmPrefixo: "");
+        protected void Message(string prmTipo, string prmTexto, string prmPrefixo)
         {
+            string texto = prmTexto;
 
-            if (Trace.Exibir(prmTipo, prmTexto))
+            if (prmPrefixo != "")
+                texto = prmPrefixo + "# " + texto;
+
+            if (Trace.Exibir(prmTipo, texto))
                 Trace.OnLogExecutado();
-
         }
 
     }

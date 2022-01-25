@@ -26,8 +26,13 @@ namespace Dooggy.Factory.Console
         public void Play()
         {
 
-            foreach (TestCommand command in this)
-                command.Play();
+            if (Script.DoConnect())
+            {
+
+                foreach (TestCommand command in this)
+                    command.Play();
+
+            }
 
         }
 

@@ -138,6 +138,7 @@ namespace Dooggy
     public static class Prefixo
     {
         public static bool IsPrefixo(string prmTexto, string prmPrefixo) => (xString.GetFirst(prmTexto, prmTamanho: prmPrefixo.Length) == prmPrefixo);
+        public static string GetPrefixo(string prmTexto, string prmPrefixo) => GetPrefixo(prmTexto, prmPrefixo, prmDelimitador:"");
         public static string GetPrefixo(string prmTexto, string prmPrefixo, string prmDelimitador) => GetPrefixo(prmTexto, prmPrefixo, prmDelimitador, prmPreserve: false);
         public static string GetPrefixo(string prmTexto, string prmPrefixo, string prmDelimitador, bool prmPreserve)
         {

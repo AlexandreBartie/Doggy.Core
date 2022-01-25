@@ -103,12 +103,12 @@ namespace Dooggy.Factory.Data
 
         }
 
-        public string tag_view { get => View.tag; }
+        public string tag_view  => View.tag;
 
-        public string header_txt { get => View.header_txt; }
+        public string header_txt => View.header_txt;
 
-        public bool IsOK { get => Cursor.IsOK(); }
-        public Exception erro { get => Cursor.erro; }
+        public bool IsOK => Cursor.IsOK;
+        public Exception erro => Cursor.erro;
 
         public TestDataFluxo(string prmTag, string prmSQL, string prmMask, TestDataView prmDataView)
         {

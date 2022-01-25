@@ -119,6 +119,10 @@ namespace Dooggy
 
                 if (indice != 0)
                 {
+
+
+
+
                     return GetSubstring(prmTexto, prmIndice: indice + 1, prmTamanho: prmTexto.Length - indice);
                 }
             }
@@ -132,7 +136,7 @@ namespace Dooggy
             if (IsFull(prmTexto))
             {
 
-                return (prmTexto.IndexOf(prmParte)) + 1;
+                return (prmTexto.IndexOf(prmParte)) + prmParte.Length;
             }
 
             return (0);

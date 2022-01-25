@@ -63,9 +63,7 @@ namespace Dooggy.Factory.Console
 
         }
 
-        public void SetAnchor(DateTime prmAncora) => Config.Anchor.SetDate(prmAncora);
-        public void SetAnchor(string prmAncora) => Config.Anchor.SetDate(prmAncora);
-
+        public void SetAnchor(DateTime prmAncora) => Config.Perfil.SetToday(prmAncora);
 
         public void SetDBStatus(bool prmBloqueado) => Pool.SetDBStatus(prmBloqueado);
         public void AddLog() => Scripts.AddLog();
@@ -157,6 +155,18 @@ namespace Dooggy.Factory.Console
 
         }
 
+        public string GetLista()
+        {
+
+            xMemo memo = new xMemo(prmSeparador: Environment.NewLine);
+
+            foreach (TestConsoleScript Script in this)
+                memo.Add(Script.key);
+
+            return (memo.memo() + Environment.NewLine);
+
+        }
+
     }
     public class TestConsoleScript
     {
@@ -202,6 +212,8 @@ namespace Dooggy.Factory.Console
 
         }
 
+        public bool DoConnect() => Dados.DoConnect();
+
         public void SetCode(string prmCode) => Result.SetCode(prmCode);
 
         public void Play(string prmCode, string prmArquivoOUT) => Build(prmCode, prmArquivoOUT, prmPlay: true);
@@ -215,7 +227,7 @@ namespace Dooggy.Factory.Console
 
             Builder.Compile(prmCode);
 
-            if (Dados.DoConnect() && prmPlay)
+            if (prmPlay)
                 Commands.Play();
 
             Result.LogStop();
@@ -379,12 +391,16 @@ namespace Dooggy.Factory.Console
 
         private Path PathOUT;
 
+        private Path PathLOG;
+
         public TestConsoleOutput(TestConsole prmConsole)
         {
 
             Console = prmConsole;
 
             PathOUT = new Path();
+
+            PathLOG = new Path();
 
         }
 
@@ -405,6 +421,14 @@ namespace Dooggy.Factory.Console
             Trace.LogPath.SetPath(prmContexto: "DestinoMassaTestes", prmPath);
 
         }
+        public void SetPathLOG(string prmPath)
+        {
+
+            PathLOG.SetPath(prmPath);
+
+            Trace.LogPath.SetPath(prmContexto: "LogMassaTestes", prmPath);
+
+        }
         public string GetScriptOrigem()
         {
 
@@ -420,6 +444,8 @@ namespace Dooggy.Factory.Console
         public string GetPath() => (PathOUT.path);
         public string GetPath(string prmSubPath) => (PathOUT.GetPath(prmSubPath));
         public string GetPathFull(eTipoFileFormat prmTipo) => (GetPath(prmSubPath: GetExtensao(prmTipo)));
+
+        public string GetPathLOG() => (PathLOG.path);
 
     }
     public class TestConsoleIO
