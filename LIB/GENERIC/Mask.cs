@@ -73,16 +73,6 @@ namespace Dooggy.Lib.Generic
             }
         }
 
-        //private bool IsZero(char prmItem, char prmMask)
-        //{
-
-        //    if (prmMask == msk_numero)
-        //        return (prmItem == chr_zero);
-
-        //    return false;
-
-        //}
-
         private bool IsReservado(char prmItem)
         {
 

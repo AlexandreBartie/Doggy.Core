@@ -147,11 +147,6 @@ namespace Dooggy.Lib.Files
 
         }
 
-        public string memo()
-        {
-            return string.Format("CT[{0,30}]: {1}{2}", nome, Parametros.memo(), Fluxos.memo()) ; 
-        }
-
     }
     public class TestParametersJUnit
     {
@@ -195,7 +190,7 @@ namespace Dooggy.Lib.Files
             return ("{ "+ lista + " }");
 
         }
-        public string memo() => Lista.memo(TestCase.separador);
+        public string txt() => Lista.txt(TestCase.separador);
  
     }
     public class TestDataJUnit
@@ -223,23 +218,6 @@ namespace Dooggy.Lib.Files
 
             Dados.Add(item);
 
-        }
-        public string memo()
-        {
-
-            string lista = "";
-            string aux = "";
-
-            foreach (xMemo fluxo in Dados)
-            {
-
-                lista += aux + (fluxo.memo(TestCase.separador));
-
-                aux = Environment.NewLine;
-
-            }
-
-            return lista;
         }
 
     }
@@ -286,7 +264,7 @@ namespace Dooggy.Lib.Files
             foreach (xMemo fluxo in Dados)
             {
 
-                lista += aux + (fluxo.memo(File.separador));
+                lista += aux + (fluxo.txt(File.separador));
 
                 aux = Environment.NewLine;
 

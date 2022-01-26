@@ -199,9 +199,7 @@ namespace Dooggy.Lib.Generic
             Parse(prmLista);
 
         }
-
         public virtual void Parse(string prmLista) => Parse(prmLista, separador);
-
         public virtual void Parse(string prmLista, string prmSeparador)
         {
 
@@ -228,7 +226,7 @@ namespace Dooggy.Lib.Generic
 
         public bool IsRange(int prmIndice) => ((prmIndice >= 1) && (prmIndice <= qtde));
 
-        public string log { get => GetTXT(); }
+        public string log { get => GetLOG(); }
 
         public bool Excluir(int prmIndice)
         {
@@ -332,7 +330,7 @@ namespace Dooggy.Lib.Generic
         {
             return GetFind(prmTexto).Replace(prmTexto, "");
         }
-        private string GetTXT()
+        private string GetLOG()
         {
 
             string aux = "";
@@ -350,22 +348,11 @@ namespace Dooggy.Lib.Generic
 
             return (resultado);
         }
-    }
-    public class xMemo : xLista
-    {
-        public xMemo()
-        { }
-        public xMemo(string prmSeparador)
-        { separador = prmSeparador; }
 
-        public xMemo(string prmTexto, string prmSeparador)
-        { separador = prmSeparador; Parse(prmTexto); }
+        public string csv { get => txt(", "); }
+        public string txt() => txt(separador);
 
-        public string csv { get => memo(", "); }
-
-        public string memo() => memo(separador);
-
-        public string memo(string prmSeparador)
+        public string txt(string prmSeparador)
         {
 
             string lista = "";
@@ -383,7 +370,18 @@ namespace Dooggy.Lib.Generic
             return lista;
         }
 
-        public string txt() => memo(prmSeparador: Environment.NewLine);
+    }
+    public class xMemo : xLista
+    {
+        public xMemo()
+        { }
+        public xMemo(string prmSeparador)
+        { separador = prmSeparador; }
+
+        public xMemo(string prmTexto, string prmSeparador)
+        { separador = prmSeparador; Parse(prmTexto); }
+
+        public string memo() => txt(prmSeparador: Environment.NewLine);
 
     }
     public class xMask
@@ -404,14 +402,11 @@ namespace Dooggy.Lib.Generic
 
         }
 
-        public string GetValor(string prmValor, string prmKey)
-        {
+        public string GetFormat(string prmKey, string prmValor) => mask.Get(prmValor, GetFormato(prmKey));
+        public string GetFormatDate(string prmKey, DateTime prmValor, string prmPadrao) => xDate.GetFormatacao(prmValor, GetFormato(prmKey, prmPadrao));
 
-            string formato = lista.GetValor(prmKey);
-
-            return mask.Get(prmValor, formato);
-
-        }
+        private string GetFormato(string prmKey) => GetFormato(prmKey, prmPadrao: "");
+        private string GetFormato(string prmKey, string prmPadrao) => lista.GetValor(prmKey, prmPadrao);
 
     }
     public class xLinhas : xMemo

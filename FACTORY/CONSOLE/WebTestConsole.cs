@@ -48,7 +48,9 @@ namespace Dooggy.Factory.Console
 
         }
 
-        public bool Setup(string prmArquivoCFG) => Config.Setup(prmArquivoCFG);
+        public bool EXE(string prmArquivoCFG) => Setup(prmArquivoCFG, prmPlay: true);
+        public bool Setup(string prmArquivoCFG) => Setup(prmArquivoCFG, prmPlay: false);
+        private bool Setup(string prmArquivoCFG, bool prmPlay) => Config.Setup(prmArquivoCFG, prmPlay); 
 
         public void Setup(string prmPathINI, string prmPathOUT) => Setup(prmPathINI, prmPathOUT, prmStart: false);
         public void Setup(string prmPathINI, string prmPathOUT, bool prmStart)
@@ -63,7 +65,7 @@ namespace Dooggy.Factory.Console
 
         }
 
-        public void SetAnchor(DateTime prmAncora) => Config.Perfil.SetToday(prmAncora);
+        public void SetAnchor(DateTime prmAncora) => Config.Format.SetToday(prmAncora);
 
         public void SetDBStatus(bool prmBloqueado) => Pool.SetDBStatus(prmBloqueado);
         public void AddLog() => Scripts.AddLog();
@@ -330,7 +332,7 @@ namespace Dooggy.Factory.Console
             foreach (TestItemLog item in this)
                 memo.Add(item.msg);
 
-            return (memo.txt() + Environment.NewLine);
+            return (memo.memo() + Environment.NewLine);
         }
 
     }

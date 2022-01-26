@@ -591,7 +591,7 @@ namespace Dooggy.Factory.Data
 
         private TestTrace Trace { get => Pool.Trace; }
 
-        private string output { get => Itens.memo(prmSeparador: Environment.NewLine) + Environment.NewLine ; }
+        private string output { get => Itens.memo() + Environment.NewLine ; }
 
         public TestDataRaws(TestDataPool prmPool)
         {

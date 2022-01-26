@@ -16,8 +16,6 @@ namespace Dooggy.Lib.Data
     public class DataCursorConnection : DataCursorDados
     {
 
-        private DataBaseConnection DataBase;
-
         public Exception erro;
 
         private string _sql;
@@ -91,6 +89,10 @@ namespace Dooggy.Lib.Data
 
     public class DataCursorDados
     {
+        
+        public DataBaseConnection DataBase;
+
+        public TestDataTratamento Tratamento => DataBase.Pool.Tratamento;
 
         public OracleDataReader reader;
 
@@ -117,29 +119,48 @@ namespace Dooggy.Lib.Data
             return reader.GetName(prmIndice);
 
         }
-        public string GetValor(int prmIndice)
+        public string GetValor(int prmIndice) => GetValorTratado(prmIndice);
+        public string GetValor(string prmCampo) => GetValorTratado(prmCampo);
+
+        private string GetValorTratado(string prmCampo) => GetValorTratado(prmIndice: reader.GetOrdinal(prmCampo));
+        private string GetValorTratado(int prmIndice)
         {
 
-            string valor = reader.GetOracleValue(prmIndice).ToString();
+            string tipo = reader.GetDataTypeName(prmIndice).ToLower();
 
-            return GetMask(valor, prmName: GetName(prmIndice));
+            string campo = GetName(prmIndice);
+
+            switch (tipo)
+            {
+
+                case "date":
+                    return GetMaskDate(campo, prmData: reader.GetDateTime(prmIndice));
+
+
+                default:
+                    return GetMask(campo, prmTexto: reader.GetOracleValue(prmIndice).ToString());
+
+            }
+
 
         }
-        public string GetValor(string prmNome)
-        {
 
-            string valor = reader.GetString(prmNome);
-
-            return GetMask(valor, prmNome);
-
-        }
-        private string GetMask(string prmValor, string prmName)
+        private string GetMask(string prmCampo, string prmTexto)
         {
 
             if (IsMask)
-                return Mask.GetValor(prmValor, prmName);
+                return Mask.GetFormat(prmCampo, prmTexto);
 
-            return (prmValor);
+            return (prmTexto);
+
+        }
+        private string GetMaskDate(string prmCampo, DateTime prmData)
+        {
+
+            if (IsMask)
+                return Mask.GetFormatDate(prmCampo, prmData, Tratamento.dateFormatDefault);
+
+            return (Tratamento.GetDateFormat(prmData));
 
         }
         public string GetCSV(string prmSeparador)
@@ -232,7 +253,7 @@ namespace Dooggy.Lib.Data
 
         public bool IsOK => _isOpen;
         public int command_timeout => Pool.Connect.command_timeout;
-        public string log => string.Format("{0}: {1}", tag, status);
+        public string log => string.Format("-db[{0}]: {1}", tag, status);
 
         private string SetStatus(string prmStatus) { status = prmStatus; _isOpen = (prmStatus == "CONECTADO");  return prmStatus; }
 
@@ -333,12 +354,12 @@ namespace Dooggy.Lib.Data
         public string log()
         {
 
-            string memo = "";
+            xMemo lista = new xMemo(prmSeparador: ", ");
 
-            foreach (DataBaseConnection db in this)
-                memo += db.log + Environment.NewLine;
+                foreach (DataBaseConnection db in this)
+                lista.Add(db.log);
 
-            return memo;
+            return ">dbase: " + lista.txt();
 
         }
 

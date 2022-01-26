@@ -175,7 +175,7 @@ namespace Dooggy
             foreach (Arquivo file in this)
                 memo.Add(file.nome);
 
-            return memo.memo();
+            return memo.txt();
 
         }
         private string GetLinhas()
@@ -186,7 +186,7 @@ namespace Dooggy
             foreach (Arquivo file in this)
                 memo.Add(String.Format("#{0}", file.qtde_linhas));
 
-            return memo.memo();
+            return memo.txt();
 
         }
         private string[] GetFiles(string prmFiltro)

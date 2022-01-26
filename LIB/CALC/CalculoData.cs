@@ -133,18 +133,9 @@ namespace Dooggy
 
         public void Setup(string prmFormat) => formatacao_data = prmFormat;
 
-        public string GetView(DateTime prmData)
-        {
+        public string GetView(DateTime prmData) => xDate.GetFormatacao(prmData, GetFormato());
 
-            string formato = GetFormatacaoAtual();
-
-            string retorno = prmData.ToString(formato);
-
-            return (retorno);
-
-        }
-
-        private string GetFormatacaoAtual() 
+        private string GetFormato() 
         {
 
             string formato;
@@ -152,35 +143,12 @@ namespace Dooggy
             if (formatacao_data != "") 
                 formato = formatacao_data;
             else
-               formato = formatacao_padrao;
+                formato = formatacao_padrao;
 
-            return (GetFormatacaoAjustada(formato));
+            return (formato);
         
         }
 
-        private string GetFormatacaoAjustada(string prmFormato)
-        {
-
-            string formato = GetFormatacao(prmFormato);
-
-            formato = xString.GetSubstituir(formato, "A", "y");
-            formato = xString.GetSubstituir(formato, "a", "y");
-
-            formato = xString.GetSubstituir(formato, "D", "d");
-            formato = xString.GetSubstituir(formato, "m", "M");
-
-            return (formato);
-
-        }
-        private string GetFormatacao(string prmFormato)
-        {
-
-            if (prmFormato == "")
-                return (formatacao_data);
-
-            return (prmFormato);
-
-        }
     }
     public class DynamicDateAnchor : DynamicDateParameters
     {

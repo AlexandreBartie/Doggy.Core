@@ -12,6 +12,7 @@ namespace Dooggy.Factory.Data
 
         private DataBaseOracle _Oracle;
 
+        public int connect_timeout = 30;
         public int command_timeout = 20;
 
         public DataBaseOracle Oracle { get { if (_Oracle == null) _Oracle = new DataBaseOracle(this); return _Oracle; } }
@@ -21,6 +22,7 @@ namespace Dooggy.Factory.Data
             Pool = prmPool;
         }
 
+        public void SetConnectTimeOut(int prmSegundos) => connect_timeout = prmSegundos;
         public void SetCommandTimeOut(int prmSegundos) => command_timeout = prmSegundos;
 
     }
@@ -35,8 +37,7 @@ namespace Dooggy.Factory.Data
         public string host;
         public string port;
         public string service;
-
-        public string timeout;
+        public int timeout => Connect.connect_timeout;
 
         public DataBaseOracle(TestDataConnect prmConexao)
         {
@@ -70,8 +71,6 @@ namespace Dooggy.Factory.Data
 
             Connect.Oracle.user = Args.GetValor("user", prmPadrao: "desenvolvedor_sia");
             Connect.Oracle.password = Args.GetValor("password", prmPadrao: "asdfg");
-
-            Connect.Oracle.timeout = Args.GetValor("timeout", prmPadrao: "10");
 
             Connect.Oracle.Add(prmTag.ToUpper());
 

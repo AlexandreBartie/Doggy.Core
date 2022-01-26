@@ -105,10 +105,8 @@ namespace Dooggy.Factory.Data
 
     }
 
-    public class TestDataTratamento : TestDataException
+    public class TestDataTratamento : TestDataFormat
     {
-
-        public DateTime anchor = DateTime.Now;
 
         private TestDataVars Vars => Pool.Vars;
         private TestDataRaws Raws => (Pool.Raws);
@@ -239,7 +237,21 @@ namespace Dooggy.Factory.Data
         }
 
     }
+    public class TestDataFormat : TestDataException
+    {
 
+        public DateTime anchor = DateTime.Now;
+
+        public string dateFormatDefault = "DD/MM/AAAA";
+
+
+        public string GetDateAnchor() => GetDateAnchor(dateFormatDefault);
+        public string GetDateAnchor(string prmFormatacao) => GetDateFormat(anchor, prmFormatacao);
+
+        public string GetDateFormat(DateTime prmData) => GetDateFormat(prmData, dateFormatDefault);
+        public string GetDateFormat(DateTime prmData, string prmFormatacao) => xDate.GetFormatacao(prmData, prmFormatacao);
+
+    }
     public class TestDataException
     {
 
@@ -338,7 +350,7 @@ namespace Dooggy.Factory.Data
         public string json(string prmTags) => (Pool.json(prmTags));
         public string output(string prmTags, eTipoFileFormat prmTipo) => (Pool.output(prmTags, prmTipo));
 
-        public string log => Pool.Bases.log();
+        public string log() => Pool.Bases.log();
 
     }
 

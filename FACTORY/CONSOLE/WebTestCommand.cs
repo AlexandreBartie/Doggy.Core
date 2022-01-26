@@ -172,8 +172,8 @@ namespace Dooggy.Factory.Console
         private void PlayParametros()
         {
 
-            foreach (TestCommandParameter parametro in Command.Parametros)
-                PlayArg(parametro.arg, parametro.instrucao);
+            foreach (TestCommandParameter Parametro in Command.Parametros)
+                PlayArg(Parametro.arg, Parametro.Instrucao.txt());
 
         }
 
@@ -228,9 +228,7 @@ namespace Dooggy.Factory.Console
 
         public string arg;
 
-        private xMemo Memo;
-
-        public string instrucao { get => Memo.memo(); }
+        public xLista Instrucao;
 
         private TestTrace Trace { get => Command.Trace; }
 
@@ -239,7 +237,7 @@ namespace Dooggy.Factory.Console
 
             arg = prmArg;
 
-            Memo = new xMemo(prmSeparador: " ");
+            Instrucao = new xMemo(prmSeparador: " ");
 
             Command = prmCommand;
 
@@ -248,7 +246,7 @@ namespace Dooggy.Factory.Console
         public void Add(string prmLinha)
         {
 
-            Memo.Add(prmLinha);
+            Instrucao.Add(prmLinha);
 
             Trace.LogConsole.WriteKeyWordArg(arg, prmLinha);
 

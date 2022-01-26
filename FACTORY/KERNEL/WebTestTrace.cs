@@ -30,6 +30,8 @@ namespace Dooggy.Factory
 
         public TestTraceLogRobot LogRobot;
 
+        public TestTraceLogConfig LogConfig;
+
         public TestTraceLogConsole LogConsole;
 
         public TestTraceMsg Msg;
@@ -50,6 +52,8 @@ namespace Dooggy.Factory
             LogPath = new TestTraceLogPath();
 
             LogRobot = new TestTraceLogRobot();
+
+            LogConfig = new TestTraceLogConfig();
 
             LogConsole = new TestTraceLogConsole();
 
@@ -196,7 +200,19 @@ namespace Dooggy.Factory
         public void TargetNotFound(string prmTAG) => msgErro("TARGET NOT FOUND: " + prmTAG);
 
     }
-    public class TestTraceLogConsole : TestTraceLog
+    public class TestTraceLogConfig : TestTraceLog
+    {
+        public void LoadConfig(string prmArquivoCFG) => msgSet(String.Format("Arquivo CFG carregado ... -file: {0}", prmArquivoCFG));
+
+        public void FailLoadConfig(string prmArquivoCFG, string prmStatus) => msgSet(String.Format("Parâmetros incompletos no arquivo CFG ... -file: {0} -status: {1}", prmArquivoCFG, prmStatus));
+
+        public void FailFindGroup(string prmGroup) => msgErro(String.Format("Grupo do arquivo CFG não encontrado ... -grp: {0}", prmGroup));
+
+        public void FailFindParameter(string prmParameter, string prmValor) => msgErro(String.Format("Parâmetro do arquivo CFG não encontrado ... -item: {0} -valor: {1}", prmParameter, prmValor));
+
+
+    }
+    public class TestTraceLogConsole : TestTraceLogConsole_Fail
     {
 
         public void SetScript(string prmScript) => msgSet(String.Format("Script Selecionado ... -ini: {0}", prmScript));
@@ -207,6 +223,10 @@ namespace Dooggy.Factory
 
         public void WriteKeyWordArg(string prmArg, string prmParametros) => msgCode(String.Format("  -{0}: {1}", prmArg, prmParametros));
 
+    }
+    public class TestTraceLogConsole_Fail : TestTraceLog
+    {
+
         public void FailFindKeyWord(string prmKeyWord) => msgErro(String.Format("Keyword não encontrada ... -key: {0}", prmKeyWord));
 
         public void FailActionKeyWord(string prmKeyWord) => msgErro(String.Format("Keyword não executada ... -key: {0}", prmKeyWord));
@@ -216,7 +236,9 @@ namespace Dooggy.Factory
         public void FailArgMergeKeyWord(string prmKeyWord, string prmLinha) => msgErro(String.Format("Argumento-Keyword foi ignorado ... -key: {0} -line: [{1}]", prmKeyWord, prmLinha));
 
         public void FailFindValueVariable(string prmVariable, string prmTexto) => msgErro(String.Format("Variável não encontrada ... -var: {0} -txt: {1}", prmVariable, prmTexto));
+
     }
+
     public class TestTraceLog : TestTraceErro
     {
 
