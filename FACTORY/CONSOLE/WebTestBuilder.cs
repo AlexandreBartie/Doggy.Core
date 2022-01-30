@@ -21,31 +21,27 @@ namespace Dooggy.Factory.Console
         view = 20,
         item = 21,
 
-        savetxt = 51,
-        savecsv = 52,
-        savejson = 53,
+        save = 50,
 
     }
 
     public class TestBuilder
     {
 
-        private TestConsoleScript Script;
-        
+        private TestCode Code;
+
         private TestSintaxe Sintaxe;
 
-        public TestConsole Console { get => Script.Console; }
-
-        private TestCommands Commands { get => Script.Commands; }
-
+        public TestConsole Console { get => Code.Console; }
+        public TestScript Script { get => Code.Script; }
+        private TestBlocks Blocks { get => Code.Blocks; }
+        public TestResult Result { get => Code.Result; }
         public TestTrace Trace { get => Console.Trace; }
 
-        public TestConsoleResult Result { get => Script.Result; }
-
-        public TestBuilder(TestConsoleScript prmScript)
+        public TestBuilder(TestCode prmCode)
         {
 
-            Script = prmScript;
+            Code = prmCode;
 
             Sintaxe = new TestSintaxe(this);
 
@@ -53,28 +49,46 @@ namespace Dooggy.Factory.Console
 
         public void Compile(string prmCode)
         {
-           
+            Result.SetCodeZero(); 
+            
+            Merge(prmCode);
+
+            if (Blocks.IsNeedSaveData)
+                Merge(prmCode: Console.Config.Format.saveKeywordDefault);
+        }
+
+        private void Merge(string prmCode)
+        {
+
             Result.SetCodeZero(prmCode);
 
             foreach (string linha in new xLinhas(prmCode))
+            {
 
                 if (Sintaxe.IsNewLine(linha))
                 {
 
-                    if (Sintaxe.IsNewCommand())
-                        Commands.AddCommand(new TestCommand(Sintaxe, Console));
+                    if (Sintaxe.IsNewTag())
+                    {
+
+
+                    }
+                    else if (Sintaxe.IsNewCommand())
+                        Blocks.AddCommand(Sintaxe);
                     else
-                        Commands.AddParameter(Sintaxe);
+                        Blocks.AddParameter(Sintaxe);
 
                 }
 
+                Blocks.AddLine(linha);
+            }
+
         }
-
     }
-
     public class TestSintaxe : TestSintaxeCommand
     {
-
+        public TestConsole Console => Builder.Console;
+        
         private string linha;
 
         private string keyword_note = ">>";
@@ -85,8 +99,11 @@ namespace Dooggy.Factory.Console
         private string option_start = "[";
         private string option_finish = "]";
 
+        private string tag_start = "<";
+        private string tag_finish = ">";
+
         private bool TemKeyword() => (keyword != "");
-        private bool TemOption() => (opcoes != "");
+        private bool TemOption() => (options != "");
         public TestSintaxe(TestBuilder prmBuilder)
         {
 
@@ -105,10 +122,17 @@ namespace Dooggy.Factory.Console
 
         }
 
+        public bool IsNewTag()
+        {
+
+            return (false);
+
+
+        }
         public bool IsNewCommand()
         {
 
-            if (IsNewNote())
+            if (IsPrefixoNote())
                 GetTargetNote();
 
             else if (IsNewKeyword())
@@ -123,14 +147,16 @@ namespace Dooggy.Factory.Console
 
         public bool IsNewParametro() => Argumento.IsNewParametro(linha);
 
-        private bool IsNewNote() => (Prefixo.IsPrefixo(linha, prmPrefixo: keyword_note));
+        private bool IsPrefixoNote() => (Prefixo.IsPrefixo(linha, prmPrefixo: keyword_note));
+
+        private bool IsPrefixoTag() => (Prefixo.IsPrefixo(linha, prmPrefixo: tag_start, prmDelimitador: tag_finish));
 
         private bool IsNewKeyword()
         {
 
             keyword = GetKeywordCommand();
 
-            opcoes = GetOptionsCommand();
+            options = GetOptionsCommand();
 
             key = GetBaseKeyCommand();
 
@@ -138,6 +164,15 @@ namespace Dooggy.Factory.Console
 
         }
 
+        private bool  GetTagBlock()
+        {
+
+            tag = Prefixo.GetPrefixo(linha, prmPrefixo: tag_start, prmDelimitador: tag_finish).ToUpper();
+
+            return (tag != "");
+
+        }
+        
         private void GetTargetNote()
         {
 
@@ -186,20 +221,24 @@ namespace Dooggy.Factory.Console
         public TestBuilder Builder;
 
         public TestTrace Trace { get => Builder.Trace; }
+        public TestScript Script { get => Builder.Script; }
+        
 
         public string key;
+
+        public string tag;
 
         public string keyword;
 
         public string target;
 
-        public string opcoes;
+        public string options;
 
         private string args;
 
-        public string comando { get => GetComando(); }
-
         public eTipoTestCommand tipo;
+
+        public string comando { get => GetComando(); }
 
         public TestSintaxeArgumento Argumento;
 
@@ -212,7 +251,6 @@ namespace Dooggy.Factory.Console
 
         protected void Setup()
         {
-
             switch (key)
             {
 
@@ -245,20 +283,29 @@ namespace Dooggy.Factory.Console
                     args = "sql;filtro;ordem";
                     break;
 
-                case "txt":
-                case "savetxt":
-                    tipo = eTipoTestCommand.savetxt;
+                case "save":
+                case "datasave":
+                    tipo = eTipoTestCommand.save;
+                    args = "";//args = "encode;extensao";
                     break;
 
-                case "csv":
-                case "savecsv":
-                    tipo = eTipoTestCommand.savecsv;
-                    break;
+                //case "txt":
+                //case "savetxt":
+                //    tipo = eTipoTestCommand.savetxt;
+                //    args = "";//args = "encode;extensao";
+                //    break;
 
-                case "json":
-                case "savejson":
-                    tipo = eTipoTestCommand.savejson;
-                    break;
+                //case "csv":
+                //case "savecsv":
+                //    tipo = eTipoTestCommand.savecsv;
+                //    args = "";//args = "encode;extensao";
+                //    break;
+
+                //case "json":
+                //case "savejson":
+                //    tipo = eTipoTestCommand.savejson;
+                //    args = "";//args = "encode;extensao";
+                //    break;
 
                 default:
                     tipo = eTipoTestCommand.fail;
@@ -294,14 +341,17 @@ namespace Dooggy.Factory.Console
                 case eTipoTestCommand.item:
                     return "datafluxo";
 
-                case eTipoTestCommand.savetxt:
-                    return "savetxt";
+                case eTipoTestCommand.save:
+                    return "save";
 
-                case eTipoTestCommand.savecsv:
-                    return "savecsv";
+                //case eTipoTestCommand.savetxt:
+                //    return "savetxt";
 
-                case eTipoTestCommand.savejson:
-                    return "savejson";
+                //case eTipoTestCommand.savecsv:
+                //    return "savecsv";
+
+                //case eTipoTestCommand.savejson:
+                //    return "savejson";
 
                 case eTipoTestCommand.fail:
                     return "fail";
@@ -316,7 +366,7 @@ namespace Dooggy.Factory.Console
             key = "";
             keyword = "";
             target = "";
-            opcoes = "";
+            options = "";
 
         }
 

@@ -17,19 +17,16 @@ namespace Dooggy
 
         private bool TemTerminal { get => xString.GetLast(path) == @"\"; }
 
+        public bool IsFull => xString.IsFull(path);
+
+        public bool IsFind => Directory.Exists(path);
+
         public bool SetPath(string prmPath)
         {
 
-            if (xString.IsFull(prmPath))
-            {
-                
-                path = prmPath;
+            path = prmPath;
 
-                return (true);
-
-            }
-
-            return(false);
+            return(IsFull);
 
         }
         public bool Criar() => Criar(path);
@@ -38,29 +35,18 @@ namespace Dooggy
 
             if (SetPath(prmPath))
             {
-
                 try
                 {
-                    // Se o diretório não existir...
-                    if (!Directory.Exists(path))
-                    {
-
-                        // Criamos o diretório ...
+                    if (!IsFind)
+                        // Se o diretório não existir... Criamos o diretório ...
                         Directory.CreateDirectory(path);
-
-                    }
-
-                    return (true);
                 }
                 catch
                 { }
 
             }
-
-            return (false);
-
+            return (IsFind);
         }
-
 
         public string GetPath(string prmSubPath) => GetPath(prmSubPath, prmNome: "");
         public string GetPath(string prmSubPath, string prmNome) => GetPath(prmSubPath, prmNome, prmExtensao: "");
@@ -75,23 +61,17 @@ namespace Dooggy
                     retorno += @"\";
 
                 retorno += prmSubPath + @"\";
-
             }
 
             if (xString.IsFull(prmNome))
             {
-
                 retorno += prmNome;
 
                 if (xString.IsFull(prmExtensao))
                     retorno += "." + prmExtensao;
-
             }
-
             return (retorno);
-
         }
-
     }
 
     public class Diretorio : Path

@@ -46,15 +46,15 @@ namespace Dooggy.Factory.Console
 
         }
 
-        public string Criar(string prmTarget, DataBaseConnection prmDataBase)
+        public string Criar(string prmVar, DataBaseConnection prmDataBase)
         {
 
             //
             // Identidica TAG e VALOR da variável 
             //
             
-            string tag = xString.GetFirst(prmTarget, prmDelimitador: "=").Trim();
-            string valor = xString.GetLast(prmTarget, prmDelimitador: "=").Trim();
+            string tag = xString.GetFirst(prmVar, prmDelimitador: "=").Trim();
+            string valor = xString.GetLast(prmVar, prmDelimitador: "=").Trim();
 
             //
             // Verifica se a variável já existe ...

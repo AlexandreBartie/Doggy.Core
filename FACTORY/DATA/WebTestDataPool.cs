@@ -25,17 +25,22 @@ namespace Dooggy.Factory.Data
     public class TestDataPool
     {
 
+        public TestFactory Factory;
+
         public DataBasesConnection Bases;
 
-        public TestTrace Trace;
-
         public TestDataConnect Connect;
+
+        public TestDataLocal Dados;
 
         public TestDataVars Vars;
         public TestDataRaws Raws;
         public TestDataViews Views;
 
         public TestDataTratamento Tratamento;
+
+        public TestConsole Console => Factory.Console;
+        public TestTrace Trace => Factory.Trace;
 
         private bool bloqueado = false;
 
@@ -48,13 +53,16 @@ namespace Dooggy.Factory.Data
 
         public bool IsDbOK => (Bases.IsOK);
         public bool IsDbBlocked => bloqueado;
+        public bool IsHaveData => Raws.IsHaveData || Views.IsHaveData;
 
-        public TestDataPool()
+        public TestDataPool(TestFactory prmFactory)
         {
 
-            Trace = new TestTrace();
+            Factory = prmFactory;
 
             Bases = new DataBasesConnection();
+
+            Dados = new TestDataLocal(this);
 
             Connect = new TestDataConnect(this);
 
@@ -68,16 +76,16 @@ namespace Dooggy.Factory.Data
 
         public bool AddDataBase(string prmTag, string prmConexao) => Bases.Criar(prmTag, prmConexao, this);
 
-        public string AddDataVar(string prmTarget) => Vars.Criar(prmTarget, DataBaseCorrente);
-
-        public string AddDataRaw(string prmTarget) => Vars.Criar(prmTarget, DataBaseCorrente);
+        public string AddDataVar(string prmVar) => Vars.Criar(prmVar, DataBaseCorrente);
 
         public string AddDataView(string prmTag) => AddDataView(prmTag, prmMask: "");
         public string AddDataView(string prmTag, string prmMask) => Views.Criar(prmTag, prmMask, DataBaseCorrente);
 
         public bool AddDataFluxo(string prmTag, string prmSQL, string prmMask) => DataViewCorrente.Fluxos.Criar(prmTag, prmSQL, prmMask, DataViewCorrente);
 
-        public void SetDataRaw(string prmArg, string prmInstrucao) => Raws.SetArgumento(prmArg, prmInstrucao);
+        public void SetDataRaw(string prmOptions) => Raws.SetOptions(prmOptions);
+        public void AddDataRaw(string prmArg, string prmInstrucao) => Raws.SetArgumento(prmArg, prmInstrucao);
+
         public void SetDataVar(string prmArg, string prmInstrucao) => Vars.SetArgumento(prmArg, prmInstrucao);
         public void SetDataView(string prmArg, string prmInstrucao) => Views.SetArgumento(prmArg, prmInstrucao);
         public void SetDataFluxo(string prmArg, string prmInstrucao) => Fluxos.SetArgumento(prmArg, prmInstrucao);
@@ -107,7 +115,6 @@ namespace Dooggy.Factory.Data
 
     public class TestDataTratamento : TestDataFormat
     {
-
         private TestDataVars Vars => Pool.Vars;
         private TestDataRaws Raws => (Pool.Raws);
         private TestDataViews Views => (Pool.Views);
@@ -125,14 +132,19 @@ namespace Dooggy.Factory.Data
 
             texto = GetSQLVariavel(texto);
             texto = GetSQLFuncoes(texto);
-
+            
             return (texto);
 
         }
         public string GetOutput(string prmTags, eTipoFileFormat prmTipo)
         {
 
-            return Raws.GetOutput(prmDados: Views.output(prmTags, prmTipo), prmTipo);
+            string data_view = Views.output(prmTags, prmTipo);
+
+            if (Raws.IsON)
+                return Raws.GetOutput(data_view, prmTipo);
+
+            return data_view;
 
         }
         private string GetVariavel(string prmTag)
@@ -240,10 +252,11 @@ namespace Dooggy.Factory.Data
     public class TestDataFormat : TestDataException
     {
 
-        public DateTime anchor = DateTime.Now;
+        public TestConsoleConfig Config => Pool.Console.Config;
 
-        public string dateFormatDefault = "DD/MM/AAAA";
+        public DateTime anchor => Config.Format.anchor;
 
+        public string dateFormatDefault => Config.Format.dateFormatDefault;
 
         public string GetDateAnchor() => GetDateAnchor(dateFormatDefault);
         public string GetDateAnchor(string prmFormatacao) => GetDateFormat(anchor, prmFormatacao);
@@ -304,39 +317,27 @@ namespace Dooggy.Factory.Data
     public class TestDataLocal
     {
 
-        private Object Origem;
-
         public TestDataPool Pool;
 
-        public TestDataFile File;
-
+        public TestDataFile FileINI;
+        public TestDataFile FileLOG;
         public TestDataView View { get => Pool.DataViewCorrente; }
 
         public TestTrace Trace { get => Pool.Trace; }
 
-        public TestDataLocal()
+        public bool IsHaveData => Pool.IsHaveData;
+
+        public TestDataLocal(TestDataPool prmPool)
         {
-
-            File = new TestDataFile(this);
-
-        }
-
-        public void Setup(Object prmOrigem, TestDataPool prmPool)
-        {
-
-            Origem = prmOrigem;
 
             Pool = prmPool;
+
+            FileINI = new TestDataFile(this, prmExtensao: "ini");
+            FileLOG = new TestDataFile(this, prmExtensao: "log");
 
         }
 
         public bool DoConnect() => Pool.DoConnect();
-
-        public bool AddDataBase(string prmTag, string prmConexao) => (Pool.AddDataBase(prmTag, prmConexao));
-
-        public string AddDataVar(string prmTag) => (Pool.AddDataVar(prmTag));
-
-        public string AddDataRaw(string prmTag) => (Pool.AddDataRaw(prmTag));
 
         public string AddDataView(string prmTag) => (AddDataView(prmTag, prmMask: ""));
         public string AddDataView(string prmTag, string prmMask) => (Pool.AddDataView(prmTag, prmMask));
@@ -350,7 +351,7 @@ namespace Dooggy.Factory.Data
         public string json(string prmTags) => (Pool.json(prmTags));
         public string output(string prmTags, eTipoFileFormat prmTipo) => (Pool.output(prmTags, prmTipo));
 
-        public string log() => Pool.Bases.log();
+        public string log => Pool.Bases.log();
 
     }
 
@@ -364,7 +365,7 @@ namespace Dooggy.Factory.Data
             get
             {
                 if (_Dados == null)
-                    _Dados = new TestDataLocal();
+                    _Dados = null; // new TestDataLocal();
 
                 return _Dados;
 

@@ -16,21 +16,23 @@ namespace Dooggy.Factory.Data
 
         public TestTrace Trace => Dados.Trace;
 
-        private string extensao_ini = "ini";
+        private string extensao_padrao;
 
-        public TestDataFile(TestDataLocal prmDados)
+        public TestDataFile(TestDataLocal prmDados, string prmExtensao)
         {
 
             Dados = prmDados;
 
             File = new TestDataFileIO(this);
 
+            extensao_padrao = prmExtensao;
+
         }
 
-        public string Open(string prmNome, string prmPath) => Open(prmNome, prmPath, prmExtensao: extensao_ini);
+        public string Open(string prmNome, string prmPath) => Open(prmNome, prmPath, prmExtensao: extensao_padrao);
         public string Open(string prmNome, string prmPath, string prmExtensao) => File.Open(prmPath, GetArquivo(prmNome, prmExtensao));
 
-        public bool Save(string prmNome, string prmPath, string prmConteudo) => Save(prmNome, prmPath, prmConteudo, prmExtensao: extensao_ini);
+        public bool Save(string prmNome, string prmPath, string prmConteudo) => Save(prmNome, prmPath, prmConteudo, prmExtensao: extensao_padrao);
         public bool Save(string prmNome, string prmPath, string prmConteudo, string prmExtensao) => Save(prmNome, prmPath, prmConteudo, prmExtensao, prmEncoding: "");
         public bool Save(string prmNome, string prmPath, string prmConteudo, string prmExtensao, string prmEncoding) => File.Save(prmPath, GetArquivo(prmNome, prmExtensao), prmConteudo, prmEncoding);
 

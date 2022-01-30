@@ -15,13 +15,14 @@ namespace Dooggy.Factory.Console
 
         public TestConfigImport Import;
 
+        public TestConfigMode Mode;
+
         public TestConfigPath Path;
-
         public TestConfigFormat Format;
-
         public TestConfigTimeout Timeout;
 
-        private DataBasesConnection Bases => Console.Pool.Bases;
+        public TestDataPool Pool => Console.Pool;
+        private DataBasesConnection Bases => Pool.Bases;
 
         public string status => GetStatus();
 
@@ -34,25 +35,27 @@ namespace Dooggy.Factory.Console
 
             Import = new TestConfigImport(this);
 
+            Mode = new TestConfigMode(this);
+
             Path = new TestConfigPath(this);
             Format = new TestConfigFormat(this);
             Timeout = new TestConfigTimeout(this);
 
         }
 
-        public bool Setup(string prmArquivoCFG, bool prmPlay)
+        public void Setup(string prmArquivoCFG, bool prmPlay)
         {
 
-            if (Import.Setup(prmArquivoCFG))
-                { Console.Load(prmPlay); return true; }
+            Mode.SetMode(prmPlay);
 
-            return false;
+            if (Import.Setup(prmArquivoCFG))
+                Console.Load(prmPlay);
 
         }
 
         public bool Run(string prmBloco) => Import.Run(prmBloco);
 
-        public string GetStatus() => Console.Dados.log() + " | " + Timeout.log() + " | " + Format.log() + " | " + Path.log();
+        public string GetStatus() => Console.Dados.log + " | " + Timeout.log + " | " + Format.log + " | " + Path.log;
 
     }
     public class TestConfigTimeout
@@ -60,36 +63,34 @@ namespace Dooggy.Factory.Console
 
         private TestConsoleConfig Config;
 
-        private TestDataPool Pool => Config.Console.Pool;
-        private TestDataConnect Connect => Pool.Connect;
-        private TestDataTratamento Tratamento => Pool.Tratamento;
+        public int connect_timeout = 30;
+        public int command_timeout = 20;
 
         public TestConfigTimeout(TestConsoleConfig prmConfig)
         {
             Config = prmConfig;
         }
 
-        public void SetConnectTimeOut(int prmSegundos)
-        {
-            Connect.SetConnectTimeOut(prmSegundos);
-        }
-        public void SetCommandTimeOut(int prmSegundos)
-        {
-            Connect.SetCommandTimeOut(prmSegundos);
-        }
-        private string connect_timeout() => String.Format("-connectDB: {0}", Connect.connect_timeout);
-        private string command_timeout() => String.Format("-commandSQL: {0}", Connect.command_timeout);
-        public string log() => String.Format(">timeout: {0}, {1}", connect_timeout(), command_timeout());
+        public void SetConnectTimeOut(int prmSegundos) => connect_timeout = prmSegundos;
+        public void SetCommandTimeOut(int prmSegundos) => command_timeout = prmSegundos;
+
+        private string txtconnectTimeout() => String.Format("-connectDB: {0}", connect_timeout);
+        private string txtcommandTimeout() => String.Format("-commandSQL: {0}", command_timeout);
+        public string log => String.Format(">timeout: {0}, {1}", txtconnectTimeout(), txtcommandTimeout());
 
     }
     public class TestConfigFormat
     {
 
         private TestConsoleConfig Config;
+        private TestDataTratamento Tratamento => Config.Pool.Tratamento;
 
-        private TestDataPool Pool => Config.Console.Pool;
-        private TestDataConnect Connect => Pool.Connect;
-        private TestDataTratamento Tratamento => Pool.Tratamento;
+
+        public DateTime anchor = DateTime.Now;
+
+        public string dateFormatDefault = "DD/MM/AAAA";
+
+        public string saveKeywordDefault;
 
         public TestConfigFormat(TestConsoleConfig prmConfig)
         {
@@ -98,21 +99,43 @@ namespace Dooggy.Factory.Console
 
         public void SetToday(string prmDate)
         {
-            DynamicDate Data = new DynamicDate(Tratamento.anchor);
+            DynamicDate Data = new DynamicDate(anchor);
 
-            Tratamento.anchor = Data.Calc(prmSintaxe: prmDate);
+            anchor = Data.Calc(prmSintaxe: prmDate);
         }
         public void SetToday(DateTime prmDate)
         {
-            Tratamento.anchor = prmDate;
+            anchor = prmDate;
         }
         public void SetFormatDate(string prmDate)
         {
-            Tratamento.dateFormatDefault = prmDate;
+            dateFormatDefault = prmDate;
         }
-        private string today() => String.Format("-today: {0}", Tratamento.GetDateAnchor());
-        private string date() => String.Format("-date: {0}", Tratamento.dateFormatDefault);
-        public string log() => String.Format(">format: {0}, {1}", today(), date());
+        public void SetSaveDefault(string prmDefault)
+        {
+            saveKeywordDefault = prmDefault;
+        }
+
+        private string txt_today => String.Format("-today: {0}", Tratamento.GetDateAnchor());
+        private string txt_date => String.Format("-date: {0}", dateFormatDefault);
+        private string txt_save => String.Format("-save: {0}", saveKeywordDefault);
+
+        public string log => String.Format(">format: {0}, {1}, {2}", txt_today, txt_date, txt_save);
+
+    }
+    public class TestConfigMode
+    {
+
+        private TestConsoleConfig Config;
+
+        public bool IsAutoPlay;
+
+        public TestConfigMode(TestConsoleConfig prmConfig)
+        {
+            Config = prmConfig;
+        }
+
+        public void SetMode(bool prmAutoPlay) => IsAutoPlay = prmAutoPlay;
 
     }
     public class TestConfigPath
@@ -120,24 +143,82 @@ namespace Dooggy.Factory.Console
 
         private TestConsoleConfig Config;
 
-        private TestConsoleInput Input => Config.Console.Input;
-        private TestConsoleOutput Output => Config.Console.Output;
+        private TestTrace Trace => Config.Console.Trace;
 
-        public string path_INI => Input.GetPath();
-        public string path_OUT => Output.GetPath();
-        public string path_LOG => Output.GetPathLOG();
-        public bool IsOK => xString.IsFull(path_INI) && xString.IsFull(path_OUT) && xString.IsFull(path_LOG);
+        public Diretorio INI;
+        public Diretorio OUT;
+        public Diretorio LOG;
+
+        public bool IsOK => INI.IsFull && OUT.IsFull && LOG.IsFull;
 
         public TestConfigPath(TestConsoleConfig prmConfig)
         {
             Config = prmConfig;
+
+            INI = new Diretorio();
+            OUT = new Diretorio();
+            LOG = new Diretorio();
+
         }
 
-        public void SetPathINI(string prmPathINI) => Input.SetPath(prmPathINI);
-        public void SetPathOUT(string prmPathOUT) => Output.SetPath(prmPathOUT);
-        public void SetPathLOG(string prmPathLOG) => Output.SetPathLOG(prmPathLOG);
+        public void SetINI(string prmPath)
+        {
 
-        public string log() => String.Format(">path: -ini: '{0}', -out: '{1}', -log: '{2}'", path_INI, path_OUT, path_LOG);
+            INI.SetPath(prmPath);
+
+            Trace.LogPath.SetPath(prmContexto: "OrigemMassaTestes", prmPath);
+
+        }
+
+        public void SetOUT(string prmPath)
+        {
+
+            OUT.SetPath(prmPath);
+
+            Trace.LogPath.SetPath(prmContexto: "DestinoMassaTestes", prmPath);
+
+        }
+        public void SetLOG(string prmPath)
+        {
+
+            LOG.SetPath(prmPath);
+
+            Trace.LogPath.SetPath(prmContexto: "LogMassaTestes", prmPath);
+
+        }
+
+        public string GetExtensao(eTipoFileFormat prmTipo)
+        {
+            switch (prmTipo)
+            {
+                case eTipoFileFormat.txt:
+                    return "txt";
+
+                case eTipoFileFormat.json:
+                    return "json";
+            }
+            return "csv";
+        }
+        public eTipoFileFormat GetTipoFormato(string prmTipo)
+        {
+            switch (prmTipo)
+            {
+                case "txt":
+                    return eTipoFileFormat.txt;
+
+                case "json":
+                    return eTipoFileFormat.json;
+            }
+            return eTipoFileFormat.csv;
+        }
+        public string GetPathINI() => (INI.path);
+        public string GetPathOUT() => (OUT.path);
+        public string GetPathOUT(string prmSubPath) => (OUT.GetPath(prmSubPath));
+        public string GetPathLOG() => (LOG.path);
+
+        public string GetPathFullOUT(eTipoFileFormat prmTipo) => (GetPathOUT(prmSubPath: GetExtensao(prmTipo)));
+
+        public string log => String.Format(">path: -ini: '{0}', -out: '{1}', -log: '{2}'", INI.path, OUT.path, LOG.path);
 
     }
     public class TestConfigImport
@@ -254,13 +335,13 @@ namespace Dooggy.Factory.Console
             switch (prmTag)
             {
                 case "ini":
-                    Config.Path.SetPathINI(prmValor); break;
+                    Config.Path.SetINI(prmValor); break;
 
                 case "out":
-                    Config.Path.SetPathOUT(prmValor); break;
+                    Config.Path.SetOUT(prmValor); break;
 
                 case "log":
-                    Config.Path.SetPathLOG(prmValor); break;
+                    Config.Path.SetLOG(prmValor); break;
 
                 default:
                     Trace.LogConfig.FailFindParameter(prmTag, prmValor); break;
@@ -300,6 +381,9 @@ namespace Dooggy.Factory.Console
 
                 case "date":
                     Config.Format.SetFormatDate(prmValor); break;
+
+                case "save":
+                    Config.Format.SetSaveDefault(prmValor); break;
 
                 default:
                     Trace.LogConfig.FailFindParameter(prmTag, prmValor); break;

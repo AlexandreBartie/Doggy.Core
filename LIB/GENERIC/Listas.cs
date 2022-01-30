@@ -214,7 +214,7 @@ namespace Dooggy.Lib.Generic
         }
         public int qtde { get => this.Count; }
 
-        public bool IsOK { get => !IsVazio; }
+        public bool IsFull { get => !IsVazio; }
 
         public bool IsUnico { get => (qtde == 1); }
 
@@ -349,6 +349,7 @@ namespace Dooggy.Lib.Generic
             return (resultado);
         }
 
+        public string memo { get => txt(prmSeparador: Environment.NewLine); }
         public string csv { get => txt(", "); }
         public string txt() => txt(separador);
 
@@ -381,7 +382,7 @@ namespace Dooggy.Lib.Generic
         public xMemo(string prmTexto, string prmSeparador)
         { separador = prmSeparador; Parse(prmTexto); }
 
-        public string memo() => txt(prmSeparador: Environment.NewLine);
+        public string memo_ext => memo + Environment.NewLine;
 
     }
     public class xMask

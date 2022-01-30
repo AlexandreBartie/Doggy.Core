@@ -16,7 +16,7 @@ namespace Dooggy.Factory.Robot
         ChromeDriver = 0,
         EdgeDriver = 1
     }
-    public class TestRobotSuite : ITestDataLocal
+    public class TestRobotSuite
     {
 
         public TestRobotProject Projeto;
@@ -40,7 +40,7 @@ namespace Dooggy.Factory.Robot
             
             Projeto = prmProjeto;
 
-            Dados.Setup(this, prmProjeto.Pool);
+            //Dados.Setup(this, prmProjeto.Pool);
 
         }
 
@@ -81,7 +81,7 @@ namespace Dooggy.Factory.Robot
         }
 
     }
-    public class TestRobotScript : ITestDataLocal
+    public class TestRobotScript
     {
 
         public string nome;
@@ -108,7 +108,7 @@ namespace Dooggy.Factory.Robot
 
             Trace.ActionTag(prmTag: "Script", this.nome);
 
-            Dados.Setup(this, Suite.Pool);
+            //Dados.Setup(this, Suite.Pool);
 
             if (MetodoDADOS())
             {

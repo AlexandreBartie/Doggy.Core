@@ -13,27 +13,35 @@ using System.Windows.Forms;
 
 namespace Dooggy.Factory
 {
-    public class TestFactory : ITestDataLocal
+    public class TestFactory 
     {
 
         public xJSON args = new xJSON();
 
+        public TestDataPool Pool;
+
+        public TestDataLocal Dados => Pool.Dados;
+
         public TestConsole Console;
 
-        public TestDataPool Pool = new TestDataPool();
-        
-        public TestConfig Config = new TestConfig();
+        public TestConfig Config;
 
-        public TestTrace Trace = new TestTrace();
+        public TestTrace Trace;
 
-        public TestParameters Parameters = new TestParameters();
+        public TestParameters Parameters;
 
         public TestFactory()
         {
 
-            Dados.Setup(this, Pool);
+            Pool = new TestDataPool(this);
 
             Console = new TestConsole(this);
+
+            Config = new TestConfig(this);
+
+            Parameters = new TestParameters();
+
+            Trace = new TestTrace();
 
             Trace.LogExecutado += TraceExecutado;
 
@@ -45,36 +53,12 @@ namespace Dooggy.Factory
             Console.AddLog();
 
         }
-        public bool SetApp(string prmParametros, string prmNomeApp, string prmVersaoApp)
+        public void EXE(string prmArquivoCFG, bool prmPlay, string prmAppName, string prmAppVersion)
         {
+            Trace.LogApp.SetApp(prmAppName, prmAppVersion);
 
-            Trace.LogApp.ExeRunning(prmNome: Application.ProductName, prmVersao: Application.ProductVersion);
-
-            return(Setup(prmParametros));
-
+            Console.Setup(prmArquivoCFG, prmPlay);
         }
-
-        public bool Setup(string prmParametros)
-        {
-
-            if (args.Parse(prmParametros))
-                return (TestDataBase());
-
-            Trace.LogFile.FailJSONFormat(prmContexto: "Parâmetros do Projeto", prmFluxo: prmParametros, prmErro: args.Erro);
-
-            return (false);
-
-        }
-
-        private bool TestDataBase()
-        {
-
-
-
-            return (true);
-
-        }
-
         public bool Call(Object prmObjeto, string prmMetodo)
         {
 
@@ -109,11 +93,12 @@ namespace Dooggy.Factory
     }
     public class TestConfig
     {
+
+        private TestFactory Factory;
+
         //
         // Parâmetros da Massa de Testes
         //
-
-
         public bool onlyDATA;
 
         public Encoding EncodedDataJUNIT;
@@ -122,12 +107,16 @@ namespace Dooggy.Factory
         //
         // Pausa na Automação (em segundos)
         //
-
         public int pauseAfterTestCase;
 
         public int pauseAfterTestRobotScript;
 
         public int pauseAfterTestRobotSuite;
+
+        public TestConfig(TestFactory prmFactory)
+        {
+            Factory = prmFactory;
+        }
 
         //
         // Parâmetros da Arquitetura de Testes

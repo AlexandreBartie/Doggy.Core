@@ -371,7 +371,7 @@ namespace Dooggy.Factory.Robot
         public bool SetAction(string prmValor)
         {
 
-            if (Dominio.IsON())
+            if (Dominio.IsFull())
             {
                 return (Dominio.SetAction(prmValor));
             }
@@ -549,8 +549,8 @@ namespace Dooggy.Factory.Robot
             return (false);
         }
 
-        public bool IsON()
-        { return (lista.IsOK); }
+        public bool IsFull()
+        { return (lista.IsFull); }
     }
     public class QA_WebTarget
     {

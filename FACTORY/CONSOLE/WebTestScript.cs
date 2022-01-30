@@ -1,0 +1,238 @@
+﻿using Dooggy.Factory.Data;
+using Dooggy.Lib.Generic;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Windows.Forms;
+
+namespace Dooggy.Factory.Console
+{
+    public class TestScripts : List<TestScript>
+    {
+
+        private TestConsole Console;
+
+        public TestScript Corrente;
+
+        public TestTrace Trace => Console.Trace;
+
+        public TestDataPool Pool => Console.Pool;
+
+        private bool TemCorrente => (Corrente != null);
+
+        public TestScripts(TestConsole prmConsole)
+        {
+
+            Console = prmConsole;
+
+        }
+
+        public void Load(string prmArquivoINI, bool prmPlay) { GetScript(prmArquivoINI); Corrente.Load(prmArquivoINI, prmPlay); }
+        public void Play(string prmCode, string prmArquivoOUT) { GetScript(prmArquivoOUT); Corrente.Play(prmCode, prmArquivoOUT); }
+
+        public void AddLog()
+        {
+            if (TemCorrente)
+                Corrente.AddLog(Trace.Msg);
+        }
+
+        public string GetLog()
+        {
+            if (TemCorrente)
+                return Corrente.Result.log;
+
+            return ("");
+        }
+
+        private void GetScript(string prmKey)
+        {
+            if (!FindScript(prmKey))
+                NewScript(prmKey);
+
+            Pool.Cleanup();
+        }
+
+        private void NewScript(string prmKey) { Corrente = new TestScript(Console); Add(Corrente); }
+
+        public bool FindScript(string prmKey)
+        {
+
+            foreach (TestScript Script in this)
+
+                if (xString.IsEqual(Script.key, prmKey))
+                {
+
+                    Corrente = Script;
+
+                    Trace.LogConsole.SetScript(prmKey);
+
+                    return true;
+
+                }
+
+            Corrente = null;
+
+            return false;
+
+        }
+
+        public string GetLista()
+        {
+
+            xMemo memo = new xMemo(prmSeparador: Environment.NewLine);
+
+            foreach (TestScript Script in this)
+                memo.Add(Script.key);
+
+            return (memo.memo_ext);
+
+        }
+
+    }
+    public class TestScript : TestScriptSave
+    {
+
+        public TestTags Tags;
+
+        private TestCode Code;
+
+        private TestTrace Trace => Dados.Trace;
+
+        private TestDataLocal Dados => Console.Dados;
+        private TestConsoleInput Input => Console.Input;
+
+        public string key;
+
+        public string tags => Tags.txt;
+
+        public TestScript(TestConsole prmConsole)
+        {
+
+            Console = prmConsole;
+
+            Code = new TestCode(this);
+
+            Result = new TestResult(this);
+
+            Tags = new TestTags(this);
+
+        }
+        public void Load(string prmArquivoINI, bool prmPlay)
+        {
+
+            key = prmArquivoINI;
+
+            Code.Load(prmCode: Input.GetCode(prmArquivoINI), prmArquivoINI, prmPlay);
+
+        }
+
+        public void SetCode(string prmCode) => Result.SetCode(prmCode);
+        public void Play(string prmCode, string prmArquivoOUT) => Code.Play(prmCode, prmArquivoOUT);
+        public void AddLog(TestTraceMsg prmMsg) => Result.AddLog(prmTipo: prmMsg.tipo, prmTexto: prmMsg.texto);
+
+    }
+
+    public class TestScriptSave
+    {
+
+        public TestConsole Console;
+
+        public TestResult Result;
+
+
+        public eTipoFileFormat tipo;
+
+        public string encoding;
+        public string extensao;
+
+        private TestDataLocal Dados => Console.Dados;
+
+        private TestConfigPath Path => Console.Config.Path;
+        private TestConsoleOutput Output => Console.Output;
+
+        public void Save(string prmOptions)
+        { 
+            
+            SetOptions(prmOptions);
+
+            Result.SetData(prmData: Dados.output(prmTags: "", tipo));
+
+            Output.SaveOUT(Result.data, tipo, encoding, extensao, Result.log);
+        }
+        private void SetOptions(string prmOptions)
+        {
+
+            xLista options = new xLista(prmOptions, prmSeparador: ".");
+
+            tipo = Path.GetTipoFormato(options.Get(prmIndice: 1, prmPadrao: "csv"));
+
+            encoding = xString.GetLower(options.Get(prmIndice: 2, prmPadrao: "UTF8"));
+            extensao = xString.GetLower(options.Get(prmIndice: 3, prmPadrao: Path.GetExtensao(tipo)));
+
+        }
+
+    }
+    public class TestTag
+    {
+
+        public string _key;
+        public string _valor;
+
+        public string key => _key.ToLower();
+        public string valor => _valor.ToUpper();
+
+        public string txt => String.Format("[{0,12} {1}], ", key, valor);
+
+        public TestTag(string prmKey, string prmValor)
+        {
+            _key = prmKey; _valor = prmValor;
+        }
+
+        public void SetValor(string prmValor) => _valor = prmValor;
+
+    }
+    public class TestTags : List<TestTag>
+    {
+
+        private TestScript Script;
+
+        private TestTag Corrente;
+
+        public string txt => GetTXT();
+
+        public TestTags(TestScript prmScript)
+        {
+            Script = prmScript;
+        }
+
+        public void AddTag(string prmKey, string prmValor)
+        {
+
+            foreach (TestTag Tag in this)
+
+                if (xString.IsEqual(Tag.key, prmKey))
+                {
+
+                    Tag.SetValor(prmValor);
+
+                    return;
+
+                }
+
+            Add(new TestTag(prmKey, prmValor));
+
+        }
+        private string GetTXT()
+        {
+
+            xMemo memo = new xMemo();
+
+            foreach (TestTag Tag in this)
+                memo.Add(Tag.txt);
+
+            return memo.memo;
+
+        }
+
+    }
+}

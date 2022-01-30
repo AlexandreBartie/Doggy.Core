@@ -1,4 +1,5 @@
-﻿using Dooggy.Lib.Parse;
+﻿using Dooggy.Factory.Console;
+using Dooggy.Lib.Parse;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -10,20 +11,18 @@ namespace Dooggy.Factory.Data
 
         public TestDataPool Pool;
 
+        public TestConfigTimeout Timeout => Pool.Console.Config.Timeout;
+
+        public int connect_timeout => Timeout.connect_timeout;
+        public int command_timeout => Timeout.command_timeout;
+
         private DataBaseOracle _Oracle;
-
-        public int connect_timeout = 30;
-        public int command_timeout = 20;
-
         public DataBaseOracle Oracle { get { if (_Oracle == null) _Oracle = new DataBaseOracle(this); return _Oracle; } }
 
         public TestDataConnect(TestDataPool prmPool)
         {
             Pool = prmPool;
         }
-
-        public void SetConnectTimeOut(int prmSegundos) => connect_timeout = prmSegundos;
-        public void SetCommandTimeOut(int prmSegundos) => command_timeout = prmSegundos;
 
     }
     public class DataBaseOracle : DataBaseOracleDefault

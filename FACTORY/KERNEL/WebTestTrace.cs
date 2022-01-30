@@ -74,7 +74,7 @@ namespace Dooggy.Factory
     public class TestTraceLogApp : TestTraceLog
     {
 
-        public void ExeRunning(string prmNome, string prmVersao) { msgApp(string.Format("-name {0} -version: {1}", prmNome, prmVersao)); }
+        public void SetApp(string prmAppName, string prmAppVersion) { msgApp(string.Format("-name {0} -version: {1}", prmAppName, prmAppVersion)); }
 
     }
     public class TestTraceLogData : TestTraceLogData_Fail
@@ -122,7 +122,7 @@ namespace Dooggy.Factory
 
     public class TestTraceLogPath : TestTraceLog
     {
-        public void SetPath(string prmContexto, string prmPath) => msgSet(String.Format(@"{0} -path: {1}", prmContexto, prmPath));
+        public void SetPath(string prmContexto, string prmPath) => msgSet(String.Format(@"{0,15} -path: {1}", prmContexto, prmPath));
 
     }
     public class TestTraceLogFile : TestTraceLog

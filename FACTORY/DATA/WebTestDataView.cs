@@ -275,6 +275,8 @@ namespace Dooggy.Factory.Data
 
         private TestTrace Trace { get => Pool.Trace; }
 
+        public bool IsHaveData => (this.Count != 0);
+
         public TestDataViews(TestDataPool prmPool)
         {
 
@@ -591,7 +593,10 @@ namespace Dooggy.Factory.Data
 
         private TestTrace Trace { get => Pool.Trace; }
 
-        private string output { get => Itens.memo() + Environment.NewLine ; }
+        private string output { get => Itens.memo_ext ; }
+
+        public bool IsON = true;
+        public bool IsHaveData => IsON && Itens.IsFull;
 
         public TestDataRaws(TestDataPool prmPool)
         {
@@ -601,7 +606,19 @@ namespace Dooggy.Factory.Data
             Itens = new xMemo();
 
         }
+        public void SetOptions(string prmOptions)
+        {
 
+            switch (prmOptions)
+            {
+
+                case "off":
+                    IsON = false;
+                    break;
+
+            }
+
+        }
         public void SetArgumento(string prmArg, string prmInstrucao)
         {
 
