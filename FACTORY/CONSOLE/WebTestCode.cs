@@ -22,7 +22,7 @@ namespace Dooggy.Factory.Console
 
         public TestConsole Console { get => Script.Console; }
         public TestResult Result { get => Script.Result; }
-
+        public TestTrace Trace { get => Script.Trace; }
         public bool DoConnect() => Console.Dados.DoConnect();
 
         public TestCode(TestScript prmScript)
@@ -36,7 +36,7 @@ namespace Dooggy.Factory.Console
 
         public void Load(string prmCode, string prmArquivoINI, bool prmPlay)
         {
-            Result.Setup(prmArquivoINI);
+            Result.Setup(prmCode, prmArquivoINI);
 
             Play(prmCode, prmArquivoINI, prmPlay); 
         }
@@ -66,10 +66,10 @@ namespace Dooggy.Factory.Console
         private TestScript Script => Code.Script;
         private TestResult Result => Code.Result;
 
+        public bool TemCommand => Corrente.TemCommand;
         public bool IsNeedSaveData => IsDataDetected && !IsSaveDetected;
         private bool IsDataDetected => GetDataDetected();
         private bool IsSaveDetected => GetSaveDetected();
-        private string saveKeywordDefault => Console.Config.Format.saveKeywordDefault;
 
         public TestBlocks(TestCode prmCode)
         {
@@ -83,7 +83,7 @@ namespace Dooggy.Factory.Console
             foreach (TestBlock Block in this)
                 Block.Clear();
 
-            Clear(); AddBlock(prmKey: "ROOT");
+            Clear(); CriarROOT();
         }
 
         public void Builder(string prmCode) => Code.Builder.Compile(prmCode);
@@ -99,15 +99,20 @@ namespace Dooggy.Factory.Console
             Result.LogStop();
         }
 
+        public void CriarROOT() => AddBlock(prmKey: "ROOT");
+        public void CriarRAW() => AddBlock(prmKey: "RAW");
+        public void CriarSAVE() => AddBlock(prmKey: "SAVE");
+
         public void AddLine(string prmLine) => Corrente.AddLine(prmLine);
         public void AddCommand(TestSintaxe prmSintaxe) => Corrente.AddCommand(new TestCommand(prmSintaxe));
         public void AddParameter(TestSintaxe prmSintaxe) => Corrente.AddParameter(prmSintaxe);
 
-        private void AddBlock(string prmKey)
+        private void AddBlock(string prmKey) => AddBlock(prmKey, prmInterno: false);
+        private void AddBlock(string prmKey, bool prmInterno)
         {
             if (!Find(prmKey))
             {
-                Corrente = new TestBlock(prmKey, Code);
+                Corrente = new TestBlock(prmKey, prmInterno, Code);
 
                 Add(Corrente);
             }
@@ -152,15 +157,18 @@ namespace Dooggy.Factory.Console
 
         public string key;
 
+        public bool interno;
+
+        public bool TemCommand => Commands.TemCorrente;
         public bool IsDataDetected => Commands.IsDataDetected;
         public bool IsSaveDetected => Commands.IsSaveDetected;
         public string txt => Linhas.memo;   
 
         private xMemo Linhas;
 
-        public TestBlock(string prmKey, TestCode prmCode)
+        public TestBlock(string prmKey, bool prmInterno, TestCode prmCode)
         {
-            key = prmKey; Code = prmCode;
+            key = prmKey; interno = prmInterno;  Code = prmCode;
 
             Commands = new TestCommands(this);
 
@@ -184,6 +192,9 @@ namespace Dooggy.Factory.Console
         public TestCommand Corrente;
 
         private TestCode Code => Block.Code;
+
+        private TestTrace Trace => Code.Trace;
+        public bool TemCorrente => (Corrente != null);
 
         public bool IsDataDetected => GetDataDetected();
         public bool IsSaveDetected => GetSaveDetected();

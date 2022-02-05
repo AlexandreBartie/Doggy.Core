@@ -190,7 +190,30 @@ namespace Dooggy
 
             return ("");
         }
-        
+
+        public static string GetFull(string prmTexto)
+        {
+            if (IsFull(prmTexto))
+                return prmTexto;
+
+            return ("");
+        }
+
+        public static string Concat(string prmValorA, string prmValorB, string prmSeparador)
+        {
+
+            string valorA = GetFull(prmValorA);
+            string valorB = GetFull(prmValorB);
+
+            if (valorA == "")
+                return valorB;
+            
+            if (valorB == "")
+                return valorA;
+
+            return (valorA + prmSeparador + valorB);
+        }
+    
     }
 
 

@@ -20,12 +20,14 @@ namespace Dooggy.Factory.Data
 
         public string descricao;
 
+        public string entrada;
         public string saida;
 
         public TestDataFluxos Fluxos;
 
         public string tag { get => GetTag(); }
-        public string header_txt { get => (descricao + "," + saida); }
+        public string header_txt => xString.Concat(descricao, fluxo_txt, prmSeparador: ",");
+        private string fluxo_txt => xString.Concat(entrada, saida, prmSeparador: ",");
 
         public TestDataPool Pool { get => DataBase.Pool; }
 
@@ -41,7 +43,6 @@ namespace Dooggy.Factory.Data
             Cleanup();
 
         }
-
         private void Setup(string prmTag)
         {
 
@@ -72,6 +73,14 @@ namespace Dooggy.Factory.Data
 
             return (alias);
 
+        }
+
+        private string GetFluxoTXT()
+        {
+            if (xString.IsFull(entrada))
+                return entrada + "," + saida;
+
+            return (entrada);
         }
 
     }
@@ -166,7 +175,7 @@ namespace Dooggy.Factory.Data
     }
     public class TestDataSQL : TestDataSQLBase
     {
-        
+
         public string sql;
 
         public string filtro;
@@ -201,9 +210,7 @@ namespace Dooggy.Factory.Data
                 comando_sql = GetSQL();
 
             }
-
             return (prmView.Pool.GetTextoTratado(comando_sql));
-
         }
 
         private string GetSQL()
@@ -234,11 +241,7 @@ namespace Dooggy.Factory.Data
                 sql += condicoes + ordenacao;
 
             }
-
-
             return (sql.Trim());
-
-
         }
 
     }
@@ -330,6 +333,10 @@ namespace Dooggy.Factory.Data
                 
                 case "mask":
                     Corrente.SetMask(prmInstrucao);
+                    break;
+
+                case "entrada":
+                    Corrente.entrada = prmInstrucao;
                     break;
 
                 case "saida":

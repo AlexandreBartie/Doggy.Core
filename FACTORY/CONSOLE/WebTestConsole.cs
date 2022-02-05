@@ -56,8 +56,8 @@ namespace Dooggy.Factory.Console
 
         public void EXE(string prmArquivoCFG) => Setup(prmArquivoCFG, prmPlay: true);
 
-        public void Setup(string prmArquivoCFG) => Setup(prmArquivoCFG, prmPlay: false);
-        public void Setup(string prmArquivoCFG, bool prmPlay) => Config.Setup(prmArquivoCFG, prmPlay);
+        public bool Setup(string prmArquivoCFG) => Setup(prmArquivoCFG, prmPlay: false);
+        public bool Setup(string prmArquivoCFG, bool prmPlay) => Config.Setup(prmArquivoCFG, prmPlay);
 
         public void SetAnchor(DateTime prmAncora) => Config.Format.SetToday(prmAncora);
 
@@ -101,7 +101,7 @@ namespace Dooggy.Factory.Console
         public bool SaveINI(string prmCode)
         {
 
-            Result.SetCode(prmCode);
+            Result.SetSave(prmCode);
 
             return Dados.FileINI.Save(prmNome: GetNameScriptOrigem(), prmPath: Path.GetPathINI(), prmConteudo: prmCode);
 

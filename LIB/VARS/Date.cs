@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 namespace Dooggy
@@ -29,6 +30,24 @@ namespace Dooggy
 
             return (formato);
 
+        }
+
+    }
+
+    public static class xDouble
+    {
+
+        public static string GetFormatacao(Double prmNumber, string prmFormato) => GetFormatacao(prmNumber, prmFormato, prmRegionalizacao: false);
+        public static string GetFormatacao(Double prmNumber, string prmFormato, bool prmRegionalizacao)
+        {
+            IFormatProvider cultura;
+
+            if (prmRegionalizacao)
+                cultura = CultureInfo.CurrentUICulture;
+            else
+                cultura = CultureInfo.InvariantCulture;
+
+            return (prmNumber.ToString(prmFormato, provider: cultura));
         }
 
     }

@@ -30,7 +30,6 @@ namespace Dooggy.Factory.Console
 
         public TestConsoleConfig(TestConsole prmConsole)
         {
-
             Console = prmConsole;
 
             Import = new TestConfigImport(this);
@@ -40,22 +39,28 @@ namespace Dooggy.Factory.Console
             Path = new TestConfigPath(this);
             Format = new TestConfigFormat(this);
             Timeout = new TestConfigTimeout(this);
-
         }
 
-        public void Setup(string prmArquivoCFG, bool prmPlay)
+        public bool Setup(string prmArquivoCFG, bool prmPlay)
         {
-
             Mode.SetMode(prmPlay);
 
             if (Import.Setup(prmArquivoCFG))
-                Console.Load(prmPlay);
+                { Console.Load(prmPlay); return true; }
 
+            return false;
         }
 
         public bool Run(string prmBloco) => Import.Run(prmBloco);
 
-        public string GetStatus() => Console.Dados.log + " | " + Timeout.log + " | " + Format.log + " | " + Path.log;
+        public string GetStatus()
+        {
+            if (Console.IsDbOK)
+                return Console.Dados.log + " | " + Timeout.log + " | " + Format.log + " | " + Path.log;
+
+            return Console.Dados.log;
+        
+        }
 
     }
     public class TestConfigTimeout
@@ -89,8 +94,9 @@ namespace Dooggy.Factory.Console
         public DateTime anchor = DateTime.Now;
 
         public string dateFormatDefault = "DD/MM/AAAA";
+        public string saveFormatDefault => GetSaveDefault();
 
-        public string saveKeywordDefault;
+        private string baseSaveFormatDefault;
 
         public TestConfigFormat(TestConsoleConfig prmConfig)
         {
@@ -107,18 +113,28 @@ namespace Dooggy.Factory.Console
         {
             anchor = prmDate;
         }
-        public void SetFormatDate(string prmDate)
+        public void SetFormatDate(string prmFormatDefault)
         {
-            dateFormatDefault = prmDate;
+            dateFormatDefault = prmFormatDefault;
         }
-        public void SetSaveDefault(string prmDefault)
+        public void SetFormatSave(string prmFormatDefault)
         {
-            saveKeywordDefault = prmDefault;
+            baseSaveFormatDefault = prmFormatDefault;
+        }
+
+        private string GetSaveDefault()
+        {
+            string format = "";
+
+            if (xString.IsFull(baseSaveFormatDefault))
+                format = string.Format("[{0}]", baseSaveFormatDefault);
+
+            return string.Format(">save{0}:", format);
         }
 
         private string txt_today => String.Format("-today: {0}", Tratamento.GetDateAnchor());
         private string txt_date => String.Format("-date: {0}", dateFormatDefault);
-        private string txt_save => String.Format("-save: {0}", saveKeywordDefault);
+        private string txt_save => String.Format("-save: {0}", baseSaveFormatDefault);
 
         public string log => String.Format(">format: {0}, {1}, {2}", txt_today, txt_date, txt_save);
 
@@ -232,13 +248,14 @@ namespace Dooggy.Factory.Console
 
         private FileTXT File;
 
-        public string nome => File.nome;
+        public bool IsOK;
+
+        public string nome { get { if (IsOK) return File.nome; return ""; } }
         private string nome_completo => File.nome_completo;
 
         private string grupo;
 
         private string linha;
-
 
         private string prefixo_grupo = ">";
         private string prefixo_parametro = "-";
@@ -253,15 +270,15 @@ namespace Dooggy.Factory.Console
         public bool Setup(string prmArquivoCFG)
         {
 
-            File = new FileTXT();
+            File = new FileTXT(); IsOK = false;
 
             if (File.Open(prmArquivoCFG))
             {
 
                 if (Run(prmBloco: File.txt()))
-                    { Trace.LogConfig.LoadConfig(prmArquivoCFG: nome_completo); return (true); }
+                { Trace.LogConfig.LoadConfig(prmArquivoCFG: nome_completo); IsOK = true; return true; }
                 else
-                    { Trace.LogConfig.FailLoadConfig(prmArquivoCFG: nome_completo, Config.status); return (false); }
+                { Trace.LogConfig.FailLoadConfig(prmArquivoCFG: nome_completo, Config.status); return (false); }
 
             }
 
@@ -269,7 +286,6 @@ namespace Dooggy.Factory.Console
 
             return false;
         }
-
         public bool Run(string prmBloco)
         {
             foreach (string line in new xMemo(prmBloco, prmSeparador: Environment.NewLine))
@@ -383,7 +399,7 @@ namespace Dooggy.Factory.Console
                     Config.Format.SetFormatDate(prmValor); break;
 
                 case "save":
-                    Config.Format.SetSaveDefault(prmValor); break;
+                    Config.Format.SetFormatSave(prmValor); break;
 
                 default:
                     Trace.LogConfig.FailFindParameter(prmTag, prmValor); break;

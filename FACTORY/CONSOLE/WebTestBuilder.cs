@@ -10,7 +10,6 @@ namespace Dooggy.Factory.Console
 
     public enum eTipoTestCommand : int
     {
-
         fail = -1,
 
         note = 0,
@@ -22,7 +21,6 @@ namespace Dooggy.Factory.Console
         item = 21,
 
         save = 50,
-
     }
 
     public class TestBuilder
@@ -49,25 +47,26 @@ namespace Dooggy.Factory.Console
 
         public void Compile(string prmCode)
         {
-            Result.SetCodeZero(); 
-            
+            Result.SetCode(prmCode);
+
             Merge(prmCode);
 
             if (Blocks.IsNeedSaveData)
-                Merge(prmCode: Console.Config.Format.saveKeywordDefault);
+            {
+                Blocks.CriarSAVE();
+
+                Merge(prmCode: Console.Config.Format.saveFormatDefault);
+            }
+
         }
 
         private void Merge(string prmCode)
         {
 
-            Result.SetCodeZero(prmCode);
-
             foreach (string linha in new xLinhas(prmCode))
             {
-
                 if (Sintaxe.IsNewLine(linha))
                 {
-
                     if (Sintaxe.IsNewTag())
                     {
 
@@ -76,13 +75,17 @@ namespace Dooggy.Factory.Console
                     else if (Sintaxe.IsNewCommand())
                         Blocks.AddCommand(Sintaxe);
                     else
-                        Blocks.AddParameter(Sintaxe);
+                    {
+                        if (Blocks.TemCommand)
+                            Blocks.AddParameter(Sintaxe);
+                        else
+                            Trace.LogConsole.IgnoredArgLine(linha);
+                    }
 
                 }
 
                 Blocks.AddLine(linha);
             }
-
         }
     }
     public class TestSintaxe : TestSintaxeCommand
@@ -274,7 +277,7 @@ namespace Dooggy.Factory.Console
                 case "view":
                 case "dataview":
                     tipo = eTipoTestCommand.view;
-                    args = "descricao;tabelas;campos;relacoes,mask;saida";
+                    args = "descricao;tabelas;campos;relacoes;mask;entrada;saida";
                     break;
 
                 case "item":
@@ -288,24 +291,6 @@ namespace Dooggy.Factory.Console
                     tipo = eTipoTestCommand.save;
                     args = "";//args = "encode;extensao";
                     break;
-
-                //case "txt":
-                //case "savetxt":
-                //    tipo = eTipoTestCommand.savetxt;
-                //    args = "";//args = "encode;extensao";
-                //    break;
-
-                //case "csv":
-                //case "savecsv":
-                //    tipo = eTipoTestCommand.savecsv;
-                //    args = "";//args = "encode;extensao";
-                //    break;
-
-                //case "json":
-                //case "savejson":
-                //    tipo = eTipoTestCommand.savejson;
-                //    args = "";//args = "encode;extensao";
-                //    break;
 
                 default:
                     tipo = eTipoTestCommand.fail;
@@ -344,15 +329,6 @@ namespace Dooggy.Factory.Console
                 case eTipoTestCommand.save:
                     return "save";
 
-                //case eTipoTestCommand.savetxt:
-                //    return "savetxt";
-
-                //case eTipoTestCommand.savecsv:
-                //    return "savecsv";
-
-                //case eTipoTestCommand.savejson:
-                //    return "savejson";
-
                 case eTipoTestCommand.fail:
                     return "fail";
             }
@@ -389,7 +365,7 @@ namespace Dooggy.Factory.Console
         private string arg_default => arg_start + arg_finish;
 
         private bool IsArg() => (key != "");
-        public bool IsOk() => lista.IsContem(key);
+        public bool IsOk() => GetOK();
 
         public void Setup(string prmArgs)
         {
@@ -437,6 +413,15 @@ namespace Dooggy.Factory.Console
             parametro = xString.GetLast(linha, prmDelimitador: ":").Trim();
 
         }
+
+        private bool GetOK()
+        {
+            if (lista != null)
+                return lista.IsContem(key);
+            
+            return false;
+        }
+
 
     }
 

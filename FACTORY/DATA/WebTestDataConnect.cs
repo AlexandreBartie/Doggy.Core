@@ -13,8 +13,11 @@ namespace Dooggy.Factory.Data
 
         public TestConfigTimeout Timeout => Pool.Console.Config.Timeout;
 
-        public int connect_timeout => Timeout.connect_timeout;
+        public string var_timeout = "##timeout##";
+
         public int command_timeout => Timeout.command_timeout;
+
+        public string GetFullConnection(string prmStrConnection) => xString.GetSubstituir(prmStrConnection, var_timeout, Timeout.connect_timeout.ToString());
 
         private DataBaseOracle _Oracle;
         public DataBaseOracle Oracle { get { if (_Oracle == null) _Oracle = new DataBaseOracle(this); return _Oracle; } }
@@ -36,18 +39,15 @@ namespace Dooggy.Factory.Data
         public string host;
         public string port;
         public string service;
-        public int timeout => Connect.connect_timeout;
 
         public DataBaseOracle(TestDataConnect prmConexao)
         {
-
             Connect = prmConexao;
-
         }
 
         public bool Add(string prmTag) => Pool.AddDataBase(prmTag, GetString());
 
-        public string GetString() => String.Format(model, host, port, service, user, password, timeout);
+        public string GetString() => String.Format(model, host, port, service, user, password, Connect.var_timeout);
 
     }
     public class DataBaseOracleDefault

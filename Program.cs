@@ -23,7 +23,6 @@ namespace Dooggy
 
         static void ConsoleScriptsINI(bool prmGerarMassaTestes)
         {
-
             string arquivoCFG = @"C:\MassaTestes\POC\CLI\projeto-teste.cfg";
 
             ProjetoMassaDados.EXE(arquivoCFG, prmGerarMassaTestes, prmAppName: Application.ProductName, prmAppVersion: Application.ProductVersion);

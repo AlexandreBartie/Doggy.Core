@@ -177,7 +177,7 @@ namespace Dooggy
                 return (Directory.GetFiles(Diretorio.path, prmFiltro));
             }
             catch (Exception e)
-            { Debug.WriteLine (string.Format("{0}: -err: {1}", "Erro na leituras do arquivos do diretório.", e.Message)) ; }
+            { Debug.WriteLine (string.Format("{0}: -err: {1}", "Erro de carregamento dos arquivos do diretório.", e.Message)) ; }
 
             return (null);
 

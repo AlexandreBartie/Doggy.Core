@@ -104,7 +104,7 @@ namespace Dooggy.Factory
     public class TestTraceLogData_Fail : TestTraceLog
     {
 
-        public void FailDBBlocked(string prmTag, string prmConexao) => FailConnection(prmMSG: "Conexão bloqueada", prmTag, prmVar: "-string", prmConexao, prmErro: @"APENAS para testes unitários.");
+        public void FailDBBlocked(string prmTag, string prmConexao) => FailConnection(prmMSG: "Conexão bloqueada", prmTag, prmVar: "-string", prmConexao, prmErro: @"APENAS para testes unitários");
         public void FailDBConnection(string prmTag, string prmConexao, Exception prmErro) => FailConnection(prmMSG: "Conexão falhou", prmTag, prmVar: "-string", prmConexao, prmErro);
         public void FailSQLConnection(string prmTag, string prmSQL, Exception prmErro) => FailConnection(prmMSG: "SQL falhou", prmTag, prmVar: "-sql", prmSQL, prmErro);
         public void FailSQLNoDataBaseConnection(string prmTag, string prmSQL, Exception prmErro) => FailConnection(prmMSG: "DB Desconectado", prmTag, prmVar: "-sql", prmSQL, prmErro);
@@ -114,7 +114,7 @@ namespace Dooggy.Factory
         private void FailConnection(string prmMSG, string prmTag, string prmVar, string prmErro) => msgErro(String.Format(@"{0} >>> tag:[{1}] {2}", prmMSG, prmTag, prmVar), prmErro);
 
         private void FailConnection(string prmMSG, string prmTag, string prmVar, string prmSQL, Exception prmErro) => FailConnection(prmMSG, prmTag, prmVar, prmSQL, GetMsgErro(prmErro));
-        private void FailConnection(string prmMSG, string prmTag, string prmVar, string prmSQL, string prmErro) => msgErro(String.Format(@">>>> [{0}] -db:[{1}] {2}: {3} -error: {4}", prmMSG, prmTag, prmVar, prmSQL, prmErro));
+        private void FailConnection(string prmMSG, string prmTag, string prmVar, string prmSQL, string prmErro) => msgErro(String.Format(@"{0} ... -error: [{1}] -db:[{2}] {3}: {4} ", prmMSG, prmErro, prmTag, prmVar, prmSQL));
 
         private string GetMsgErro(Exception prmErro) { if (prmErro != null) return (prmErro.Message); return (""); }
 
@@ -228,14 +228,12 @@ namespace Dooggy.Factory
     {
 
         public void FailFindKeyWord(string prmKeyWord) => msgErro(String.Format("Keyword não encontrada ... -key: {0}", prmKeyWord));
-
         public void FailActionKeyWord(string prmKeyWord) => msgErro(String.Format("Keyword não executada ... -key: {0}", prmKeyWord));
-
-        public void FailArgNewKeyWord(string prmKeyWord, string prmArg, string prmLinha) => msgErro(String.Format("Argumento-Keyword não suportado ... -key: {0} -arg: {1} -line: [{2}]", prmKeyWord, prmArg, prmLinha));
-
+        public void FailArgNewKeyWord(string prmKeyWord, string prmArg, string prmLinha) => msgErro(String.Format("Argumento-Keyword não suportado ... -arg: {0}.{1} -line: [{2}]", prmKeyWord, prmArg, prmLinha));
         public void FailArgMergeKeyWord(string prmKeyWord, string prmLinha) => msgErro(String.Format("Argumento-Keyword foi ignorado ... -key: {0} -line: [{1}]", prmKeyWord, prmLinha));
-
         public void FailFindValueVariable(string prmVariable, string prmTexto) => msgErro(String.Format("Variável não encontrada ... -var: {0} -txt: {1}", prmVariable, prmTexto));
+
+        public void IgnoredArgLine(string prmArg) => msgErro(String.Format("Nenhum comando encontrado antes do argumento ... {0}", prmArg));
 
     }
 
@@ -251,10 +249,10 @@ namespace Dooggy.Factory
         public void msgData(string prmMensagem) => Message(prmTipo: "DAT", prmMensagem);
         public void msgFile(string prmMensagem) => Message(prmTipo: "FILE", prmMensagem);
         public void msgFile(string prmTipo, string prmMensagem) => Message(prmTipo, prmMensagem);
+
         public void msgShow(string prmMensagem) => Message(prmTipo: "SHOW", prmMensagem);
         public void msgAviso(string prmAviso) => Message(prmTipo: "AVISO", prmAviso);
         public void msgFalha(string prmAviso) => Message(prmTipo: "FALHA", prmAviso);
-
 
     }
     public class TestTraceErro : TestTraceWrite

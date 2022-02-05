@@ -39,7 +39,7 @@ namespace Dooggy.Factory.Console
         public string GetLog()
         {
             if (TemCorrente)
-                return Corrente.Result.log;
+                return Corrente.Result.Log.txt;
 
             return ("");
         }
@@ -96,7 +96,7 @@ namespace Dooggy.Factory.Console
 
         private TestCode Code;
 
-        private TestTrace Trace => Dados.Trace;
+        public TestTrace Trace => Dados.Trace;
 
         private TestDataLocal Dados => Console.Dados;
         private TestConsoleInput Input => Console.Input;
@@ -157,7 +157,7 @@ namespace Dooggy.Factory.Console
 
             Result.SetData(prmData: Dados.output(prmTags: "", tipo));
 
-            Output.SaveOUT(Result.data, tipo, encoding, extensao, Result.log);
+            Output.SaveOUT(Result.data, tipo, encoding, extensao, Result.Log.txt);
         }
         private void SetOptions(string prmOptions)
         {

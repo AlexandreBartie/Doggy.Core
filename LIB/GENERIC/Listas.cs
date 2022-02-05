@@ -406,8 +406,8 @@ namespace Dooggy.Lib.Generic
         public string GetFormat(string prmKey, string prmValor) => mask.Get(prmValor, GetFormato(prmKey));
         public string GetFormatDate(string prmKey, DateTime prmValor, string prmPadrao) => xDate.GetFormatacao(prmValor, GetFormato(prmKey, prmPadrao));
 
-        private string GetFormato(string prmKey) => GetFormato(prmKey, prmPadrao: "");
-        private string GetFormato(string prmKey, string prmPadrao) => lista.GetValor(prmKey, prmPadrao);
+        public string GetFormato(string prmKey) => GetFormato(prmKey, prmPadrao: "");
+        public string GetFormato(string prmKey, string prmPadrao) => lista.GetValor(prmKey, prmPadrao);
 
     }
     public class xLinhas : xMemo

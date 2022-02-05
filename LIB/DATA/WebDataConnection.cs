@@ -128,6 +128,8 @@ namespace Dooggy.Lib.Data
 
             string tipo = reader.GetDataTypeName(prmIndice).ToLower();
 
+            string tipox = reader.GetFieldType(prmIndice).Name;
+
             string campo = GetName(prmIndice);
 
             switch (tipo)
@@ -136,6 +138,8 @@ namespace Dooggy.Lib.Data
                 case "date":
                     return GetMaskDate(campo, prmData: reader.GetDateTime(prmIndice));
 
+                case "double":
+                    return GetMaskDouble(campo, prmNumber: reader.GetDouble(prmIndice));
 
                 default:
                     return GetMask(campo, prmTexto: reader.GetOracleValue(prmIndice).ToString());
@@ -147,21 +151,24 @@ namespace Dooggy.Lib.Data
 
         private string GetMask(string prmCampo, string prmTexto)
         {
-
             if (IsMask)
                 return Mask.GetFormat(prmCampo, prmTexto);
 
             return (prmTexto);
-
         }
         private string GetMaskDate(string prmCampo, DateTime prmData)
         {
-
             if (IsMask)
                 return Mask.GetFormatDate(prmCampo, prmData, Tratamento.dateFormatDefault);
 
             return (Tratamento.GetDateFormat(prmData));
+        }
+        private string GetMaskDouble(string prmCampo, Double prmNumber)
+        {
+            if (IsMask)
+                return Tratamento.GetNumberFormat(prmNumber, Mask.GetFormato(prmCampo));
 
+            return (Tratamento.GetNumberFormat(prmNumber));
         }
         public string GetCSV(string prmSeparador)
         {
@@ -228,7 +235,10 @@ namespace Dooggy.Lib.Data
 
         public string status;
 
-        public string str_conection;
+        public string stringConnection;
+
+        private string baseConnection;
+
 
         public OracleConnection Conexao;
 
@@ -240,32 +250,27 @@ namespace Dooggy.Lib.Data
 
         public DataBaseConnection(string prmTag, string prmConexao, TestDataPool prmPool)
         {
-
             tag = prmTag;
 
             Pool = prmPool;
 
-            str_conection = prmConexao;
-
-            Abrir();
-
+            baseConnection = prmConexao;
         }
 
         public bool IsOK => _isOpen;
-        public int command_timeout => Pool.Connect.command_timeout;
         public string log => string.Format("-db[{0}]: {1}", tag, status);
 
         private string SetStatus(string prmStatus) { status = prmStatus; _isOpen = (prmStatus == "CONECTADO");  return prmStatus; }
 
-        public bool Testar() => Abrir();
-
         public bool Abrir()
         {
+
+            stringConnection = Pool.Connect.GetFullConnection(baseConnection);
 
             // used to do unit-testing ...
             if (Pool.IsDbBlocked)
             {
-                Trace.LogData.FailDBBlocked(tag, str_conection);
+                Trace.LogData.FailDBBlocked(tag, stringConnection);
 
                 return (false);
             }
@@ -273,7 +278,9 @@ namespace Dooggy.Lib.Data
             try
             {
 
-                Conexao = new OracleConnection(str_conection);
+                int x = Pool.Connect.command_timeout;
+
+                Conexao = new OracleConnection(stringConnection);
 
                 Conexao.Open();
 
@@ -284,7 +291,7 @@ namespace Dooggy.Lib.Data
             }
 
             catch (Exception e)
-            { Trace.LogData.FailDBConnection(tag, str_conection, e); erro = e; SetStatus("ERRO"); }
+            { Trace.LogData.FailDBConnection(tag, stringConnection, e); erro = e; SetStatus("ERRO"); }
 
             return (false);
         }
@@ -304,41 +311,34 @@ namespace Dooggy.Lib.Data
 
         public DataBaseConnection Corrente;
 
+        private bool IsConnected;
+
         public bool IsOK => GetIsOK();
 
         public bool Criar(string prmTag, string prmConexao, TestDataPool prmPool)
         {
-
             Corrente = new DataBaseConnection(prmTag, prmConexao, prmPool);
 
             Add(Corrente);
 
             return (Corrente.IsOK);
-
         }
         public bool DoConnect()
         {
+            IsConnected = true;
 
             foreach (DataBaseConnection db in this)
                 if (!db.Abrir())
                     return false;
 
-            return true;
-
-        }
-        public bool Testar()
-        {
-
-            foreach (DataBaseConnection db in this)
-                if (!db.Testar())
-                    return false;
-
-            return true;
-
+            return IsConnected;
         }
 
         private bool GetIsOK()
         {
+
+            if (!IsConnected)
+                DoConnect();
 
             bool ok = false;
 
@@ -349,23 +349,18 @@ namespace Dooggy.Lib.Data
                     break;
 
             return ok;
-
         }
         public string log()
         {
-
             xMemo lista = new xMemo(prmSeparador: ", ");
 
                 foreach (DataBaseConnection db in this)
                 lista.Add(db.log);
 
             return ">dbase: " + lista.txt();
-
         }
 
     }
-
-
 
 }
 

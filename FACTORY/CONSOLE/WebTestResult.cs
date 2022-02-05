@@ -24,15 +24,14 @@ namespace Dooggy.Factory.Console
         public string code { get => _code; }
         public string data { get => _data; }
 
-        public string log => Log.txt;
-
-        public bool IsChanged => (xString.IsNoEqual(_code, _codeZero));
-        public bool IsData => (xString.IsFull(data));
         public bool IsError => Log.erro;
 
-        public bool IsDataSaved;
+        public bool IsData => (xString.IsFull(data));
 
-        private TestResultLog Log;
+        public bool IsDataSaved;
+        public bool IsChanged => (xString.IsNoEqual(_code, _codeZero));
+
+        public TestResultLog Log;
 
 
         public TestResult(TestScript prmScript)
@@ -44,8 +43,10 @@ namespace Dooggy.Factory.Console
 
         }
 
-        public void Setup(string prmArquivoINI)
+        public void Setup(string prmCode, string prmArquivoINI)
         {
+
+            SetSave(prmCode);
 
             name_INI = prmArquivoINI;
 
@@ -56,12 +57,10 @@ namespace Dooggy.Factory.Console
 
         public void AddLog(string prmTipo, string prmTexto) => Log.AddNew(prmTipo, prmTexto);
 
-        public void SetCodeZero() { _codeZero = ""; SetCodeZero(prmCode: ""); }
-        public void SetCodeZero(string prmCode) { _codeZero += prmCode; SetCode(_codeZero); _data = ""; }
-
+        public void SetSave(string prmCode) { _codeZero = prmCode; SetCode(_codeZero); }
         public void SetCode(string prmCode) => _code = prmCode;
         public void SetData(string prmData) { _data = prmData; IsDataSaved = true; }
-        public void UndoCode() => SetCode(prmCode: Script.Console.Input.GetCode(name_INI));
+        public void UndoCode() => SetSave(prmCode: Script.Console.Input.GetCode(name_INI));
 
     }
     public class TestResultLog : List<TestItemLog>

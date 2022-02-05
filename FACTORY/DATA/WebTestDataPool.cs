@@ -54,6 +54,7 @@ namespace Dooggy.Factory.Data
         public bool IsDbOK => (Bases.IsOK);
         public bool IsDbBlocked => bloqueado;
         public bool IsHaveData => Raws.IsHaveData || Views.IsHaveData;
+        private int next_view => Views.Count + 1;
 
         public TestDataPool(TestFactory prmFactory)
         {
@@ -104,7 +105,7 @@ namespace Dooggy.Factory.Data
 
         public bool IsSQLDataException(string prmTexto) => Tratamento.IsSQLDataException(prmTexto);
         public string GetTextoTratado(string prmTexto) => Tratamento.GetTextoTratado(prmTexto);
-        public string GetNextKeyDataView() => string.Format("null_{0},", Views.Count);
+        public string GetNextKeyDataView() => string.Format("view#{0},", next_view);
 
         public string txt(string prmTags) => output(prmTags, prmTipo: eTipoFileFormat.txt);
         public string csv(string prmTags) => output(prmTags, prmTipo: eTipoFileFormat.csv);
@@ -260,6 +261,10 @@ namespace Dooggy.Factory.Data
 
         public string GetDateAnchor() => GetDateAnchor(dateFormatDefault);
         public string GetDateAnchor(string prmFormatacao) => GetDateFormat(anchor, prmFormatacao);
+
+
+        public string GetNumberFormat(double prmNumber) => GetNumberFormat(prmNumber, prmFormatacao: "C2");
+        public string GetNumberFormat(double prmNumber, string prmFormatacao) => prmNumber.ToString(prmFormatacao);
 
         public string GetDateFormat(DateTime prmData) => GetDateFormat(prmData, dateFormatDefault);
         public string GetDateFormat(DateTime prmData, string prmFormatacao) => xDate.GetFormatacao(prmData, prmFormatacao);
