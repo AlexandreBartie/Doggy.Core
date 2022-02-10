@@ -1,4 +1,6 @@
-﻿using Dooggy.Lib.Generic;
+﻿using Dooggy;
+using Dooggy.Lib.Generic;
+using Dooggy.Lib.Vars;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -26,10 +28,10 @@ namespace Dooggy.Factory.Console
 
         public bool IsError => Log.erro;
 
-        public bool IsData => (xString.IsFull(data));
+        public bool IsData => (myString.IsFull(data));
 
         public bool IsDataSaved;
-        public bool IsChanged => (xString.IsNoEqual(_code, _codeZero));
+        public bool IsChanged => (myString.IsNoEqual(_code, _codeZero));
 
         public TestResultLog Log;
 
@@ -88,7 +90,7 @@ namespace Dooggy.Factory.Console
             {
                 Add(new TestItemLog(prmTipo, prmTexto));
 
-                erro = erro || xString.IsEqual(prmTipo, "erro");
+                erro = erro || myString.IsEqual(prmTipo, "erro");
             }
 
         }

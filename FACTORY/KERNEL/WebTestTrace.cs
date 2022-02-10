@@ -2,8 +2,9 @@
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Text;
-using Dooggy.Lib.Generic;
+using Dooggy;
 using Dooggy.Factory.Console;
+using Dooggy.Lib.Vars;
 
 namespace Dooggy.Factory
 {
@@ -108,7 +109,7 @@ namespace Dooggy.Factory
         public void FailDBConnection(string prmTag, string prmConexao, Exception prmErro) => FailConnection(prmMSG: "Conexão falhou", prmTag, prmVar: "-string", prmConexao, prmErro);
         public void FailSQLConnection(string prmTag, string prmSQL, Exception prmErro) => FailConnection(prmMSG: "SQL falhou", prmTag, prmVar: "-sql", prmSQL, prmErro);
         public void FailSQLNoDataBaseConnection(string prmTag, string prmSQL, Exception prmErro) => FailConnection(prmMSG: "DB Desconectado", prmTag, prmVar: "-sql", prmSQL, prmErro);
-        public void FailNoDataViewDetected(string prmTag) => msgErro(prmTexto: string.Format("Data View não identificada ... >>> fluxo: [{0}] não executou o SQL ...", prmTag));
+        public void FailNoDataViewDetected(string prmTag) => msgErro(prmTexto: string.Format("Data View não identificada ... >>> Flow: [{0}] não executou o SQL ...", prmTag));
 
         private void FailConnection(string prmMSG, string prmTag, string prmVar, Exception prmErro) => FailConnection(prmMSG, prmTag, prmVar, GetMsgErro(prmErro));
         private void FailConnection(string prmMSG, string prmTag, string prmVar, string prmErro) => msgErro(String.Format(@"{0} >>> tag:[{1}] {2}", prmMSG, prmTag, prmVar), prmErro);
@@ -149,10 +150,10 @@ namespace Dooggy.Factory
 
             string msg = string.Format("act# -{0}: {1}.", txt, prmContexto);
 
-            if (xString.IsFull(prmEncoding))
+            if (myString.IsFull(prmEncoding))
                 msg += @" -encoding: " + prmEncoding;
             
-            if (xString.GetFirst(prmArquivo, prmDelimitador: ".") != "")
+            if (myString.GetFirst(prmArquivo, prmDelimitador: ".") != "")
             {
                 msg += @" -file: " + prmArquivo;
 
@@ -170,7 +171,7 @@ namespace Dooggy.Factory
         public void FailDataFileEncoding(string prmEncoding) => msgErro(String.Format("Formato encoding [{0}] não encontrado ...", prmEncoding));
         public void FailDataFileSave(string prmArquivo, string prmPath) => msgErro(String.Format("Falha na criação do arquivo ... -file: {0} -path: {1}", prmArquivo, prmPath));
         public void FailDataFileOpen(string prmArquivo, string prmPath) => FailDataFileOpenDefault(prmLocal: String.Format("-file: {0} -path: {1}", prmArquivo, prmPath));
-        public void FailJSONFormat(string prmContexto, string prmFluxo, Exception prmErro) => msgErro(prmTexto: String.Format(@"Fluxo JSON: [invalid format] ... contexto: {0} fluxo: {1}", prmContexto, prmFluxo));
+        public void FailJSONFormat(string prmContexto, string prmFlow, Exception prmErro) => msgErro(prmTexto: String.Format(@"Flow JSON: [invalid format] ... contexto: {0} Flow: {1}", prmContexto, prmFlow));
 
         private void FailDataFileOpenDefault(string prmLocal) => msgErro(String.Format("Falha na abertura do arquivo ... {0}", prmLocal));
 
@@ -231,7 +232,8 @@ namespace Dooggy.Factory
         public void FailActionKeyWord(string prmKeyWord) => msgErro(String.Format("Keyword não executada ... -key: {0}", prmKeyWord));
         public void FailArgNewKeyWord(string prmKeyWord, string prmArg, string prmLinha) => msgErro(String.Format("Argumento-Keyword não suportado ... -arg: {0}.{1} -line: [{2}]", prmKeyWord, prmArg, prmLinha));
         public void FailArgMergeKeyWord(string prmKeyWord, string prmLinha) => msgErro(String.Format("Argumento-Keyword foi ignorado ... -key: {0} -line: [{1}]", prmKeyWord, prmLinha));
-        public void FailFindValueVariable(string prmVariable, string prmTexto) => msgErro(String.Format("Variável não encontrada ... -var: {0} -txt: {1}", prmVariable, prmTexto));
+        public void FailFindVariable(string prmVariable, string prmCommand) => msgErro(String.Format("Variável não encontrada ... -var: {0} -cmd: {1}", prmVariable, prmCommand));
+        public void FailFindFunction(string prmFunction, string prmCommand) => msgErro(String.Format("Função não encontrada ... -fnc: {0} -cmd: {1}", prmFunction, prmCommand));
 
         public void IgnoredArgLine(string prmArg) => msgErro(String.Format("Nenhum comando encontrado antes do argumento ... {0}", prmArg));
 

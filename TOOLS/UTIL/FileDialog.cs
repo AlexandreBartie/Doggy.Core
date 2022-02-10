@@ -4,9 +4,9 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace Dooggy
+namespace Dooggy.Tools.Util
 {
-    public class xFileDialog
+    public class myFileDialog
     {
 
         public OpenFileDialog Dialog;
@@ -14,7 +14,7 @@ namespace Dooggy
         private Thread Thread;
         private DialogResult Result;
 
-        public xFileDialog()
+        public myFileDialog()
         {
             Dialog = new OpenFileDialog();
             Thread = new Thread(new ThreadStart(MethodThread));

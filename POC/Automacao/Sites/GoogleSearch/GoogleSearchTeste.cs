@@ -4,7 +4,7 @@ using System.Text;
 using System.Diagnostics;
 using Dooggy.Factory.Robot;
 using Dooggy.Lib.Files;
-using Dooggy.Lib.Generic;
+using Dooggy;
 
 namespace Dooggy.GoogleSearch
 {
@@ -30,7 +30,7 @@ namespace Dooggy.GoogleSearch
             //                Debug.WriteLine(teste.nome);
             //                Debug.WriteLine("===============================================");
             //                Debug.WriteLine(teste.Parametros.memo());
-            //                Debug.WriteLine(teste.Fluxos.memo());
+            //                Debug.WriteLine(teste.Flows.memo());
             //                Debug.WriteLine("===============================================");
 
             //            }
@@ -38,10 +38,10 @@ namespace Dooggy.GoogleSearch
             //        else
             //        {
 
-            //            foreach (xMemo fluxo in Massa.Fonte.FileJUnit.JSON.Dados)
+            //            foreach (xMemo Flow in Massa.Fonte.FileJUnit.JSON.Dados)
             //            {
 
-            //                Debug.WriteLine(fluxo.memo());
+            //                Debug.WriteLine(Flow.memo());
 
             //                Debug.Assert(false);
 
@@ -50,9 +50,9 @@ namespace Dooggy.GoogleSearch
             //    }
             //}
 
-            Massa.Add(prmFluxo: @"{'Nome':'Alexandre Bartie'}");
-            Massa.Add(prmFluxo: @"{'Nome':'Teste de Software'}");
-            Massa.Add(prmFluxo: @"{'Nome':'Albert Einstein'}");
+            Massa.Add(prmFlow: @"{'Nome':'Alexandre Bartie'}");
+            Massa.Add(prmFlow: @"{'Nome':'Teste de Software'}");
+            Massa.Add(prmFlow: @"{'Nome':'Albert Einstein'}");
 
             Massa.Save();
 

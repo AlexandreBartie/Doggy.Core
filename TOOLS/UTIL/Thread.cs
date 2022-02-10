@@ -4,18 +4,59 @@ using System.Diagnostics;
 using System.Text;
 using System.Threading;
 
-namespace Dooggy
+namespace Dooggy.Tools.Util
 {
 
-    public abstract class xThread
+    public abstract class myThread
     {
 
+        Thread thread;
 
+        Exception Error;
+
+        public void Go(string prmName) => Go(prmName, prmBackground: false);
+        public void Go(string prmName, bool prmBackground)
+        {
+            thread = new Thread(new ThreadStart(DoWork));
+
+            thread.Name = prmName;
+            thread.IsBackground = prmBackground;
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
+
+        }
+
+        [STAThread]
+        private void DoWork()
+        {
+            try
+            {
+                Debug.WriteLine("Try: Espera Work ...");
+                Work();
+                Debug.WriteLine("Try: Depois Work ...");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Erro na Tread: " + ex.Message); Error = ex;
+            }
+            finally
+            {
+                Debug.WriteLine("Finally: Espera End ...");
+                End();
+                Debug.WriteLine("Finally: Depois End ...");
+            }
+        }
+
+        public void WaitEnd() { thread.Join(); }
+
+        protected abstract void Work();
+        protected abstract void End();
 
     }
 
-    public abstract class xSuperThread
+    public abstract class mySuperThread
     {
+        
         readonly ManualResetEvent _complete = new ManualResetEvent(false);
 
         public void Go(string prmName)

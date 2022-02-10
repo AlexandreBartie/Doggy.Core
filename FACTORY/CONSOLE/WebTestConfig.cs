@@ -1,10 +1,14 @@
 ﻿using Dooggy.Factory.Data;
 using Dooggy.Lib.Data;
 using Dooggy.Lib.Files;
-using Dooggy.Lib.Generic;
+using Dooggy;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Dooggy.Lib.Generic;
+using Dooggy.Lib.Vars;
+using Dooggy.Tools.Calc;
+using System.Globalization;
 
 namespace Dooggy.Factory.Console
 {
@@ -17,14 +21,16 @@ namespace Dooggy.Factory.Console
 
         public TestConfigMode Mode;
 
+        public TestConfigCSV CSV;
         public TestConfigPath Path;
-        public TestConfigFormat Format;
         public TestConfigTimeout Timeout;
+
+        public TestConfigValidation Validation;
 
         public TestDataPool Pool => Console.Pool;
         private DataBasesConnection Bases => Pool.Bases;
 
-        public string status => GetStatus();
+        public string status() => GetStatus();
 
         public bool IsOK => Path.IsOK && Bases.IsOK;
 
@@ -36,9 +42,14 @@ namespace Dooggy.Factory.Console
 
             Mode = new TestConfigMode(this);
 
+            CSV = new TestConfigCSV(this);
+
             Path = new TestConfigPath(this);
-            Format = new TestConfigFormat(this);
+
             Timeout = new TestConfigTimeout(this);
+
+            Validation = new TestConfigValidation(this);
+
         }
 
         public bool Setup(string prmArquivoCFG, bool prmPlay)
@@ -53,13 +64,18 @@ namespace Dooggy.Factory.Console
 
         public bool Run(string prmBloco) => Import.Run(prmBloco);
 
-        public string GetStatus()
+        private string GetStatus()
         {
-            if (Console.IsDbOK)
-                return Console.Dados.log + " | " + Timeout.log + " | " + Format.log + " | " + Path.log;
+            
+            string status = Console.Dados.log;
 
-            return Console.Dados.log;
-        
+            if (Console.IsDbOK)
+                status += " | " + Timeout.log + " | " + CSV.log + " | " + Path.log;
+
+            status += " | " + Validation.log;
+
+            return status;
+      
         }
 
     }
@@ -84,59 +100,110 @@ namespace Dooggy.Factory.Console
         public string log => String.Format(">timeout: {0}, {1}", txtconnectTimeout(), txtcommandTimeout());
 
     }
-    public class TestConfigFormat
+
+    public class TestConfigCSV
     {
-
         private TestConsoleConfig Config;
-        private TestDataTratamento Tratamento => Config.Pool.Tratamento;
 
+        public DateTime anchor;
 
-        public DateTime anchor = DateTime.Now;
+        public string formatRegion;
 
-        public string dateFormatDefault = "DD/MM/AAAA";
-        public string saveFormatDefault => GetSaveDefault();
+        public string formatToday;
 
-        private string baseSaveFormatDefault;
+        public string formatDateDefault;
 
-        public TestConfigFormat(TestConsoleConfig prmConfig)
+        private string formatSaveDefault;
+
+        public CultureInfo Culture;
+
+        public TestConfigCSV(TestConsoleConfig prmConfig)
         {
             Config = prmConfig;
+
+            anchor = DateTime.Now;
+
+            formatDateDefault = "DD/MM/AAAA";
+
+            GetCulture();
         }
-
-        public void SetToday(string prmDate)
+        public void SetToday(string prmFormat)
         {
-            DynamicDate Data = new DynamicDate(anchor);
+            formatToday = prmFormat;
 
-            anchor = Data.Calc(prmSintaxe: prmDate);
+            anchor = myDate.Calc(prmDate: anchor, prmSintaxe: prmFormat);
         }
         public void SetToday(DateTime prmDate)
         {
             anchor = prmDate;
         }
-        public void SetFormatDate(string prmFormatDefault)
+        public void SetFormatDate(string prmFormat)
         {
-            dateFormatDefault = prmFormatDefault;
-        }
-        public void SetFormatSave(string prmFormatDefault)
-        {
-            baseSaveFormatDefault = prmFormatDefault;
+            formatDateDefault = prmFormat;
         }
 
-        private string GetSaveDefault()
+        public void SetRegion() => SetRegion(prmRegion: "");
+        public void SetRegion(string prmRegion)
+        {
+            formatRegion = prmRegion; GetCulture();
+        }
+        public void SetFormatSave(string prmFormat)
+        {
+            formatSaveDefault = prmFormat;
+        }
+        
+        public string GetSaveDefault()
         {
             string format = "";
 
-            if (xString.IsFull(baseSaveFormatDefault))
-                format = string.Format("[{0}]", baseSaveFormatDefault);
+            if (myString.IsFull(formatSaveDefault))
+                format = string.Format("[{0}]", formatSaveDefault);
 
             return string.Format(">save{0}:", format);
         }
 
-        private string txt_today => String.Format("-today: {0}", Tratamento.GetDateAnchor());
-        private string txt_date => String.Format("-date: {0}", dateFormatDefault);
-        private string txt_save => String.Format("-save: {0}", baseSaveFormatDefault);
+        public string TextToCSV(string prmText, string prmFormat) => myCSV.TextToCSV(prmText, prmFormat);
+        public string DateToCSV(DateTime prmDate, string prmFormat) => myCSV.DateToCSV(prmDate, prmFormat);
+        public string DoubleToCSV(Double prmNumber, string prmFormat) => myCSV.DoubleToCSV(prmNumber, prmFormat, prmCulture: Culture);
 
-        public string log => String.Format(">format: {0}, {1}, {2}", txt_today, txt_date, txt_save);
+        private string txt_region => String.Format("-region: {0}", formatRegion);
+        private string txt_today => String.Format("-today: {0}", formatToday);
+        private string txt_date => String.Format("-date: {0}", formatDateDefault);
+        private string txt_save => String.Format("-save: {0}", formatSaveDefault);
+
+        public string log => String.Format(">csv: {0}, {1}, {2}, {3}", txt_region, txt_today, txt_date, txt_save);
+
+        private void GetCulture()
+        {
+            CultureInfo ret = CultureInfo.InvariantCulture;
+            try
+            { ret = new CultureInfo(formatRegion); }
+
+            catch (Exception e)
+            { }
+
+            Culture = ret;
+        }
+    }
+
+    public class TestConfigValidation
+    {
+
+        private TestConsoleConfig Config;
+
+        private TestConfigCSV CSV => Config.CSV;
+
+        public TestConfigValidation(TestConsoleConfig prmConfig)
+        {
+            Config = prmConfig;
+        }
+
+        public string log => GetTest(prmDate: CSV.anchor, prmNumber: 1234.5);
+
+        private string txt_date(DateTime prmDate) => String.Format("-date: {0}", myCSV.DateToCSV(prmDate, CSV.formatDateDefault));
+        private string txt_double(Double prmDouble) => String.Format("-double: {0}", myCSV.DoubleToCSV(prmDouble, CSV.Culture));
+
+        private string GetTest(DateTime prmDate, Double prmNumber) => String.Format(">test: {0}, {1}", txt_date(prmDate), txt_double(prmNumber));
 
     }
     public class TestConfigMode
@@ -278,7 +345,7 @@ namespace Dooggy.Factory.Console
                 if (Run(prmBloco: File.txt()))
                 { Trace.LogConfig.LoadConfig(prmArquivoCFG: nome_completo); IsOK = true; return true; }
                 else
-                { Trace.LogConfig.FailLoadConfig(prmArquivoCFG: nome_completo, Config.status); return (false); }
+                { Trace.LogConfig.FailLoadConfig(prmArquivoCFG: nome_completo, Config.status()); return (false); }
 
             }
 
@@ -305,7 +372,7 @@ namespace Dooggy.Factory.Console
         public bool SetLine(string prmLinha)
         {
 
-            if (xString.IsFull(prmLinha))
+            if (myString.IsFull(prmLinha))
                 { linha = prmLinha; return true; }
 
             return false;
@@ -337,8 +404,8 @@ namespace Dooggy.Factory.Console
                 case "timeout":
                     SetGroupTimeout(tag, valor); break;
 
-                case "format":
-                    SetGroupFormat(tag, valor); break;
+                case "csv":
+                    SetGroupCSV(tag, valor); break;
 
                 default:
                     Trace.LogConfig.FailFindGroup(grupo); break;
@@ -379,33 +446,35 @@ namespace Dooggy.Factory.Console
             switch (prmTag)
             {
                 case "connectdb":
-                    Config.Timeout.SetConnectTimeOut(xInt.GetNumero(prmValor)); break;
+                    Config.Timeout.SetConnectTimeOut(myInt.GetNumero(prmValor)); break;
 
                 case "commandsql":
-                    Config.Timeout.SetCommandTimeOut(xInt.GetNumero(prmValor)); break;
+                    Config.Timeout.SetCommandTimeOut(myInt.GetNumero(prmValor)); break;
 
                 default:
                     Trace.LogConfig.FailFindParameter(prmTag, prmValor); break;
             }
         }
-        private void SetGroupFormat(string prmTag, string prmValor)
+        private void SetGroupCSV(string prmTag, string prmValor)
         {
             switch (prmTag)
             {
+                case "region":
+                    Config.CSV.SetRegion(prmValor); break;
+
                 case "today":
-                    Config.Format.SetToday(prmValor); break;
+                    Config.CSV.SetToday(prmValor); break;
 
                 case "date":
-                    Config.Format.SetFormatDate(prmValor); break;
+                    Config.CSV.SetFormatDate(prmValor); break;
 
                 case "save":
-                    Config.Format.SetFormatSave(prmValor); break;
+                    Config.CSV.SetFormatSave(prmValor); break;
 
                 default:
                     Trace.LogConfig.FailFindParameter(prmTag, prmValor); break;
             }
         }
-
         private bool IsGroup() => (Prefixo.IsPrefixo(linha, prefixo_grupo, delimitador));
         private void SetGroup() => grupo = (Prefixo.GetPrefixo(linha, prefixo_grupo, delimitador).Trim().ToLower());
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
 using Dooggy.Lib.Parse;
+using Dooggy;
 using Dooggy.Lib.Generic;
 
 namespace Dooggy.Lib.Files
@@ -81,7 +82,7 @@ namespace Dooggy.Lib.Files
 
             else
 
-                AddFluxo(prmLine);
+                AddFlow(prmLine);
 
         }
 
@@ -95,10 +96,10 @@ namespace Dooggy.Lib.Files
 
         }
 
-        private void AddFluxo(string prmLine) 
+        private void AddFlow(string prmLine) 
         {
 
-            TestCaseCurrent.Fluxos.Add(prmLine);
+            TestCaseCurrent.Flows.Add(prmLine);
 
         }
 
@@ -128,7 +129,7 @@ namespace Dooggy.Lib.Files
 
         public FileJUNIT File;
 
-        public TestDataJUnit Fluxos;
+        public TestDataJUnit Flows;
 
         public TestParametersJUnit Parametros;
 
@@ -141,7 +142,7 @@ namespace Dooggy.Lib.Files
 
             File = prmFile;
 
-            Fluxos = new TestDataJUnit(this);
+            Flows = new TestDataJUnit(this);
 
             Parametros = new TestParametersJUnit(this, prmLine);
 
@@ -167,7 +168,7 @@ namespace Dooggy.Lib.Files
             nome = Lista.GetRemove();
 
         }
-        public string GetJSON(xMemo prmFluxo)
+        public string GetJSON(xMemo prmFlow)
         {
 
             string lista = "";
@@ -181,7 +182,7 @@ namespace Dooggy.Lib.Files
 
                 cont++;
 
-                lista += aux + string.Format("'{0}': '{1}'", atributo, prmFluxo.Item(cont));
+                lista += aux + string.Format("'{0}': '{1}'", atributo, prmFlow.Item(cont));
 
                 aux = ",";
 
@@ -245,10 +246,10 @@ namespace Dooggy.Lib.Files
             foreach (TestCaseJUnit teste in File.TestCases)
             {
 
-                foreach (xMemo fluxo in teste.Fluxos.Dados)
+                foreach (xMemo Flow in teste.Flows.Dados)
                 {
 
-                    Debug.WriteLine(  teste.Parametros.GetJSON(fluxo));
+                    Debug.WriteLine(  teste.Parametros.GetJSON(Flow));
 
                 }
 
@@ -261,10 +262,10 @@ namespace Dooggy.Lib.Files
             string lista = "";
             string aux = "";
 
-            foreach (xMemo fluxo in Dados)
+            foreach (xMemo Flow in Dados)
             {
 
-                lista += aux + (fluxo.txt(File.separador));
+                lista += aux + (Flow.txt(File.separador));
 
                 aux = Environment.NewLine;
 

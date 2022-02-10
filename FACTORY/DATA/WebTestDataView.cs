@@ -3,6 +3,8 @@ using Dooggy.Factory;
 using Dooggy.Factory.Data;
 using Dooggy.Lib.Data;
 using Dooggy.Lib.Generic;
+using Dooggy.Lib.Parse;
+using Dooggy.Lib.Vars;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -19,15 +21,11 @@ namespace Dooggy.Factory.Data
         private string alias;
 
         public string descricao;
+        public string tag => GetTag();
 
-        public string entrada;
-        public string saida;
+        public TestViewHeader Header;
 
-        public TestDataFluxos Fluxos;
-
-        public string tag { get => GetTag(); }
-        public string header_txt => xString.Concat(descricao, fluxo_txt, prmSeparador: ",");
-        private string fluxo_txt => xString.Concat(entrada, saida, prmSeparador: ",");
+        public TestDataFlows Flows;
 
         public TestDataPool Pool { get => DataBase.Pool; }
 
@@ -52,44 +50,38 @@ namespace Dooggy.Factory.Data
 
             alias = Bloco.GetBlocoAntes(prmTag, bloco, prmTRIM: true);
 
-            saida = Bloco.GetBlocoDepois(prmTag, bloco, prmTRIM: true);
+            //SetOutput(prmLista: Bloco.GetBlocoDepois(prmTag, bloco, prmTRIM: true));
 
             key = Pool.GetNextKeyDataView();
 
         }
 
+        public void SetInput(string prmLista) => Header.Input.Parse(prmLista);
+        public void SetOutput(string prmLista) => Header.Output.Parse(prmLista);
+
         public void Cleanup()
         {
+            Header = new TestViewHeader(this);
 
-            Fluxos = new TestDataFluxos(Pool);
-
+            Flows = new TestDataFlows(Pool);
         }
-
         private string GetTag()
         {
-
             if (alias == "")
                 return (key);
 
             return (alias);
-
-        }
-
-        private string GetFluxoTXT()
-        {
-            if (xString.IsFull(entrada))
-                return entrada + "," + saida;
-
-            return (entrada);
         }
 
     }
-    public class TestDataFluxo : TestDataSQL
+    public class TestDataFlow : TestDataSQL
     {
 
         public string tag;
 
         public TestDataView View;
+
+        public myTupla Input;
 
         private TestDataTratamento Tratamento { get => View.Pool.Tratamento; }
 
@@ -114,15 +106,17 @@ namespace Dooggy.Factory.Data
 
         public string tag_view  => View.tag;
 
-        public string header_txt => View.header_txt;
+        public string header_txt => View.Header.txt;
 
         public bool IsOK => Cursor.IsOK;
         public Exception erro => Cursor.erro;
 
-        public TestDataFluxo(string prmTag, string prmSQL, string prmMask, TestDataView prmDataView)
+        public TestDataFlow(string prmTag, string prmSQL, string prmMask, TestDataView prmDataView)
         {
 
             tag = prmTag;
+
+            SetInput(prmDataView.Header.Input);
 
             SetSQL(prmSQL);
 
@@ -176,22 +170,30 @@ namespace Dooggy.Factory.Data
     public class TestDataSQL : TestDataSQLBase
     {
 
-        public string sql;
+        private myTuplas Input;
+        
+        private string sql;
 
-        public string filtro;
+        private string filtro;
 
-        public string ordem;
+        private string ordem;
 
+        public TestDataSQL()
+        {
+            Input = new myTuplas();
+        }
+        public void SetInput(myTuplas prmTuplas) => Input.Parse(prmTuplas);
+        public void SetInput(string prmValores) => Input.Parse(prmValores);
         public void SetSQL(string prmSQL) => sql = prmSQL;
         public void SetFiltro(string prmFiltro) => filtro = prmFiltro;
         public void SetOrdem(string prmOrdem) => ordem = prmOrdem;
 
         public bool TemSQL() => (TemSQLMontada() || TemEstrutura());
-        public bool TemSQLMontada() => (xString.IsFull(sql));
+        public bool TemSQLMontada() => (myString.IsFull(sql));
         private bool TemCombinacoes() => TemRelacoes() && TemFiltro();
         private bool TemCondicoes() => TemRelacoes() || TemFiltro();
-        private bool TemFiltro() => (xString.IsFull(filtro));
-        private bool TemOrdem() => (xString.IsFull(ordem));
+        private bool TemFiltro() => (myString.IsFull(filtro));
+        private bool TemOrdem() => (myString.IsFull(ordem));
 
         public string GetSQL(TestDataView prmView)
         {
@@ -245,7 +247,6 @@ namespace Dooggy.Factory.Data
         }
 
     }
-
     public class TestDataSQLBase
     {
 
@@ -263,12 +264,11 @@ namespace Dooggy.Factory.Data
         public void SetMask(string prmMask) => mask = prmMask;
 
         public bool TemEstrutura() => TemTabelas() && TemCampos();
-        protected bool TemTabelas() => (xString.IsFull(tabelas));
-        protected bool TemCampos() => (xString.IsFull(campos));
-        protected bool TemRelacoes() => (xString.IsFull(relacoes));
+        protected bool TemTabelas() => (myString.IsFull(tabelas));
+        protected bool TemCampos() => (myString.IsFull(campos));
+        protected bool TemRelacoes() => (myString.IsFull(relacoes));
 
     }
-
     public class TestDataViews : List<TestDataView>
     {
 
@@ -336,11 +336,11 @@ namespace Dooggy.Factory.Data
                     break;
 
                 case "entrada":
-                    Corrente.entrada = prmInstrucao;
+                    Corrente.SetInput(prmInstrucao);
                     break;
 
                 case "saida":
-                    Corrente.saida = prmInstrucao;
+                    Corrente.SetOutput(prmInstrucao);
                     break;
 
             }
@@ -349,19 +349,19 @@ namespace Dooggy.Factory.Data
         public string output(string prmTags, eTipoFileFormat prmTipo) 
         {
 
-            TestDataFluxos filtro = new TestDataFluxos(Pool);
+            TestDataFlows filtro = new TestDataFlows(Pool);
 
             xLista lista = new xLista(prmTags, prmSeparador: "+");
 
             foreach (TestDataView View in this)
             {
 
-                if (xString.IsEmpty(prmTags) || lista.IsEqual(View.tag))
+                if (myString.IsEmpty(prmTags) || lista.IsEqual(View.tag))
                 {
                     
-                    filtro.AddItens(View.Fluxos);
+                    filtro.AddItens(View.Flows);
 
-                    Trace.LogData.SQLViewsSelection(View.tag, prmQtde: View.Fluxos.Count);
+                    Trace.LogData.SQLViewsSelection(View.tag, prmQtde: View.Flows.Count);
 
                 }
 
@@ -383,7 +383,7 @@ namespace Dooggy.Factory.Data
                 foreach (TestDataView View in this)
                 {
 
-                    if (xString.IsEqual(View.tag, tag))
+                    if (myString.IsEqual(View.tag, tag))
                     {
 
                         filtro.Add(View); cont++;
@@ -404,7 +404,7 @@ namespace Dooggy.Factory.Data
 
             foreach (TestDataView view in this)
 
-                if (xString.IsEqual(view.tag, prmTag))
+                if (myString.IsEqual(view.tag, prmTag))
                 {
 
                     Corrente = view;
@@ -418,16 +418,16 @@ namespace Dooggy.Factory.Data
         }
 
     }
-    public class TestDataFluxos : List<TestDataFluxo>
+    public class TestDataFlows : List<TestDataFlow>
     {
 
         private TestDataPool Pool;
 
-        public TestDataFluxo Corrente;
+        public TestDataFlow Corrente;
 
         public TestTrace Trace { get => Pool.Trace; }
 
-        public TestDataFluxos(TestDataPool prmPool)
+        public TestDataFlows(TestDataPool prmPool)
         {
 
             Pool = prmPool;
@@ -440,7 +440,7 @@ namespace Dooggy.Factory.Data
             if (prmDataView != null)
             {
 
-                Corrente = new TestDataFluxo(prmTag, prmSQL, prmMask, prmDataView);
+                Corrente = new TestDataFlow(prmTag, prmSQL, prmMask, prmDataView);
 
                 Add(Corrente);
 
@@ -453,11 +453,11 @@ namespace Dooggy.Factory.Data
 
         }
 
-        public void AddItens(TestDataFluxos prmFluxos)
+        public void AddItens(TestDataFlows prmFlows)
         {
 
-            foreach (TestDataFluxo fluxo in prmFluxos)
-                Add(fluxo);
+            foreach (TestDataFlow Flow in prmFlows)
+                Add(Flow);
         }
 
         public void SetArgumento(string prmArg, string prmInstrucao)
@@ -466,8 +466,12 @@ namespace Dooggy.Factory.Data
             switch (prmArg)
             {
 
+                case "input":
+                    Corrente.SetInput(prmInstrucao);
+                    break;
+                
                 case "sql":
-                    SetSQL(prmInstrucao);
+                    Corrente.SetSQL(prmInstrucao);
                     break;
 
                 case "filtro":
@@ -479,15 +483,12 @@ namespace Dooggy.Factory.Data
                     break;
 
                 case "mask":
-                    SetSQL(prmInstrucao);
+                    Corrente.SetMask(prmInstrucao);
                     break;
 
             }
 
         }
-
-        public void SetSQL(string prmSQL) => Corrente.SetSQL(prmSQL);
-        public void SetMask(string prmMask) => Corrente.SetMask(prmMask);
 
         public string output(eTipoFileFormat prmTipo)
         {
@@ -521,7 +522,7 @@ namespace Dooggy.Factory.Data
              if (prmColunaExtra)
                 coluna_extra = prmSeparador;
 
-            foreach (TestDataFluxo Fluxo in this)
+            foreach (TestDataFlow Flow in this)
             {
 
                 cont++;
@@ -530,12 +531,12 @@ namespace Dooggy.Factory.Data
                 // Adicionar o Cabeçalho (Header) sempre que o layout da visão for diferente ...
                 //
 
-                if (tag_view != Fluxo.tag_view)
+                if (tag_view != Flow.tag_view)
                 {
 
-                    tag_view = Fluxo.tag_view;
+                    tag_view = Flow.tag_view;
 
-                    header = Fluxo.header_txt;
+                    header = Flow.header_txt;
 
                     corpo += header + Environment.NewLine;
 
@@ -547,7 +548,7 @@ namespace Dooggy.Factory.Data
                 // Montar o Corpo do arquivo TXT ...
                 //
 
-                linha = Fluxo.csv(prmSeparador);
+                linha = Flow.csv(prmSeparador);
 
                 if (linha != "")
                     corpo += coluna_extra + linha;
@@ -566,8 +567,8 @@ namespace Dooggy.Factory.Data
 
             string csv = "";
 
-            foreach (TestDataFluxo Fluxo in this)
-                csv += Fluxo.csv() + Environment.NewLine;
+            foreach (TestDataFlow Flow in this)
+                csv += Flow.csv() + Environment.NewLine;
 
 
             return (csv);
@@ -578,10 +579,10 @@ namespace Dooggy.Factory.Data
 
             string json = ""; string separador = "";
 
-            foreach (TestDataFluxo Fluxo in this)
+            foreach (TestDataFlow Flow in this)
             {
 
-                json += separador + Fluxo.json(); separador = ", ";
+                json += separador + Flow.json(); separador = ", ";
 
             }
 
@@ -590,7 +591,6 @@ namespace Dooggy.Factory.Data
         }
 
     }
-
     public class TestDataRaws
     {
 
@@ -691,6 +691,68 @@ namespace Dooggy.Factory.Data
             return prmLinhaNova;
 
         }
+
+    }
+
+    public class TestViewHeader
+    {
+
+        private TestDataView View;
+
+        private myTuplasBox Box;
+
+        private myTuplas _input;
+        private myTuplas _output;
+
+        public myTuplas Input => _input;
+        public myTuplas Output => _output;
+        public string txt => Box.header;
+
+        public TestViewHeader (TestDataView prmView)
+        {
+            View = prmView;
+
+            Box = new myTuplasBox();
+
+            _input = Box.AddItem(prmKey: "input");
+
+            _output = Box.AddItem(prmKey: "output");
+        }
+    }
+    public class TestDataInput
+    {
+
+        private TestDataFlow Flow;
+
+        public myTupla Tupla = new myTupla();
+
+        public TestDataInput(string prmTag, TestDataFlow prmFlow)
+        {
+
+            Flow = prmFlow;
+
+            //Tupla.tag = prmTag;
+
+        }
+
+    }
+
+    public class TestInputFlow 
+    {
+
+        private TestDataFlow Flow;
+
+        public myTuplas Tuplas = new myTuplas();
+
+        public TestInputFlow(TestDataFlow prmFlow)
+        {
+
+            Flow = prmFlow;
+
+        }
+
+        //public void Load(string prmInput) => Tuplas.Load(prmInput);
+
 
     }
 

@@ -8,10 +8,10 @@
     <StartupObject></StartupObject>
     <Authors>Alexandre Bartie</Authors>
     <Product>DOOGGY FRAMEWORK</Product>
-    <AssemblyName>MyDooggy</AssemblyName>
+    <AssemblyName>Dooggy</AssemblyName>
     <RootNamespace>Dooggy</RootNamespace>
     <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
-    <Version>1.0.8</Version>
+    <Version>1.1.3</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageProjectUrl></PackageProjectUrl>
     <PackageIcon>MyDooggy.jpg</PackageIcon>

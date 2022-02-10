@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Windows.Forms;
 using System.Text;
 using System.IO;
+using Dooggy.Lib.Vars;
 
 namespace Dooggy.Lib.Files
 {
@@ -29,7 +30,7 @@ namespace Dooggy.Lib.Files
 
         public Diretorio Diretorio { get { if (_diretorio == null) _diretorio = new Diretorio(); return _diretorio; } }
 
-        public virtual bool IsValidName(string prmArquivo) => (xString.GetFirst(prmArquivo, prmDelimitador: ".") != "");
+        public virtual bool IsValidName(string prmArquivo) => (myString.GetFirst(prmArquivo, prmDelimitador: ".") != "");
 
         public virtual bool Open(string prmPath, string prmName) => Open(prmArquivo: prmPath + prmName);
         public virtual bool Open(string prmArquivo)

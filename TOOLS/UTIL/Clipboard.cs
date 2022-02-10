@@ -3,33 +3,33 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
 
-namespace Dooggy
+namespace Dooggy.Tools.Util
 {
-    public static class myClipBoard
+    public class myClipBoard
     {
-        public static void SetText(string prmTexto)
+        private iClipboard clip;
+        public void SetText(string prmTexto)
         {
-            xClipboard clip = new xClipboard(prmTexto);
+            clip = new iClipboard(prmTexto);
                 
             clip.Go(prmName: "Clipboard");
         }
     }
-    internal class xClipboard : xSuperThread
+    public class iClipboard : myThread
     {
 
         private string texto;
 
-        public xClipboard(string prmTexto)
+        public iClipboard(string prmTexto)
         {
             texto = prmTexto;
         }
 
         protected override void Work()
         {
-            
-            
             Clipboard.SetText(texto);
         }
 
+        protected override void End() { WaitEnd(); }
     }
 }

@@ -16,7 +16,7 @@ namespace Dooggy.Factory
     public class TestFactory 
     {
 
-        public xJSON args = new xJSON();
+        //public myJSON args = new myJSON();
 
         public TestDataPool Pool;
 

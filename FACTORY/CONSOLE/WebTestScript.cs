@@ -1,9 +1,11 @@
 ﻿using Dooggy.Factory.Data;
-using Dooggy.Lib.Generic;
+using Dooggy;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
+using Dooggy.Lib.Vars;
+using Dooggy.Lib.Generic;
 
 namespace Dooggy.Factory.Console
 {
@@ -59,7 +61,7 @@ namespace Dooggy.Factory.Console
 
             foreach (TestScript Script in this)
 
-                if (xString.IsEqual(Script.key, prmKey))
+                if (myString.IsEqual(Script.key, prmKey))
                 {
 
                     Corrente = Script;
@@ -166,8 +168,8 @@ namespace Dooggy.Factory.Console
 
             tipo = Path.GetTipoFormato(options.Get(prmIndice: 1, prmPadrao: "csv"));
 
-            encoding = xString.GetLower(options.Get(prmIndice: 2, prmPadrao: "UTF8"));
-            extensao = xString.GetLower(options.Get(prmIndice: 3, prmPadrao: Path.GetExtensao(tipo)));
+            encoding = myString.GetLower(options.Get(prmIndice: 2, prmPadrao: "UTF8"));
+            extensao = myString.GetLower(options.Get(prmIndice: 3, prmPadrao: Path.GetExtensao(tipo)));
 
         }
 
@@ -196,7 +198,7 @@ namespace Dooggy.Factory.Console
 
         private TestScript Script;
 
-        private TestTag Corrente;
+        //private TestTag Corrente;
 
         public string txt => GetTXT();
 
@@ -210,7 +212,7 @@ namespace Dooggy.Factory.Console
 
             foreach (TestTag Tag in this)
 
-                if (xString.IsEqual(Tag.key, prmKey))
+                if (myString.IsEqual(Tag.key, prmKey))
                 {
 
                     Tag.SetValor(prmValor);

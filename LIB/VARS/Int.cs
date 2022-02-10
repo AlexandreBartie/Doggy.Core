@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Dooggy
+namespace Dooggy.Lib.Vars
 {
-    public static class xInt
+    public static class myInt
     {
 
         public static int IIf(bool prmCondicao, int prmValorPOS, int prmValorNEG)
@@ -40,7 +40,7 @@ namespace Dooggy
         {
             try
             {
-                if (xString.IsFull(prmValor))
+                if (myString.IsFull(prmValor))
                     return (Convert.ToInt32(prmValor));
             }
             catch

@@ -5,6 +5,8 @@ using Dooggy.Lib.Data;
 using Dooggy.Lib.Files;
 using Dooggy.Lib.Generic;
 using Dooggy.Lib.Parse;
+using Dooggy.Lib.Vars;
+using Dooggy.Tools.Calc;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -44,12 +46,12 @@ namespace Dooggy.Factory.Data
 
         private bool bloqueado = false;
 
-        public TestDataFluxos Fluxos => (DataViewCorrente.Fluxos);
+        public TestDataFlows Flows => (DataViewCorrente.Flows);
 
+        public DataTypesField DataTypes => (Bases.DataTypes);
         public DataBaseConnection DataBaseCorrente => (Bases.Corrente);
-
         public TestDataView DataViewCorrente => (Views.Corrente);
-        public TestDataFluxo DataFluxoCorrente => (Fluxos.Corrente);
+        public TestDataFlow DataFlowCorrente => (Flows.Corrente);
 
         public bool IsDbOK => (Bases.IsOK);
         public bool IsDbBlocked => bloqueado;
@@ -61,7 +63,7 @@ namespace Dooggy.Factory.Data
 
             Factory = prmFactory;
 
-            Bases = new DataBasesConnection();
+            Bases = new DataBasesConnection(new DataTypesField());
 
             Dados = new TestDataLocal(this);
 
@@ -82,15 +84,14 @@ namespace Dooggy.Factory.Data
         public string AddDataView(string prmTag) => AddDataView(prmTag, prmMask: "");
         public string AddDataView(string prmTag, string prmMask) => Views.Criar(prmTag, prmMask, DataBaseCorrente);
 
-        public bool AddDataFluxo(string prmTag, string prmSQL, string prmMask) => DataViewCorrente.Fluxos.Criar(prmTag, prmSQL, prmMask, DataViewCorrente);
+        public bool AddDataFlow(string prmTag, string prmSQL, string prmMask) => DataViewCorrente.Flows.Criar(prmTag, prmSQL, prmMask, DataViewCorrente);
 
         public void SetDataRaw(string prmOptions) => Raws.SetOptions(prmOptions);
         public void AddDataRaw(string prmArg, string prmInstrucao) => Raws.SetArgumento(prmArg, prmInstrucao);
 
         public void SetDataVar(string prmArg, string prmInstrucao) => Vars.SetArgumento(prmArg, prmInstrucao);
         public void SetDataView(string prmArg, string prmInstrucao) => Views.SetArgumento(prmArg, prmInstrucao);
-        public void SetDataFluxo(string prmArg, string prmInstrucao) => Fluxos.SetArgumento(prmArg, prmInstrucao);
-        public void SetMaskDataFluxo(string prmMask) => Fluxos.SetMask(prmMask);
+        public void SetDataFlow(string prmArg, string prmInstrucao) => Flows.SetArgumento(prmArg, prmInstrucao);
 
         public void Cleanup()
         {
@@ -113,12 +114,19 @@ namespace Dooggy.Factory.Data
         public string output(string prmTags, eTipoFileFormat prmTipo) => Tratamento.GetOutput(prmTags, prmTipo);
 
     }
-
     public class TestDataTratamento : TestDataFormat
     {
         private TestDataVars Vars => Pool.Vars;
         private TestDataRaws Raws => (Pool.Raws);
         private TestDataViews Views => (Pool.Views);
+
+        private string varDelimitadorInicial = "$(";
+        private string varDelimitadorFinal = ")";
+
+        private string fncDelimitadorPrefixo = "$";
+        private string fncDelimitadorInicial = "(";
+        private string fncDelimitadorFinal = ")";
+
 
         public TestDataTratamento(TestDataPool prmPool)
         {
@@ -174,23 +182,13 @@ namespace Dooggy.Factory.Data
 
             return ("");
         }
-
         private string GetDataDinamica(string prmParametro)
         {
-
-            DynamicDate Date = new DynamicDate(anchor);
-
-            return (Date.View(prmSintaxe: prmParametro));
-
+            return (myDate.View(prmDate: anchor, prmSintaxe: prmParametro));
         }
-
         private string GetDataEstatica(string prmParametro)
         {
-
-            DynamicDate Date = new DynamicDate(anchor);
-
-            return (Date.Static(prmSintaxe: prmParametro));
-
+            return (myDate.Static(prmDate: anchor, prmFormato: prmParametro));
         }
         private string GetSQLVariavel(string prmTexto)
         {
@@ -200,18 +198,18 @@ namespace Dooggy.Factory.Data
             while (true)
             {
 
-                var_extendido = Bloco.GetBloco(sql, prmDelimitadorInicial: "$(", prmDelimitadorFinal: ")$", prmPreserve: true);
+                var_extendido = Bloco.GetBloco(sql, varDelimitadorInicial, varDelimitadorFinal, prmPreserve: true);
 
-                var = Bloco.GetBloco(sql, prmDelimitadorInicial: "$(", prmDelimitadorFinal: ")$");
+                var = Bloco.GetBloco(sql, varDelimitadorInicial, varDelimitadorFinal);
 
                 if (var == "") break;
 
                 var_valor = GetVariavel(prmTag: var);
 
-                sql = xString.GetSubstituir(sql, var_extendido, var_valor);
+                sql = myString.GetSubstituir(sql, var_extendido, var_valor);
 
                 if (var_valor == "")
-                    Trace.LogConsole.FailFindValueVariable(var, prmTexto);
+                    Trace.LogConsole.FailFindVariable(var, prmTexto);
 
             }
 
@@ -223,25 +221,27 @@ namespace Dooggy.Factory.Data
         {
 
             string sql = prmSQL; string funcao; string funcao_ext;
-            string prefixo; string parametro; string valor;
+            string code; string parametro; string valor;
 
             while (true)
             {
 
-                funcao = Bloco.GetBloco(sql, prmDelimitadorInicial: "$", prmDelimitadorFinal: "(");
+                funcao = Bloco.GetBloco(sql, fncDelimitadorPrefixo, fncDelimitadorInicial);
 
-                funcao_ext = Bloco.GetBloco(sql, prmDelimitadorInicial: "$", prmDelimitadorFinal: "(", prmPreserve: true);
+                funcao_ext = Bloco.GetBloco(sql, fncDelimitadorPrefixo, fncDelimitadorInicial, prmPreserve: true);
 
-                prefixo = Bloco.GetBloco(sql, prmDelimitadorInicial: funcao_ext, prmDelimitadorFinal: ")$", prmPreserve: true);
+                code = Bloco.GetBloco(sql, prmDelimitadorInicial: funcao_ext, fncDelimitadorFinal, prmPreserve: true);
 
-                parametro = Bloco.GetBloco(sql, prmDelimitadorInicial: funcao_ext, prmDelimitadorFinal: ")$");
+                parametro = Bloco.GetBloco(sql, prmDelimitadorInicial: funcao_ext, fncDelimitadorFinal);
 
-                if ((xString.IsEmpty(funcao)) || (xString.IsEmpty(parametro))) break;
+                if ((myString.IsEmpty(funcao)) || (myString.IsEmpty(parametro))) break;
 
                 valor = GetFuncao(funcao, parametro);
 
-                if (valor != "")
-                    sql = xString.GetSubstituir(sql, prefixo, valor);
+                if (valor == "")
+                    Trace.LogConsole.FailFindFunction(funcao, code);
+
+                sql = myString.GetSubstituir(sql, code, valor);
 
             }
 
@@ -253,21 +253,31 @@ namespace Dooggy.Factory.Data
     public class TestDataFormat : TestDataException
     {
 
-        public TestConsoleConfig Config => Pool.Console.Config;
+        public TestConfigCSV CSV => Pool.Console.Config.CSV;
 
-        public DateTime anchor => Config.Format.anchor;
+        public DateTime anchor => CSV.anchor;
 
-        public string dateFormatDefault => Config.Format.dateFormatDefault;
+        public string formatDateDefault => CSV.formatDateDefault;
 
-        public string GetDateAnchor() => GetDateAnchor(dateFormatDefault);
-        public string GetDateAnchor(string prmFormatacao) => GetDateFormat(anchor, prmFormatacao);
+        public string GetDateAnchor() => GetDateAnchor(formatDateDefault);
+        public string GetDateAnchor(string prmFormat) => GetDateFormat(anchor, prmFormat);
+
+        public string GetTextFormat(string prmText, string prmFormat) => CSV.TextToCSV(prmText, prmFormat);
+
+        public string GetDateFormat(DateTime prmDate) => GetDateFormat(prmDate, prmFormat: "");
+        public string GetDateFormat(DateTime prmDate, string prmFormat)
+        {
+            string format = prmFormat;
+
+            if (myString.IsEmpty(format))
+                format = formatDateDefault;
+
+            return CSV.DateToCSV(prmDate, format);
+        }
+        public string GetDoubleFormat(double prmNumber) => GetDoubleFormat(prmNumber, prmFormat: "");
+        public string GetDoubleFormat(double prmNumber, string prmFormat) => CSV.DoubleToCSV(prmNumber, prmFormat);
 
 
-        public string GetNumberFormat(double prmNumber) => GetNumberFormat(prmNumber, prmFormatacao: "C2");
-        public string GetNumberFormat(double prmNumber, string prmFormatacao) => prmNumber.ToString(prmFormatacao);
-
-        public string GetDateFormat(DateTime prmData) => GetDateFormat(prmData, dateFormatDefault);
-        public string GetDateFormat(DateTime prmData, string prmFormatacao) => xDate.GetFormatacao(prmData, prmFormatacao);
 
     }
     public class TestDataException
@@ -318,7 +328,6 @@ namespace Dooggy.Factory.Data
 
         }
     }
-
     public class TestDataLocal
     {
 
@@ -347,9 +356,9 @@ namespace Dooggy.Factory.Data
         public string AddDataView(string prmTag) => (AddDataView(prmTag, prmMask: ""));
         public string AddDataView(string prmTag, string prmMask) => (Pool.AddDataView(prmTag, prmMask));
 
-        public bool AddDataFluxo(string prmTag) => (AddDataFluxo(prmTag, prmSQL: ""));
-        public bool AddDataFluxo(string prmTag, string prmSQL) => (AddDataFluxo(prmTag, prmSQL, prmMask: ""));
-        public bool AddDataFluxo(string prmTag, string prmSQL, string prmMask) => (Pool.AddDataFluxo(prmTag, prmSQL, prmMask));
+        public bool AddDataFlow(string prmTag) => (AddDataFlow(prmTag, prmSQL: ""));
+        public bool AddDataFlow(string prmTag, string prmSQL) => (AddDataFlow(prmTag, prmSQL, prmMask: ""));
+        public bool AddDataFlow(string prmTag, string prmSQL, string prmMask) => (Pool.AddDataFlow(prmTag, prmSQL, prmMask));
 
         public string txt(string prmTags) => (Pool.txt(prmTags));
         public string csv(string prmTags) => (Pool.csv(prmTags));
@@ -359,7 +368,6 @@ namespace Dooggy.Factory.Data
         public string log => Pool.Bases.log();
 
     }
-
     public class ITestDataLocal
     {
 

@@ -1,9 +1,11 @@
 ﻿using Dooggy.Factory;
 using Dooggy.Factory.Console;
-using Dooggy.Lib.Generic;
+using Dooggy;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Dooggy.Lib.Generic;
+using Dooggy.Lib.Vars;
 
 namespace Dooggy.Factory.Console
 {
@@ -55,7 +57,7 @@ namespace Dooggy.Factory.Console
             {
                 Blocks.CriarSAVE();
 
-                Merge(prmCode: Console.Config.Format.saveFormatDefault);
+                Merge(prmCode: Console.Config.CSV.GetSaveDefault());
             }
 
         }
@@ -281,9 +283,9 @@ namespace Dooggy.Factory.Console
                     break;
 
                 case "item":
-                case "datafluxo":
+                case "dataFlow":
                     tipo = eTipoTestCommand.item;
-                    args = "sql;filtro;ordem";
+                    args = "input;sql;filtro;ordem";
                     break;
 
                 case "save":
@@ -324,7 +326,7 @@ namespace Dooggy.Factory.Console
                     return "dataview";
 
                 case eTipoTestCommand.item:
-                    return "datafluxo";
+                    return "dataFlow";
 
                 case eTipoTestCommand.save:
                     return "save";
@@ -410,7 +412,7 @@ namespace Dooggy.Factory.Console
         private void GetArgDescription()
         {
 
-            parametro = xString.GetLast(linha, prmDelimitador: ":").Trim();
+            parametro = myString.GetLast(linha, prmDelimitador: ":").Trim();
 
         }
 

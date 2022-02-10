@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Text.Json;
 using System.Diagnostics;
+using Dooggy;
 using Dooggy.Lib.Generic;
 
 namespace Dooggy.Lib.Parse
 {
-    public class xJSON
+    public class myJSON
     {
 
-        public xJSON_Control Controle;
+        public JSON_Control Controle;
 
         private bool _IsOK;
 
@@ -18,38 +19,38 @@ namespace Dooggy.Lib.Parse
 
         public Exception Erro { get => Controle.erro; }
 
-        public string fluxo { get => Controle.fluxo; }
+        public string Flow { get => Controle.Flow; }
 
         public string tuplas { get => Controle.tuplas; }
 
-        public xJSON()
+        public myJSON()
         {
-            Controle = new xJSON_Control(this);
+            Controle = new JSON_Control(this);
 
         }
-        public xJSON(string prmFluxo)
+        public myJSON(string prmFlow)
         {
 
-            Controle = new xJSON_Control(this);
+            Controle = new JSON_Control(this);
 
-            Parse(prmFluxo);
+            Parse(prmFlow);
 
         }
 
-        public void Add(string prmFluxo)
+        public void Add(string prmFlow)
         {
-            Controle.Add(prmFluxo);
+            Controle.Add(prmFlow);
         }
 
-        public void Add(string prmFluxo, string prmMestre)
+        public void Add(string prmFlow, string prmMestre)
         {
-            Controle.AddCombine(prmFluxo, prmMestre);
+            Controle.AddCombine(prmFlow, prmMestre);
         }
 
-        public bool Parse(string prmFluxo)
+        public bool Parse(string prmFlow)
         {
 
-            Add(prmFluxo);
+            Add(prmFlow);
 
             return (Save());
 
@@ -72,10 +73,10 @@ namespace Dooggy.Lib.Parse
         public JsonProperty GetProperty (string prmKey) => Controle.GetProperty(prmKey);
 
     }
-    public class xJSON_Control
+    public class JSON_Control
     {
 
-        private xJSON JSON;
+        private myJSON JSON;
 
         private JsonDocument doc;
 
@@ -87,7 +88,7 @@ namespace Dooggy.Lib.Parse
 
         public Exception erro;
 
-        private xJSON_Fluxos Fluxos;
+        private JSON_Flows Flows;
 
         private JsonElement root { get => doc.RootElement; }
 
@@ -98,7 +99,7 @@ namespace Dooggy.Lib.Parse
         private JsonElement.ObjectEnumerator Propriedades { get => item.EnumerateObject(); }
 
 
-        public xJSON_Control(xJSON prmJSON)
+        public JSON_Control(myJSON prmJSON)
         {
             
             JSON = prmJSON;
@@ -110,49 +111,49 @@ namespace Dooggy.Lib.Parse
         private void Setup()
         {
 
-            Fluxos = new xJSON_Fluxos(JSON);
+            Flows = new JSON_Flows(JSON);
 
         }
 
-        public string fluxo { get => (Fluxos.output); } 
+        public string Flow { get => (Flows.output); } 
 
         public string tuplas { get => (GetTuplas()); }
 
-        public void Add(string prmFluxo)
+        public void Add(string prmFlow)
         {
 
-            string linha = @prmFluxo;
+            string linha = @prmFlow;
 
-            //fluxo = fluxo.Replace(@"\'", @"#""");
+            //Flow = Flow.Replace(@"\'", @"#""");
             linha = linha.Replace(@"'", "\"");
 
-            Fluxos.Add(linha);
+            Flows.Add(linha);
 
         }
 
-        public void AddCombine(string prmFluxo, string prmMestre)
+        public void AddCombine(string prmFlow, string prmMestre)
         {
 
-            string fluxo_combinado = GetCombine(prmFluxo, prmMestre);
+            string Flow_combinado = GetCombine(prmFlow, prmMestre);
 
-            Add(prmFluxo: fluxo_combinado);
+            Add(prmFlow: Flow_combinado);
 
         }
 
-        private string GetCombine(string prmFluxo, string prmMestre)
+        private string GetCombine(string prmFlow, string prmMestre)
         {
 
-            xJSON Fluxo = new xJSON(prmFluxo);
+            myJSON Flow = new myJSON(prmFlow);
 
-            xJSON Mestre = new xJSON(prmMestre);
+            myJSON Mestre = new myJSON(prmMestre);
 
-            // Lista acomodara o Fluxo Combinado
+            // Lista acomodara o Flow Combinado
 
             xMemo Memo = new xMemo(";");
 
-            // Sobrepor valores do MESTRE que estão presentes no FLUXO
+            // Sobrepor valores do MESTRE que estão presentes no Flow
 
-            foreach (JsonProperty prop in Fluxo.Controle.Propriedades)
+            foreach (JsonProperty prop in Flow.Controle.Propriedades)
             {
 
                 JsonProperty mix = prop;
@@ -165,12 +166,12 @@ namespace Dooggy.Lib.Parse
 
             }
 
-            // Inserir propriedades MESTRE que não aparecem no Fluxo
+            // Inserir propriedades MESTRE que não aparecem no Flow
 
             foreach (JsonProperty prop in Mestre.Controle.Propriedades)
             {
 
-                if (!Fluxo.Find(prmKey: prop.Name))
+                if (!Flow.Find(prmKey: prop.Name))
                 { Memo.Add(string.Format("'{0}': '{1}'", prop.Name, prop.Value)); }
 
             }
@@ -183,7 +184,7 @@ namespace Dooggy.Lib.Parse
             try
             {
 
-                doc = JsonDocument.Parse(Fluxos.output);
+                doc = JsonDocument.Parse(Flows.output);
 
                 Corpo = root.EnumerateArray();
 
@@ -196,7 +197,7 @@ namespace Dooggy.Lib.Parse
             catch (Exception e)
             { 
                 
-                Debug.WriteLine("Fluxo JSON: " + fluxo);
+                Debug.WriteLine("Flow JSON: " + Flow);
                 Debug.WriteLine("Erro  JSON: " + e.Message);
 
                 Setup();  erro = e; return (false); }
@@ -288,13 +289,12 @@ namespace Dooggy.Lib.Parse
         }
 
     }
-
-    public class xJSON_Fluxos : xMemo
+    internal class JSON_Flows : xMemo
     {
 
-        private xJSON JSON;
+        private myJSON JSON;
 
-        public xJSON_Fluxos(xJSON prmJSON)
+        public JSON_Flows(myJSON prmJSON)
         {
 
             JSON = prmJSON;

@@ -1,5 +1,6 @@
 ﻿using Dooggy.Factory.Data;
 using Dooggy.Lib.Data;
+using Dooggy.Lib.Vars;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -53,8 +54,8 @@ namespace Dooggy.Factory.Console
             // Identidica TAG e VALOR da variável 
             //
             
-            string tag = xString.GetFirst(prmVar, prmDelimitador: "=").Trim();
-            string valor = xString.GetLast(prmVar, prmDelimitador: "=").Trim();
+            string tag = myString.GetFirst(prmVar, prmDelimitador: "=").Trim();
+            string valor = myString.GetLast(prmVar, prmDelimitador: "=").Trim();
 
             //
             // Verifica se a variável já existe ...
@@ -92,7 +93,7 @@ namespace Dooggy.Factory.Console
 
             foreach (TestDataVar var in this)
 
-                if (xString.IsEqual(var.tag, prmTag))
+                if (myString.IsEqual(var.tag, prmTag))
                 {
                     Corrente = var; return (true);
                 }

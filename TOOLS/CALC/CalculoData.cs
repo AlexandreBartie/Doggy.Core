@@ -1,10 +1,11 @@
-﻿using Dooggy.Lib.Generic;
+﻿using Dooggy;
+using Dooggy.Lib.Generic;
+using Dooggy.Lib.Vars;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using static Dooggy.xInt;
 
-namespace Dooggy
+namespace Dooggy.Tools.Calc
 {
     public enum eTipoMarcaData { dia, mes, ano }
 
@@ -30,7 +31,7 @@ namespace Dooggy
 
         public DateTime Calc(string prmSintaxe) => (Rules.Calc(prmSintaxe));
         public string View(string prmSintaxe) => Rules.View(prmSintaxe);
-        public string Static(string prmSintaxe) => Rules.View(":" + prmSintaxe);
+        public string Static(string prmFormato) => Rules.View(":" + prmFormato);
 
     }
     public class DynamicDateRules
@@ -95,7 +96,7 @@ namespace Dooggy
         public void SetFixo(string prmTipoData, int prmValor)
         {
 
-            Anchor.SetValor(prmTipoData, prmValor: xInt.GetPositivo(prmValor));
+            Anchor.SetValor(prmTipoData, prmValor: myInt.GetPositivo(prmValor));
 
         }
 
@@ -108,9 +109,9 @@ namespace Dooggy
 
         public void SetFormat(string prmFormat) => Format.Setup(prmFormat);
 
-        private bool IsTipoDataOK(string prmTipoData) => (xString.IsContido(prmTipoData, "DMA"));
+        private bool IsTipoDataOK(string prmTipoData) => (myString.IsContido(prmTipoData, "DMA"));
 
-        private bool IsTipoOperadorOK(string prmTipoOperador) => (xString.IsContido(prmTipoOperador, "=+-"));
+        private bool IsTipoOperadorOK(string prmTipoOperador) => (myString.IsContido(prmTipoOperador, "=+-"));
 
     }
     public class DynamicDateFormat
@@ -133,7 +134,7 @@ namespace Dooggy
 
         public void Setup(string prmFormat) => formatacao_data = prmFormat;
 
-        public string GetView(DateTime prmData) => xDate.GetFormatacao(prmData, GetFormato());
+        public string GetView(DateTime prmData) => myFormat.DateToString(prmData, GetFormato());
 
         private string GetFormato() 
         {
@@ -182,11 +183,11 @@ namespace Dooggy
             // Manter valores dentro dos intervalos estabelecidos
             //
 
-            _ano = GetIntervalo(prmValor: _ano, prmMinimo: 1, prmMaximo: 2500);
+            _ano = myInt.GetIntervalo(prmValor: _ano, prmMinimo: 1, prmMaximo: 2500);
 
-            _mes = GetIntervalo(prmValor: _mes, prmMinimo: 1, prmMaximo: 12);
+            _mes = myInt.GetIntervalo(prmValor: _mes, prmMinimo: 1, prmMaximo: 12);
 
-            _dia = GetIntervalo(prmValor: _dia, prmMinimo: 1, prmMaximo: DateTime.DaysInMonth(_ano, _mes));
+            _dia = myInt.GetIntervalo(prmValor: _dia, prmMinimo: 1, prmMaximo: DateTime.DaysInMonth(_ano, _mes));
 
             return new System.DateTime(_ano, _mes, _dia);
 
@@ -295,15 +296,15 @@ namespace Dooggy
 
             string vlParametro = prmParametro;
 
-            vlParametro = xString.GetSubstituir(vlParametro, "UTIL", "17");
+            vlParametro = myString.GetSubstituir(vlParametro, "UTIL", "17");
 
-            domingo = xString.GetFind(vlParametro, prmParte: "1");
-            segunda = xString.GetFind(vlParametro, prmParte: "2");
-            terca = xString.GetFind(vlParametro, prmParte: "3");
-            quarta = xString.GetFind(vlParametro, prmParte: "4");
-            quinta = xString.GetFind(vlParametro, prmParte: "5");
-            sexta = xString.GetFind(vlParametro, prmParte: "6");
-            sabado = xString.GetFind(vlParametro, prmParte: "7");
+            domingo = myString.GetFind(vlParametro, prmParte: "1");
+            segunda = myString.GetFind(vlParametro, prmParte: "2");
+            terca = myString.GetFind(vlParametro, prmParte: "3");
+            quarta = myString.GetFind(vlParametro, prmParte: "4");
+            quinta = myString.GetFind(vlParametro, prmParte: "5");
+            sexta = myString.GetFind(vlParametro, prmParte: "6");
+            sabado = myString.GetFind(vlParametro, prmParte: "7");
 
         }
 
@@ -317,11 +318,11 @@ namespace Dooggy
             if (prmDesvio != 0)
             {
 
-                bool avancar = xInt.IsPositivo(prmDesvio);
+                bool avancar = myInt.IsPositivo(prmDesvio);
 
-                desvio = xInt.GetPositivo(prmDesvio);
+                desvio = myInt.GetPositivo(prmDesvio);
 
-                deslocamento = xInt.GetInverter(avancar, prmValor: 1);
+                deslocamento = myInt.GetInverter(avancar, prmValor: 1);
 
                 for (int loop = 1; loop <= desvio; loop++)
                 {
@@ -336,7 +337,7 @@ namespace Dooggy
 
         }
 
-        private DateTime GetNextDate(DateTime prmData, bool prmAvancar) => (GetNextDate(prmData, xInt.GetInverter(prmAvancar, prmValor: 1)));
+        private DateTime GetNextDate(DateTime prmData, bool prmAvancar) => (GetNextDate(prmData, myInt.GetInverter(prmAvancar, prmValor: 1)));
         private DateTime GetNextDate(DateTime prmData, int prmIncremento)
         {
 
@@ -422,15 +423,15 @@ namespace Dooggy
 
             string marca; string tipo_data; string tipo_operador; string parametro; int valor;
 
-            marca = xString.GetNoBlank(prmMarca);
+            marca = myString.GetNoBlank(prmMarca);
 
-            tipo_data = xString.GetFirst(marca);
-            tipo_operador = xString.GetChar(marca, 2);
+            tipo_data = myString.GetFirst(marca);
+            tipo_operador = myString.GetChar(marca, 2);
 
             if (Rules.IsMarcaOK(tipo_data, tipo_operador))
             {
 
-                parametro = xString.GetLast(prmMarca, prmTamanho: marca.Length - 2);
+                parametro = myString.GetLast(prmMarca, prmTamanho: marca.Length - 2);
 
                 if (tipo_operador == "=")
                 {

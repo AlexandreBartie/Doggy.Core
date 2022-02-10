@@ -5,178 +5,10 @@ using System.Text;
 using Microsoft.VisualBasic.FileIO;
 using System.Linq;
 using Dooggy.Lib.Parse;
+using Dooggy.Lib.Vars;
 
 namespace Dooggy.Lib.Generic
 {
-    public class xTupla
-    {
-
-        private string delimitadorInicial = "[";
-        private string delimitadorFinal = "]";
-
-        private string _tag;
-        private string _valor;
-
-        private string _bruto;
-        private string _descricao;
-
-        public string tag { get => _tag; }
-        public string valor { get => _valor; }
-
-        public string bruto { get => _bruto; }
-        public string descricao { get => _descricao; }
-
-        public string memo { get => GetMemo(); }
-
-        private bool TemDados { get => xString.IsFull(tag + valor); }
-        private bool TemDescricao { get => (descricao != ""); }
-
-        public xTupla()
-        { }
-
-        public xTupla(string prmTexto)
-        {
-
-            Parse(prmTexto);
-
-        }
-        public xTupla(string prmTexto, string prmSeparador)
-        {
-
-            Parse(prmTexto, prmSeparador);
-
-        }
-
-        public void Parse(string prmTexto)
-        {
-
-            Parse(prmTexto, prmSeparador: "=");
-
-        }
-
-        public void Parse(string prmTexto, string prmSeparador)
-        {
-
-            //
-            // Get descricao Tupla (estão entre delimitadores pré-definidos)
-            //
-
-            _descricao = Bloco.GetBloco(prmTexto, delimitadorInicial, delimitadorFinal).Trim();
-
-            //
-            // Remove descricao da Tupla (para permitir identificar "tag" e "valor")
-            //
-
-            _bruto = Bloco.GetBlocoRemove(prmTexto, delimitadorInicial, delimitadorFinal);
-
-            //
-            // Identifica "tag" e "valor"
-            //
-
-            xLista lista = new xLista(bruto, prmSeparador);
-
-            _tag = lista.First;
-
-            if (lista.IsUnico)
-                _valor = "";
-            else
-                _valor = lista.Last;
-
-        }
-
-        private void Set(string prmTag, string prmValor)
-        {
-            _tag = prmTag;
-            _valor = prmValor;
-
-        }
-        public string GetOpcao(string prmKey, string prmOpcoes)
-        {
-
-            xLista Lista = new xLista();
-
-            Lista.Parse(prmOpcoes, prmSeparador: ";");
-
-            return (Lista.GetFindx("[" + prmKey + "]"));
-
-        }
-
-        private string GetMemo()
-        {
-            string texto = "";
-            
-            if (TemDados)
-                texto += tag + ": '" + valor + "'";
-
-            if (TemDescricao)
-                texto += " <" + descricao + ">";
-
-            return texto.Trim();
-
-        }
-
-    }
-
-    public class xTuplas : List<xTupla>
-    {
-
-        public string memo { get => GetMemo(); }
-
-        public xTuplas(string prmLista)
-        {
-            Parse(prmLista, prmSeparador: ",");
-        }
-
-        public xTuplas(string prmLista, string prmSeparador)
-        {
-            
-            Parse(prmLista, prmSeparador);
-
-        }
-
-        public virtual void Parse(string prmLista, string prmSeparador)
-        {
-
-            if (xString.IsFull(prmLista))
-            {
-
-                foreach (string item in new xLista(prmLista, prmSeparador))
-                {
-                    this.Add(new xTupla(item));
-                }
-
-            }
-
-        }
-        public bool IsContem(string prmItem)
-        {
-
-            foreach (xTupla tupla in this)
-            {
-                if (prmItem.ToLower().Contains(tupla.bruto.ToLower()))
-                    return true;
-            }
-
-            return (false);
-        }
-        private string GetMemo()
-        {
-
-            string memo = ""; string separador = "";
-
-            foreach (xTupla tupla in this)
-            {
-                memo += separador + tupla.memo;
-
-                separador = ", ";
-            }
-
-            return (memo);
-
-        }
-
-    }
-
     public class xLista : List<string>
     {
 
@@ -186,10 +18,10 @@ namespace Dooggy.Lib.Generic
         {
 
         }
-        
+
         public xLista(string prmLista)
-        { 
-            Parse(prmLista); 
+        {
+            Parse(prmLista);
         }
 
         public xLista(string prmLista, string prmSeparador)
@@ -205,7 +37,7 @@ namespace Dooggy.Lib.Generic
 
             separador = prmSeparador;
 
-            if (xString.IsFull(prmLista))
+            if (myString.IsFull(prmLista))
                 foreach (string item in prmLista.Split(separador))
                 {
                     this.Add(item.Trim());
@@ -220,9 +52,11 @@ namespace Dooggy.Lib.Generic
 
         public bool IsVazio { get => (qtde == 0); }
 
-        public string First { get => Item(1); }
+        public string first { get => Item(1); }
 
-        public string Last { get => Item(qtde); }
+        public string last { get => Item(qtde); }
+
+        public string last_exact { get { if (IsUnico) return ""; return last; } }
 
         public bool IsRange(int prmIndice) => ((prmIndice >= 1) && (prmIndice <= qtde));
 
@@ -297,7 +131,7 @@ namespace Dooggy.Lib.Generic
         {
             foreach (string vlItem in this)
             {
-                if (xString.IsStartsWith(vlItem, prmTexto))
+                if (myString.IsStartsWith(vlItem, prmTexto))
                 { return (vlItem); }
             }
             return ("");
@@ -306,7 +140,7 @@ namespace Dooggy.Lib.Generic
         {
             foreach (string vlItem in this)
             {
-                if (xString.IsEqual(vlItem, prmTexto))
+                if (myString.IsEqual(vlItem, prmTexto))
                 { return true; }
             }
             return (false);
@@ -321,7 +155,7 @@ namespace Dooggy.Lib.Generic
             foreach (string vlItem in this)
             {
                 cont++;
-                if (xString.IsContain(vlItem, prmTexto, prmInverter))
+                if (myString.IsContain(vlItem, prmTexto, prmInverter))
                 { return (cont); }
             }
             return (0);
@@ -388,26 +222,21 @@ namespace Dooggy.Lib.Generic
     public class xMask
     {
 
-        private xJSON lista;
-
-        private Mask mask;
+        private myJSON lista;
 
         public bool IsOK { get => (lista.IsOK); }
 
         public xMask(string prmMask)
         {
 
-            lista = new xJSON(prmMask);
-
-            mask = new Mask();
+            lista = new myJSON(prmMask);
 
         }
 
-        public string GetFormat(string prmKey, string prmValor) => mask.Get(prmValor, GetFormato(prmKey));
-        public string GetFormatDate(string prmKey, DateTime prmValor, string prmPadrao) => xDate.GetFormatacao(prmValor, GetFormato(prmKey, prmPadrao));
+        public string TextToString(string prmKey, string prmText) => myFormat.TextToString(prmText, GetFormat(prmKey));
 
-        public string GetFormato(string prmKey) => GetFormato(prmKey, prmPadrao: "");
-        public string GetFormato(string prmKey, string prmPadrao) => lista.GetValor(prmKey, prmPadrao);
+        public string GetFormat(string prmKey) => GetFormat(prmKey, prmPadrao: "");
+        public string GetFormat(string prmKey, string prmPadrao) => lista.GetValor(prmKey, prmPadrao);
 
     }
     public class xLinhas : xMemo

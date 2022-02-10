@@ -1,9 +1,21 @@
-﻿using System;
+﻿using Dooggy.FACTORY.UNIT;
+using System;
 using System.Collections.Generic;
 
 namespace Dooggy
 {
-    public class TestCase
+
+    public class UTC
+    {
+        public string input;
+        public string output;
+        public string result;
+
+        public string error => string.Format("{4}Gerado: <{1}>{4}{0}{4}Esperado:<{3}>{4}{2}{4}", result, TestUnityAnalise.GetAnaliseTexto(result), output, TestUnityAnalise.GetAnaliseTexto(output), Environment.NewLine);
+
+        public bool IsFail() => (output != result);
+    }
+    public class xTestCase
     {
         //private String selector;
 

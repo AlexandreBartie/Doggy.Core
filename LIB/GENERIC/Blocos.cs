@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Dooggy.Lib.Vars;
+using System;
 using System.Collections.Generic;
 using System.Text;
-using static Dooggy.xInt;
 
-namespace Dooggy
+namespace Dooggy.Lib.Generic
 {
     public static class Bloco
     {
@@ -15,7 +15,7 @@ namespace Dooggy
 
             string retorno = "";
 
-            if (xString.IsFull(prmTexto))
+            if (myString.IsFull(prmTexto))
             {
 
                 int inicio = prmTexto.IndexOf(prmDelimitadorInicial);
@@ -56,18 +56,18 @@ namespace Dooggy
         public static string GetBlocoAntes(string prmTexto, string prmDelimitador, bool prmTRIM)
         {
 
-            if (xString.IsFull(prmTexto))
+            if (myString.IsFull(prmTexto))
             {
 
                 string retorno = prmTexto;
 
-                if (xString.IsFull(prmDelimitador))
+                if (myString.IsFull(prmDelimitador))
                 {
 
                     int indice = prmTexto.IndexOf(prmDelimitador);
 
                     if (indice != -1)
-                        retorno = (xString.GetFirst(prmTexto, prmTamanho: indice));
+                        retorno = (myString.GetFirst(prmTexto, prmTamanho: indice));
                 }
 
                 if (prmTRIM)
@@ -84,7 +84,7 @@ namespace Dooggy
         public static string GetBlocoDepois(string prmTexto, string prmDelimitador, bool prmTRIM)
         {
 
-            if (xString.IsFull(prmTexto) && xString.IsFull(prmDelimitador))
+            if (myString.IsFull(prmTexto) && myString.IsFull(prmDelimitador))
             {
 
                 int indice = prmTexto.IndexOf(prmDelimitador);
@@ -92,7 +92,7 @@ namespace Dooggy
                 if (indice != -1)
                 {
 
-                    string retorno = (xString.GetLast(prmTexto, prmTamanho: prmTexto.Length - prmDelimitador.Length - indice));
+                    string retorno = (myString.GetLast(prmTexto, prmTamanho: prmTexto.Length - prmDelimitador.Length - indice));
 
                     if (prmTRIM)
                         retorno = retorno.Trim();
@@ -137,7 +137,7 @@ namespace Dooggy
 
     public static class Prefixo
     {
-        public static bool IsPrefixo(string prmTexto, string prmPrefixo) => (xString.GetFirst(prmTexto, prmTamanho: prmPrefixo.Length) == prmPrefixo);
+        public static bool IsPrefixo(string prmTexto, string prmPrefixo) => (myString.GetFirst(prmTexto, prmTamanho: prmPrefixo.Length) == prmPrefixo);
         public static bool IsPrefixo(string prmTexto, string prmPrefixo, string prmDelimitador) => (GetPrefixo(prmTexto, prmPrefixo, prmDelimitador) != "");
 
         public static string GetPrefixo(string prmTexto, string prmPrefixo) => GetPrefixo(prmTexto, prmPrefixo, prmDelimitador:"");
@@ -149,13 +149,13 @@ namespace Dooggy
 
             string retorno = "";
 
-            if (xString.IsFull(prmTexto) && IsPrefixo(prmTexto, prmPrefixo))
+            if (myString.IsFull(prmTexto) && IsPrefixo(prmTexto, prmPrefixo))
             {
 
-                if (xString.GetFind(prmTexto, prmDelimitador))
+                if (myString.GetFind(prmTexto, prmDelimitador))
                     retorno = Bloco.GetBloco(prmTexto, prmPrefixo, prmDelimitador);
                 else
-                    retorno = xString.GetLast(prmTexto, prmTamanho: -prmPrefixo.Length);
+                    retorno = myString.GetLast(prmTexto, prmTamanho: -prmPrefixo.Length);
 
                 if (prmPreserve)
                     retorno = prmPrefixo + retorno + prmDelimitador;
@@ -176,7 +176,7 @@ namespace Dooggy
 
             prefixo = GetPrefixo(prmTexto, prmPrefixo, prmDelimitador);
 
-            prefixo = xString.GetLast(prmTexto, prmTamanho: xInt.GetNegativo(prefixo.Length + 2));
+            prefixo = myString.GetLast(prmTexto, prmTamanho: myInt.GetNegativo(prefixo.Length + 2));
 
             if (prmTRIM)
                 return prefixo.Trim();

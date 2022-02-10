@@ -6,9 +6,10 @@ using System;
 using Oracle.ManagedDataAccess.Client;
 using System.IO;
 using Dooggy.Factory.Data;
-using Dooggy.Lib.Generic;
+using Dooggy;
 using Dooggy.Lib.Parse;
 using Dooggy.Factory;
+using Dooggy.Lib.Generic;
 
 namespace Dooggy.Lib.Data
 {
@@ -94,6 +95,8 @@ namespace Dooggy.Lib.Data
 
         public TestDataTratamento Tratamento => DataBase.Pool.Tratamento;
 
+        private DataTypesField DataTypes => DataBase.DataTypes;
+
         public OracleDataReader reader;
 
         private xMask Mask;
@@ -107,68 +110,48 @@ namespace Dooggy.Lib.Data
                 Mask = new xMask(prmMask);
         }
 
-        public bool IsDBNull(int prmIndice)
-        {
-
-            return reader.IsDBNull(prmIndice);
-
-        }
-        public string GetName(int prmIndice)
-        {
-
-            return reader.GetName(prmIndice);
-
-        }
+        public bool IsDBNull(int prmIndice) => reader.IsDBNull(prmIndice);
+        public string GetName(int prmIndice) => reader.GetName(prmIndice);
+        public string GetType(int prmIndice) => reader.GetDataTypeName(prmIndice).ToLower();
         public string GetValor(int prmIndice) => GetValorTratado(prmIndice);
         public string GetValor(string prmCampo) => GetValorTratado(prmCampo);
 
         private string GetValorTratado(string prmCampo) => GetValorTratado(prmIndice: reader.GetOrdinal(prmCampo));
         private string GetValorTratado(int prmIndice)
         {
-
-            string tipo = reader.GetDataTypeName(prmIndice).ToLower();
-
-            string tipox = reader.GetFieldType(prmIndice).Name;
+            string tipo = GetType(prmIndice);
 
             string campo = GetName(prmIndice);
 
-            switch (tipo)
-            {
+            if (DataTypes.IsTypeDate(tipo))
+                return GetMaskDate(campo, prmDate: reader.GetDateTime(prmIndice));
 
-                case "date":
-                    return GetMaskDate(campo, prmData: reader.GetDateTime(prmIndice));
+            if (DataTypes.IsTypeDouble(tipo))
+               return GetMaskDouble(campo, prmNumber: reader.GetDouble(prmIndice));
 
-                case "double":
-                    return GetMaskDouble(campo, prmNumber: reader.GetDouble(prmIndice));
-
-                default:
-                    return GetMask(campo, prmTexto: reader.GetOracleValue(prmIndice).ToString());
-
-            }
-
-
+            return GetMask(campo, prmText: reader.GetOracleValue(prmIndice).ToString());
         }
 
-        private string GetMask(string prmCampo, string prmTexto)
+        private string GetMask(string prmCampo, string prmText)
         {
             if (IsMask)
-                return Mask.GetFormat(prmCampo, prmTexto);
+                return Tratamento.GetTextFormat(prmText, Mask.GetFormat(prmCampo));
 
-            return (prmTexto);
+            return (prmText);
         }
-        private string GetMaskDate(string prmCampo, DateTime prmData)
+        private string GetMaskDate(string prmCampo, DateTime prmDate)
         {
             if (IsMask)
-                return Mask.GetFormatDate(prmCampo, prmData, Tratamento.dateFormatDefault);
+                return Tratamento.GetDateFormat(prmDate, Mask.GetFormat(prmCampo)); 
 
-            return (Tratamento.GetDateFormat(prmData));
+            return (Tratamento.GetDateFormat(prmDate));
         }
         private string GetMaskDouble(string prmCampo, Double prmNumber)
         {
             if (IsMask)
-                return Tratamento.GetNumberFormat(prmNumber, Mask.GetFormato(prmCampo));
+                return Tratamento.GetDoubleFormat(prmNumber, Mask.GetFormat(prmCampo));
 
-            return (Tratamento.GetNumberFormat(prmNumber));
+            return (Tratamento.GetDoubleFormat(prmNumber));
         }
         public string GetCSV(string prmSeparador)
         {
@@ -226,6 +209,7 @@ namespace Dooggy.Lib.Data
         public string GetTupla(int prmIndice) => string.Format("'{0}': '{1}'", GetName(prmIndice), GetValor(prmIndice));
 
     }
+ 
     public class DataBaseConnection
     {
 
@@ -233,7 +217,7 @@ namespace Dooggy.Lib.Data
 
         public string tag;
 
-        public string status;
+        private string status;
 
         public string stringConnection;
 
@@ -247,6 +231,7 @@ namespace Dooggy.Lib.Data
         private bool _isOpen;
 
         public TestTrace Trace => (Pool.Trace);
+        public DataTypesField DataTypes => Pool.DataTypes;
 
         public DataBaseConnection(string prmTag, string prmConexao, TestDataPool prmPool)
         {
@@ -262,7 +247,9 @@ namespace Dooggy.Lib.Data
 
         private string SetStatus(string prmStatus) { status = prmStatus; _isOpen = (prmStatus == "CONECTADO");  return prmStatus; }
 
-        public bool Abrir()
+        public string GetStatus() { if (status == "") Connect(); return status; }
+
+        public bool Connect()
         {
 
             stringConnection = Pool.Connect.GetFullConnection(baseConnection);
@@ -295,10 +282,10 @@ namespace Dooggy.Lib.Data
 
             return (false);
         }
-        public void Fechar()
+        public void Close()
         {
             try
-            { Conexao.Close(); status = "FECHADO";  }
+            { Conexao.Close(); SetStatus("FECHADO");  }
 
             catch (Exception e)
             { erro = e; }
@@ -313,8 +300,14 @@ namespace Dooggy.Lib.Data
 
         private bool IsConnected;
 
+        public DataTypesField DataTypes;
+
         public bool IsOK => GetIsOK();
 
+        public DataBasesConnection(DataTypesField prmDataTypes)
+        {
+            DataTypes = prmDataTypes;
+        }
         public bool Criar(string prmTag, string prmConexao, TestDataPool prmPool)
         {
             Corrente = new DataBaseConnection(prmTag, prmConexao, prmPool);
@@ -328,7 +321,7 @@ namespace Dooggy.Lib.Data
             IsConnected = true;
 
             foreach (DataBaseConnection db in this)
-                if (!db.Abrir())
+                if (!db.Connect())
                     return false;
 
             return IsConnected;
@@ -362,6 +355,31 @@ namespace Dooggy.Lib.Data
 
     }
 
+    public class DataTypesField
+    {
+
+        private myDominio TypesDate;
+        private myDominio TypesDouble;
+
+        public DataTypesField()
+        {
+            TypesDate = new myDominio(prmLista: "date");
+            TypesDouble = new myDominio(prmLista: "double");
+        }
+
+        public void SetTypesDate(string prmTypes)
+        {
+            myDominio TypesDate = new myDominio(prmTypes);
+        }
+        public void SetTypesNumber(string prmTypes)
+        {
+            myDominio TypesNumber = new myDominio(prmTypes);
+        }
+
+        public bool IsTypeDate(string prmType) => TypesDate.IsContem(prmType);
+        public bool IsTypeDouble(string prmType) => TypesDouble.IsContem(prmType);
+
+    }
 }
 
 

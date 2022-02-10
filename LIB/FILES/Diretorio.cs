@@ -1,13 +1,14 @@
 ﻿using Dooggy.Lib.Files;
-using Dooggy.Lib.Generic;
+using Dooggy;
 using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using static Dooggy.xInt;
+using Dooggy.Lib.Vars;
+using Dooggy.Lib.Generic;
 
-namespace Dooggy
+namespace Dooggy.Lib.Files
 {
 
     public class Path
@@ -15,9 +16,9 @@ namespace Dooggy
 
         public string path = "";
 
-        private bool TemTerminal { get => xString.GetLast(path) == @"\"; }
+        private bool TemTerminal { get => myString.GetLast(path) == @"\"; }
 
-        public bool IsFull => xString.IsFull(path);
+        public bool IsFull => myString.IsFull(path);
 
         public bool IsFind => Directory.Exists(path);
 
@@ -55,7 +56,7 @@ namespace Dooggy
 
             string retorno = path;
 
-            if (xString.IsFull(prmSubPath))
+            if (myString.IsFull(prmSubPath))
             {
                 if (!TemTerminal)
                     retorno += @"\";
@@ -63,11 +64,11 @@ namespace Dooggy
                 retorno += prmSubPath + @"\";
             }
 
-            if (xString.IsFull(prmNome))
+            if (myString.IsFull(prmNome))
             {
                 retorno += prmNome;
 
-                if (xString.IsFull(prmExtensao))
+                if (myString.IsFull(prmExtensao))
                     retorno += "." + prmExtensao;
             }
             return (retorno);
@@ -193,7 +194,7 @@ namespace Dooggy
         public FileTXT file = new FileTXT();
 
         public string nome { get => info.Name; }
-        public string nome_curto { get => xString.GetRemove(nome, prmParte: extensao); }
+        public string nome_curto { get => myString.GetRemove(nome, prmParte: extensao); }
         public string nome_completo { get => info.FullName; }
 
         public string path { get => info.DirectoryName; }

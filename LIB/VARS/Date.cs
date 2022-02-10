@@ -1,54 +1,33 @@
-﻿using System;
+﻿using Dooggy.Tools.Calc;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
-namespace Dooggy
+namespace Dooggy.Lib.Vars
 {
-    public static class xDate
+    public static class myDate
     {
-
-        public static string GetFormatacao(DateTime prmData, string prmFormato)
+        public static DateTime Calc(string prmSintaxe) => Calc(prmDate: DateTime.Today, prmSintaxe);
+        public static DateTime Calc(DateTime prmDate, string prmSintaxe)
         {
+            DynamicDate Data = new DynamicDate(prmDate);
 
-            string retorno = prmData.ToString(xDate.GetFormatacao(prmFormato));
-
-            return (retorno);
-
+            return Data.Calc(prmSintaxe);
         }
 
-        private static string GetFormatacao(string prmFormato)
+        public static string View(DateTime prmDate, string prmSintaxe)
         {
+            DynamicDate Date = new DynamicDate(prmDate);
 
-            string formato = prmFormato;
-
-            formato = xString.GetSubstituir(formato, "A", "y");
-            formato = xString.GetSubstituir(formato, "a", "y");
-
-            formato = xString.GetSubstituir(formato, "D", "d");
-            formato = xString.GetSubstituir(formato, "m", "M");
-
-            return (formato);
-
+            return (Date.View(prmSintaxe));
         }
 
-    }
-
-    public static class xDouble
-    {
-
-        public static string GetFormatacao(Double prmNumber, string prmFormato) => GetFormatacao(prmNumber, prmFormato, prmRegionalizacao: false);
-        public static string GetFormatacao(Double prmNumber, string prmFormato, bool prmRegionalizacao)
+        public static string Static(DateTime prmDate, string prmFormato)
         {
-            IFormatProvider cultura;
+            DynamicDate Date = new DynamicDate(prmDate);
 
-            if (prmRegionalizacao)
-                cultura = CultureInfo.CurrentUICulture;
-            else
-                cultura = CultureInfo.InvariantCulture;
-
-            return (prmNumber.ToString(prmFormato, provider: cultura));
+            return (Date.Static(prmFormato));
         }
-
     }
 }

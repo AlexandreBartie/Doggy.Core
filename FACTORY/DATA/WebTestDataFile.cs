@@ -1,6 +1,7 @@
 ﻿using Dooggy;
 using Dooggy.Factory;
 using Dooggy.Lib.Files;
+using Dooggy.Lib.Vars;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -153,7 +154,7 @@ namespace Dooggy.Factory.Data
 
         {
 
-            int code_page = xInt.GetNumero(prmEncoding);
+            int code_page = myInt.GetNumero(prmEncoding);
 
             if (code_page != -1)
 

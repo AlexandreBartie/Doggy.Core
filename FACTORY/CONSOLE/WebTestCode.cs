@@ -2,6 +2,7 @@
 using Dooggy.Factory.Console;
 using Dooggy.Factory.Data;
 using Dooggy.Lib.Generic;
+using Dooggy.Lib.Vars;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -90,8 +91,11 @@ namespace Dooggy.Factory.Console
 
         public void Play()
         {
-            foreach (TestBlock Block in this)
-                Block.Play();
+            if (Code.DoConnect())
+            {
+                foreach (TestBlock Block in this)
+                    Block.Play();
+            }
         }
 
         public void Stop()
@@ -122,7 +126,7 @@ namespace Dooggy.Factory.Console
         {
             foreach (TestBlock Block in this)
 
-                if (xString.IsEqual(Block.key, prmTag))
+                if (myString.IsEqual(Block.key, prmTag))
                 {
                     Corrente = Block;
 
@@ -208,11 +212,8 @@ namespace Dooggy.Factory.Console
 
         public void Play()
         {
-            if (Code.DoConnect())
-            {
-                foreach (TestCommand command in this)
-                    command.Play();
-            }
+            foreach (TestCommand command in this)
+                command.Play();
         }
 
         public void AddCommand(TestCommand prmCommand)
@@ -347,7 +348,7 @@ public class TestCommandAction
                         break;
 
                     case eTipoTestCommand.item:
-                        ActionAddDataFluxo();
+                        ActionAddDataFlow();
                         break;
 
                     case eTipoTestCommand.save:
@@ -401,7 +402,7 @@ public class TestCommandAction
                     break;
 
                 case eTipoTestCommand.item:
-                    ActionSetDataFluxo(prmArg, prmInstrucao);
+                    ActionSetDataFlow(prmArg, prmInstrucao);
                     break;
 
                 default:
@@ -418,8 +419,8 @@ public class TestCommandAction
         private void ActionAddDataView() => Dados.AddDataView(prmTag: target);
         private void ActionSetDataView(string prmArg, string prmInstrucao) => Pool.SetDataView(prmArg, prmInstrucao);
 
-        private void ActionAddDataFluxo() => Dados.AddDataFluxo(prmTag: target);
-        private void ActionSetDataFluxo(string prmArg, string prmInstrucao) => Pool.SetDataFluxo(prmArg, prmInstrucao);
+        private void ActionAddDataFlow() => Dados.AddDataFlow(prmTag: target);
+        private void ActionSetDataFlow(string prmArg, string prmInstrucao) => Pool.SetDataFlow(prmArg, prmInstrucao);
 
         private void ActionSaveFile() => Script.Save(prmOptions: Sintaxe.options);
 

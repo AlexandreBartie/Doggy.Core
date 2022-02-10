@@ -1,12 +1,13 @@
 ﻿using Dooggy.Factory.Data;
 using Dooggy.Lib.Data;
 using Dooggy.Lib.Files;
-using Dooggy.Lib.Generic;
+using Dooggy;
 using Dooggy.Lib.Parse;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using Dooggy.Lib.Vars;
 
 namespace Dooggy.Factory.Console
 {
@@ -59,7 +60,7 @@ namespace Dooggy.Factory.Console
         public bool Setup(string prmArquivoCFG) => Setup(prmArquivoCFG, prmPlay: false);
         public bool Setup(string prmArquivoCFG, bool prmPlay) => Config.Setup(prmArquivoCFG, prmPlay);
 
-        public void SetAnchor(DateTime prmAncora) => Config.Format.SetToday(prmAncora);
+        public void SetAnchor(DateTime prmAncora) => Config.CSV.SetToday(prmAncora);
 
         public void SetDBStatus(bool prmBloqueado) => Pool.SetDBStatus(prmBloqueado);
         public void AddLog() => Scripts.AddLog();
@@ -79,6 +80,8 @@ namespace Dooggy.Factory.Console
         public void UndoCode() => Script.Result.UndoCode();
 
         public bool SetScript(string prmKey) => Scripts.FindScript(prmKey);
+
+        public bool DoConnect() => Dados.DoConnect();
 
     }
     public class TestConsoleInput : TestConsoleIO
@@ -148,7 +151,7 @@ namespace Dooggy.Factory.Console
 
             string nome = Console.Result.name_OUT;
 
-            if (xString.IsFull(nome))
+            if (myString.IsFull(nome))
                 return (nome);
 
             return (Console.Result.name_INI);

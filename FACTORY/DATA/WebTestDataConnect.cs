@@ -1,5 +1,6 @@
 ﻿using Dooggy.Factory.Console;
 using Dooggy.Lib.Parse;
+using Dooggy.Lib.Vars;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -17,7 +18,7 @@ namespace Dooggy.Factory.Data
 
         public int command_timeout => Timeout.command_timeout;
 
-        public string GetFullConnection(string prmStrConnection) => xString.GetSubstituir(prmStrConnection, var_timeout, Timeout.connect_timeout.ToString());
+        public string GetFullConnection(string prmStrConnection) => myString.GetSubstituir(prmStrConnection, var_timeout, Timeout.connect_timeout.ToString());
 
         private DataBaseOracle _Oracle;
         public DataBaseOracle Oracle { get { if (_Oracle == null) _Oracle = new DataBaseOracle(this); return _Oracle; } }
@@ -56,12 +57,12 @@ namespace Dooggy.Factory.Data
         public TestDataConnect Connect;
         public TestDataPool Pool => Connect.Pool;
 
-        private xJSON Args;
+        private myJSON Args;
 
         public void AddJSON(string prmTag, string prmDados)
         {
 
-            Args = new xJSON(prmDados);
+            Args = new myJSON(prmDados);
 
             Connect.Oracle.host = Args.GetValor("host", prmPadrao: "10.250.1.35");
             Connect.Oracle.port = Args.GetValor("port", prmPadrao: "1521");

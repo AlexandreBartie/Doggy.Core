@@ -6,10 +6,11 @@ using OpenQA.Selenium;
 using System.Collections.ObjectModel;
 using Dooggy.Lib.Parse;
 using Dooggy.Lib.Files;
-using Dooggy.Lib.Generic;
+using Dooggy;
 using Dooggy.Factory.Data;
 using Dooggy.Factory;
 using OpenQA.Selenium.Chrome;
+using Dooggy.Lib.Generic;
 
 namespace Dooggy.Factory.Robot
 {
@@ -294,7 +295,7 @@ namespace Dooggy.Factory.Robot
         public bool SetTarget(string prmTarget)
         {
 
-            xTupla Target = new xTupla(prmTarget);
+            myTupla Target = new myTupla(prmTarget);
 
             return Elemento.SetAction(Target.valor);
         }
@@ -323,7 +324,7 @@ namespace Dooggy.Factory.Robot
 
         private QA_WebTarget _target;
 
-        public xTupla chave;
+        public myTupla chave;
 
         public string key { get => _key; }
 
@@ -341,7 +342,7 @@ namespace Dooggy.Factory.Robot
             _key = prmKey.ToLower();
             _tipo = eTipoElemento.Input;
 
-            chave = new xTupla(prmTarget);
+            chave = new myTupla(prmTarget);
 
             Dominio = new QA_WebDominio(this);
 
@@ -464,7 +465,7 @@ namespace Dooggy.Factory.Robot
         private string filtro;
 
         private ReadOnlyCollection<IWebElement> Opcoes;
-        public xTupla chave { get => Elemento.chave; }
+        public myTupla chave { get => Elemento.chave; }
 
         public QA_WebRobot Robot { get => Elemento.Robot; }
         public TestRobotProject Projeto { get => Robot.Projeto; }
@@ -489,11 +490,11 @@ namespace Dooggy.Factory.Robot
             if (GetElementos())
             {
 
-                xLista fluxo = new xLista(Projeto.Parameters.GetAdicaoElementos(), prmValor);
+                xLista Flow = new xLista(Projeto.Parameters.GetAdicaoElementos(), prmValor);
 
-                foreach (string item in fluxo)
+                foreach (string item in Flow)
                 {
-                    if (!SetFluxo(item))
+                    if (!SetFlow(item))
                         Trace.Erro.msgErro("Domínio não encontrado na lista ... " + item);
                 }
 
@@ -503,10 +504,10 @@ namespace Dooggy.Factory.Robot
 
             return (false);
         }
-        private bool SetFluxo(string prmFluxo)
+        private bool SetFlow(string prmFlow)
         {
 
-            int indice = lista.GetContem(prmFluxo.Trim());
+            int indice = lista.GetContem(prmFlow.Trim());
 
             if (IsIndiceOk(indice))
             {
@@ -558,7 +559,7 @@ namespace Dooggy.Factory.Robot
 
         public IWebElement control;
 
-        public xTupla chave { get => Elemento.chave; }
+        public myTupla chave { get => Elemento.chave; }
         public QA_WebRobot Robot { get => Elemento.Robot; }
 
         public QA_WebTarget(QA_WebElemento prmElemento)
@@ -685,7 +686,7 @@ namespace Dooggy.Factory.Robot
 
         public QA_FonteDados Fonte;
 
-        public xJSON JSON = new xJSON();
+        public myJSON JSON = new myJSON();
 
         public bool IsON;
 
@@ -703,27 +704,27 @@ namespace Dooggy.Factory.Robot
         private TestDataPool Pool { get => Project.Pool; }
         public bool IsOK { get => JSON.IsOK; }
         public bool IsCurrent { get => JSON.IsCurrent; }
-        public void Add(string prmFluxo)
+        public void Add(string prmFlow)
         {
             //if (IsSTATIC)
-                JSON.Add(prmFluxo);
+                JSON.Add(prmFlow);
             //else
-                //AddCombine(prmFluxo, prmMestre: DefaultView.json());
+                //AddCombine(prmFlow, prmMestre: DefaultView.json());
         }
-        public void Add(string prmFluxo, string prmView)
+        public void Add(string prmFlow, string prmView)
         {
-            AddCombine(prmFluxo, prmMestre: Pool.json(prmView));
+            AddCombine(prmFlow, prmMestre: Pool.json(prmView));
         }
-        private void AddCombine(string prmFluxo, string prmMestre)
+        private void AddCombine(string prmFlow, string prmMestre)
         {
-            JSON.Add(prmFluxo, prmMestre);
+            JSON.Add(prmFlow, prmMestre);
         }
         public bool Save()
         {
             IsON = true;
 
             if (!JSON.Save())
-            { Trace.Erro.msgErro("ERRO{JSON:Save} " + JSON.fluxo); }
+            { Trace.Erro.msgErro("ERRO{JSON:Save} " + JSON.Flow); }
 
             return (JSON.IsOK);
 

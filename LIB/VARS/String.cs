@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Dooggy
+namespace Dooggy.Lib.Vars
 {
-    public static class xString
+    public static class myString
     {
 
         public static bool IsFull(string prmTexto)
@@ -39,7 +39,7 @@ namespace Dooggy
             else
                 { textoA = prmTextoA; textoB = prmTextoB; }
 
-            if (xString.IsFull(textoA) && xString.IsFull(textoB))
+            if (myString.IsFull(textoA) && myString.IsFull(textoB))
                 return GetLower(textoA).Contains(GetLower(textoB));
 
             return (false);
@@ -102,7 +102,7 @@ namespace Dooggy
             {
 
                 if (prmTamanho < 0)
-                    tamanho = prmTexto.Length - xInt.GetPositivo(prmTamanho);
+                    tamanho = prmTexto.Length - myInt.GetPositivo(prmTamanho);
 
                 return GetSubstring(prmTexto, prmIndice: prmTexto.Length - tamanho + 1, tamanho);
 

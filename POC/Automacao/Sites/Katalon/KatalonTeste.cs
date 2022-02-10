@@ -8,12 +8,12 @@ namespace Dooggy.Katalon
         public void DATA()
         {
  
-            Massa.Add(prmFluxo: @"{ 'Nome': 'Alexandre', 'email': 'alexandre_bartie@hotmail.com' }");
-            Massa.Add(prmFluxo: @"{ 'Nome': 'Daniel', 'Sobrenome': 'Campinho', 'email': 'alexandre.bartie@gmail.com' }");
-            Massa.Add(prmFluxo: @"{ 'Nome': 'Luana', 'Sobrenome': 'Gonçalves', 'email': 'alexandre.bartie@gmail.com' }");
-            Massa.Add(prmFluxo: @"{ 'Nome': 'Lisia', 'Sobrenome': 'Amantos', 'sexo': 'Mulher', 'email': 'lisia.amantos@gmail.com' }");
-            Massa.Add(prmFluxo: @"{ 'Expectativa':'Salário + Desafio' }");
-            Massa.Add(prmFluxo: @"{ 'Expectativa':'Liderança + Ambiente + Equipe' }");
+            Massa.Add(prmFlow: @"{ 'Nome': 'Alexandre', 'email': 'alexandre_bartie@hotmail.com' }");
+            Massa.Add(prmFlow: @"{ 'Nome': 'Daniel', 'Sobrenome': 'Campinho', 'email': 'alexandre.bartie@gmail.com' }");
+            Massa.Add(prmFlow: @"{ 'Nome': 'Luana', 'Sobrenome': 'Gonçalves', 'email': 'alexandre.bartie@gmail.com' }");
+            Massa.Add(prmFlow: @"{ 'Nome': 'Lisia', 'Sobrenome': 'Amantos', 'sexo': 'Mulher', 'email': 'lisia.amantos@gmail.com' }");
+            Massa.Add(prmFlow: @"{ 'Expectativa':'Salário + Desafio' }");
+            Massa.Add(prmFlow: @"{ 'Expectativa':'Liderança + Ambiente + Equipe' }");
 
             Massa.Save();
 
