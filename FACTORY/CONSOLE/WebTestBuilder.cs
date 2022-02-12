@@ -279,13 +279,13 @@ namespace Dooggy.Factory.Console
                 case "view":
                 case "dataview":
                     tipo = eTipoTestCommand.view;
-                    args = "descricao;tabelas;campos;relacoes;mask;entrada;saida";
+                    args = "name;tables;links;input;output;alias,mask";
                     break;
 
                 case "item":
-                case "dataFlow":
+                case "dataflow":
                     tipo = eTipoTestCommand.item;
-                    args = "input;sql;filtro;ordem";
+                    args = "enter;check;sql;filter;order;mask";
                     break;
 
                 case "save":

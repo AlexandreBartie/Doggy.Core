@@ -11,77 +11,60 @@ using System.Text;
 
 namespace Dooggy.Factory.Data
 {
-    public class TestDataView : TestDataSQLBase
+    public class TestDataView : TestDataViewSQL
     {
 
         public DataBaseConnection DataBase;
 
         private string key;
 
-        private string alias;
-
-        public string descricao;
-        public string tag => GetTag();
-
-        public TestViewHeader Header;
+        private string _tag;
+        public string tag => myString.GetFull(_tag, key);
 
         public TestDataFlows Flows;
 
         public TestDataPool Pool { get => DataBase.Pool; }
+        public TestDataTratamento Tratamento { get => Pool.Tratamento; }
 
-        private TestTrace Trace { get => Pool.Trace; }
+        public TestTrace Trace { get => Pool.Trace; }
 
         public TestDataView(string prmTag, DataBaseConnection prmDataBase)
         {
-
             DataBase = prmDataBase;
-
-            Setup(prmTag);
 
             Cleanup();
 
+            Setup(prmTag);
         }
         private void Setup(string prmTag)
         {
-
             string bloco = Bloco.GetBloco(prmTag, prmDelimitador: "|", prmPreserve: true);
 
-            descricao = Bloco.GetBloco(bloco, prmDelimitador: "|").Trim();
+            SetName(prmName: Bloco.GetBloco(bloco, prmDelimitador: "|").Trim());
 
-            alias = Bloco.GetBlocoAntes(prmTag, bloco, prmTRIM: true);
+            _tag = Bloco.GetBlocoAntes(prmTag, bloco, prmTRIM: true);
 
-            //SetOutput(prmLista: Bloco.GetBlocoDepois(prmTag, bloco, prmTRIM: true));
+            SetOutput(prmLista: Bloco.GetBlocoDepois(prmTag, bloco, prmTRIM: true));
 
             key = Pool.GetNextKeyDataView();
-
         }
 
+        public void SetName(string prmName) => Header.SetName(prmName);
         public void SetInput(string prmLista) => Header.Input.Parse(prmLista);
         public void SetOutput(string prmLista) => Header.Output.Parse(prmLista);
+        public void SetAlias(string prmLista) => Header.Alias.Parse(prmLista);
 
         public void Cleanup()
         {
-            Header = new TestViewHeader(this);
+            Header = new TestDataHeaderView();
 
             Flows = new TestDataFlows(Pool);
         }
-        private string GetTag()
-        {
-            if (alias == "")
-                return (key);
-
-            return (alias);
-        }
-
     }
-    public class TestDataFlow : TestDataSQL
+    public class TestDataFlow : TestDataFlowSQL
     {
 
         public string tag;
-
-        public TestDataView View;
-
-        public myTupla Input;
 
         private TestDataTratamento Tratamento { get => View.Pool.Tratamento; }
 
@@ -99,13 +82,9 @@ namespace Dooggy.Factory.Data
                     _cursor = new DataCursorConnection(GetSQL(View), GetMask(), DataBase);
 
                 return (_cursor);
-
             }
-
         }
-
         public string tag_view  => View.tag;
-
         public string header_txt => View.Header.txt;
 
         public bool IsOK => Cursor.IsOK;
@@ -113,17 +92,15 @@ namespace Dooggy.Factory.Data
 
         public TestDataFlow(string prmTag, string prmSQL, string prmMask, TestDataView prmDataView)
         {
+            View = prmDataView;
 
             tag = prmTag;
 
-            SetInput(prmDataView.Header.Input);
+            SetHeader(prmDataView.Header);
 
             SetSQL(prmSQL);
 
             SetMask(prmMask);
-
-            View = prmDataView;
-
         }
 
         public bool Next() => Cursor.Next();
@@ -138,135 +115,145 @@ namespace Dooggy.Factory.Data
         public string csv(string prmSeparador) => GetCSV(prmSeparador);
         public string json() => Cursor.GetJSON();
 
-        private string GetMask()
-        {
-
-            if (mask == "")
-                return (View.mask);
-
-            return mask;
-
-        }
-
         private string GetCSV(string prmSeparador)
         {
-            if (TemSQL() || View.TemEstrutura())
+            if (TemSQL || TemStructure)
             {
-
                 string memo = Cursor.GetCSV(prmSeparador);
 
                 if (memo != "")
                     return memo;
                 else
                     return Tratamento.GetZeroItens();
-
             }
-
             return Tratamento.GetNoCommand();
-
         }
+        private string GetMask()
+        {
+            if (mask == "")
+                return (View.mask);
 
+            return mask;
+        }
     }
-    public class TestDataSQL : TestDataSQLBase
+    public class TestDataFlowSQL : TestDataMask
     {
+        public TestDataView View;
 
-        private myTuplas Input;
-        
+        private TestDataHeader Header;
+
+        private myTuplas Input => Header.Input;
+        private myTuplas Output => Header.Output;
+
+        private TestTrace Trace => View.Trace;
+
         private string sql;
 
-        private string filtro;
 
-        private string ordem;
+        private string filter;
 
-        public TestDataSQL()
+        private string order;
+
+        public TestDataFlowSQL()
         {
-            Input = new myTuplas();
+            Header = new TestDataHeader();
         }
-        public void SetInput(myTuplas prmTuplas) => Input.Parse(prmTuplas);
-        public void SetInput(string prmValores) => Input.Parse(prmValores);
-        public void SetSQL(string prmSQL) => sql = prmSQL;
-        public void SetFiltro(string prmFiltro) => filtro = prmFiltro;
-        public void SetOrdem(string prmOrdem) => ordem = prmOrdem;
 
-        public bool TemSQL() => (TemSQLMontada() || TemEstrutura());
-        public bool TemSQLMontada() => (myString.IsFull(sql));
-        private bool TemCombinacoes() => TemRelacoes() && TemFiltro();
-        private bool TemCondicoes() => TemRelacoes() || TemFiltro();
-        private bool TemFiltro() => (myString.IsFull(filtro));
-        private bool TemOrdem() => (myString.IsFull(ordem));
+        public void SetHeader(TestDataHeader prmHeader) => Header.Parse(prmHeader);
+        public void SetEnter(string prmLista) => SetInput(new myTuplas(prmLista));
+        public void SetCheck(string prmLista) => SetOutput(new myTuplas(prmLista));
+
+        public void SetSQL(string prmSQL) => sql = prmSQL;
+        public void SetFilter(string prmFilter) => filter = prmFilter;
+        public void SetOrder(string prmOrder) => order = prmOrder;
+
+        public bool TemSQL => (TemSQLMontada || TemStructure);
+
+        public bool TemStructure => View.TemTables && View.TemColumns;
+        public bool TemSQLMontada => (myString.IsFull(sql));
+        private bool TemLinks => View.TemLinks;
+        private bool TemCombinacoes => TemLinks && TemFiltro;
+        private bool TemCondicoes => TemLinks || TemFiltro;
+        private bool TemFiltro => (myString.IsFull(filter));
+        private bool TemOrdem => (myString.IsFull(order));
 
         public string GetSQL(TestDataView prmView)
         {
-
             string comando_sql = sql;
 
-            if (!TemSQLMontada())
-            {
+            if (!TemSQLMontada)
+                comando_sql = MontarSQL();
 
-                tabelas = prmView.tabelas;
-
-                campos = prmView.campos;
-
-                relacoes = prmView.relacoes;
-
-                comando_sql = GetSQL();
-
-            }
-            return (prmView.Pool.GetTextoTratado(comando_sql));
+            return (prmView.Tratamento.GetSQLTratado(comando_sql, Header));
         }
 
-        private string GetSQL()
+        private string MontarSQL()
         {
-
             string condicoes = ""; string ordenacao = ""; string sql = "";
 
-            if (TemEstrutura())
+            if (TemStructure)
             {
 
-                sql = String.Format("SELECT {0} FROM {1}", campos, tabelas);
+                sql = String.Format("SELECT {0} FROM {1}", Header.columns_sql, View.tables);
 
-                if (TemCombinacoes())
-                    condicoes = String.Format("({0}) AND ({1})", relacoes, filtro);
+                if (TemCombinacoes)
+                    condicoes = String.Format("({0}) AND ({1})", View.links, filter);
 
-                else if (TemRelacoes())
-                    condicoes = relacoes;
+                else if (TemLinks)
+                    condicoes = View.links;
 
-                else if (TemFiltro())
-                    condicoes = filtro;
+                else if (TemFiltro)
+                    condicoes = filter;
 
-                if (TemCondicoes())
+                if (TemCondicoes)
                     condicoes = String.Format(" WHERE {0}", condicoes);
 
-                if (TemOrdem())
-                    ordenacao = String.Format(" ORDER BY {0}", ordem);
+                if (TemOrdem)
+                    ordenacao = String.Format(" ORDER BY {0}", order);
 
                 sql += condicoes + ordenacao;
-
             }
             return (sql.Trim());
         }
 
+        private void SetInput(myTuplas prmTuplas)
+        {
+            foreach (myTupla tupla in prmTuplas)
+                if (!Input.SetValue(tupla))
+                    Trace.LogConsole.FailEnterVariable(tupla);
+        }
+
+        private void SetOutput(myTuplas prmTuplas)
+        {
+            foreach (myTupla tupla in prmTuplas)
+                if (!Output.SetValue(tupla))
+                    Trace.LogConsole.FailCheckVariable(tupla);
+        }
     }
-    public class TestDataSQLBase
+    public class TestDataViewSQL : TestDataMask
     {
 
-        public string tabelas;
+        public TestDataHeaderView Header;
 
-        public string campos;
+        public string tables;
 
-        public string relacoes;
+        public string links;
+
+        public void SetTables(string prmTables) => tables = prmTables;
+        public void SetLinks(string prmLinks) => links = prmLinks;
+
+        internal bool TemTables => (myString.IsFull(tables));
+        internal bool TemColumns => Header.TemColumns;
+        internal bool TemLinks => (myString.IsFull(links));
+
+    }
+
+    public class TestDataMask
+    {
 
         public string mask;
 
-        public void SetTabelas(string prmTabelas) => tabelas = prmTabelas;
-        public void SetCampos(string prmCampos) => campos = prmCampos;
-        public void SetRelacoes(string prmRelacoes) => relacoes = prmRelacoes;
         public void SetMask(string prmMask) => mask = prmMask;
-
-        public bool TemEstrutura() => TemTabelas() && TemCampos();
-        protected bool TemTabelas() => (myString.IsFull(tabelas));
-        protected bool TemCampos() => (myString.IsFull(campos));
-        protected bool TemRelacoes() => (myString.IsFull(relacoes));
 
     }
     public class TestDataViews : List<TestDataView>
@@ -315,34 +302,33 @@ namespace Dooggy.Factory.Data
             switch (prmArg)
             {
 
-                case "descricao":
-                    Corrente.descricao = prmInstrucao;
+                case "name":
+                    Corrente.SetName(prmInstrucao);
                     break;
 
-                case "tabelas":
-                    Corrente.SetTabelas(prmInstrucao);
+                case "tables":
+                    Corrente.SetTables(prmInstrucao);
                     break;
 
-                case "campos":
-                    Corrente.SetCampos(prmInstrucao);
-                    break;
-
-                case "relacoes":
-                    Corrente.SetRelacoes(prmInstrucao);
+                case "links":
+                    Corrente.SetLinks(prmInstrucao);
                     break;
                 
                 case "mask":
                     Corrente.SetMask(prmInstrucao);
                     break;
 
-                case "entrada":
+                case "input":
                     Corrente.SetInput(prmInstrucao);
                     break;
 
-                case "saida":
+                case "output":
                     Corrente.SetOutput(prmInstrucao);
                     break;
 
+                case "alias":
+                    Corrente.SetOutput(prmInstrucao);
+                    break;
             }
 
         }
@@ -372,32 +358,22 @@ namespace Dooggy.Factory.Data
         }
         private TestDataViews GetFiltro(string prmLista)
         {
-
             TestDataViews filtro = new TestDataViews(Pool);
 
             foreach (string tag in new xLista(prmLista, prmSeparador: "+"))
             {
-
                 int cont = 0;
 
                 foreach (TestDataView View in this)
                 {
-
                     if (myString.IsEqual(View.tag, tag))
                     {
-
                         filtro.Add(View); cont++;
-
                     }
-
                 }
-
                 Trace.LogData.SQLViewsSelection(tag, prmQtde: cont);
-
             }
-
             return filtro;
-
         }
         private bool Find(string prmTag)
         {
@@ -447,7 +423,7 @@ namespace Dooggy.Factory.Data
                 return (true);
             }
 
-            Trace.LogData.FailNoDataViewDetected(prmTag);
+            Trace.LogData.FailFindDataView(prmTag);
 
             return (false);
 
@@ -465,27 +441,23 @@ namespace Dooggy.Factory.Data
 
             switch (prmArg)
             {
+                case "enter":
+                    Corrente.SetEnter(prmInstrucao); break;
 
-                case "input":
-                    Corrente.SetInput(prmInstrucao);
-                    break;
-                
+                case "check":
+                    Corrente.SetCheck(prmInstrucao); break;
+
                 case "sql":
-                    Corrente.SetSQL(prmInstrucao);
-                    break;
+                    Corrente.SetSQL(prmInstrucao); break;
 
-                case "filtro":
-                    Corrente.SetFiltro(prmInstrucao);
-                    break;
+                case "filter":
+                    Corrente.SetFilter(prmInstrucao); break;
 
-                case "ordem":
-                    Corrente.SetOrdem(prmInstrucao);
-                    break;
+                case "order":
+                    Corrente.SetOrder(prmInstrucao); break;
 
                 case "mask":
-                    Corrente.SetMask(prmInstrucao);
-                    break;
-
+                    Corrente.SetMask(prmInstrucao); break;
             }
 
         }
@@ -519,7 +491,7 @@ namespace Dooggy.Factory.Data
 
             string corpo = ""; string linha; string coluna_extra = "";
 
-             if (prmColunaExtra)
+            if (prmColunaExtra)
                 coluna_extra = prmSeparador;
 
             foreach (TestDataFlow Flow in this)
@@ -694,65 +666,41 @@ namespace Dooggy.Factory.Data
 
     }
 
-    public class TestViewHeader
+    public class TestDataHeaderView : TestDataHeader
     {
+        public myTuplas Alias;
 
-        private TestDataView View;
-
-        private myTuplasBox Box;
-
-        private myTuplas _input;
-        private myTuplas _output;
-
-        public myTuplas Input => _input;
-        public myTuplas Output => _output;
-        public string txt => Box.header;
-
-        public TestViewHeader (TestDataView prmView)
+        public TestDataHeaderView()
         {
-            View = prmView;
+            Alias = Box.AddItem(prmKey: "alias", prmGroup: "auxiliar");
+        }
 
+    }
+
+    public class TestDataHeader
+    {
+        internal myTuplasBox Box;
+
+        public myTuplas Input;
+        public myTuplas Output;
+
+        public string txt => Box.name + "," + columns;
+
+        public string columns => Box.Main.columns;
+        public string columns_sql => Box.Main.columns_sql;
+
+        public bool TemColumns => Input.IsFull || Output.IsFull;
+
+        public TestDataHeader()
+        {
             Box = new myTuplasBox();
 
-            _input = Box.AddItem(prmKey: "input");
-
-            _output = Box.AddItem(prmKey: "output");
+            Input = Box.AddItem(prmKey: "input", prmGroup: "main");
+            Output = Box.AddItem(prmKey: "output", prmGroup: "main");
         }
-    }
-    public class TestDataInput
-    {
+        public void SetName(string prmName) => Box.name = prmName;
 
-        private TestDataFlow Flow;
-
-        public myTupla Tupla = new myTupla();
-
-        public TestDataInput(string prmTag, TestDataFlow prmFlow)
-        {
-
-            Flow = prmFlow;
-
-            //Tupla.tag = prmTag;
-
-        }
-
-    }
-
-    public class TestInputFlow 
-    {
-
-        private TestDataFlow Flow;
-
-        public myTuplas Tuplas = new myTuplas();
-
-        public TestInputFlow(TestDataFlow prmFlow)
-        {
-
-            Flow = prmFlow;
-
-        }
-
-        //public void Load(string prmInput) => Tuplas.Load(prmInput);
-
+        public void Parse(TestDataHeader prmHeader) { Input.Parse(prmHeader.Input); Output.Parse(prmHeader.Output); }
 
     }
 

@@ -73,7 +73,12 @@ namespace Dooggy.Factory.Console
             return Corrente.tag;
 
         }
-
+        public string GetValor(string prmTag)
+        {
+            if (Find(prmTag))
+                return Corrente.valor;
+            return ("");
+        }
         public void SetArgumento(string prmArg, string prmInstrucao)
         {
 
@@ -90,30 +95,23 @@ namespace Dooggy.Factory.Console
 
         public bool Find(string prmTag)
         {
-
             foreach (TestDataVar var in this)
 
                 if (myString.IsEqual(var.tag, prmTag))
                 {
                     Corrente = var; return (true);
                 }
-
             return (false);
-
         }
 
         private bool Find(string prmTag, string prmValor)
         {
-
             if (Find(prmTag))
             {
                 Corrente.valor = prmValor; return (true);
             }
-
             return (false);
-
         }
-
 
     }
 

@@ -355,18 +355,6 @@ public class TestCommandAction
                         ActionSaveFile();
                         break;
 
-                    //case eTipoTestCommand.savetxt:
-                    //    ActionSaveFile(prmTipo: eTipoFileFormat.txt);
-                    //    break;
-
-                    //case eTipoTestCommand.savecsv:
-                    //    ActionSaveFile(prmTipo: eTipoFileFormat.csv); ;
-                    //    break;
-
-                    //case eTipoTestCommand.savejson:
-                    //    ActionSaveFile(prmTipo: eTipoFileFormat.json);
-                    //    break;
-
                     default:
                         Trace.LogConsole.FailActionKeyWord(Sintaxe.keyword);
                         return;

@@ -15,7 +15,7 @@ namespace Dooggy.Lib.Vars
             return (false);
 
         }
-
+        public static bool IsNull(string prmTexto) => (prmTexto == null);
         public static bool IsEmpty(string prmTexto) => !(IsFull(prmTexto));
 
         public static bool IsEqual(string prmTextoA, string prmTextoB) => GetLower(prmTextoA) == GetLower(prmTextoB);
@@ -118,29 +118,25 @@ namespace Dooggy.Lib.Vars
                 int indice = GetPosicao(prmTexto, prmDelimitador);
 
                 if (indice != 0)
-                {
-
-
-
-
                     return GetSubstring(prmTexto, prmIndice: indice + 1, prmTamanho: prmTexto.Length - indice);
-                }
             }
 
             return ("");
 
         }
-        public static bool GetFind(string prmTexto, string prmParte) => (GetPosicao(prmTexto, prmParte) != 0);
+
+        //public static bool GetFindEx(string prmTexto, string prmParte) { if (myString.IsNull(prmParte)) return false; return GetFind(prmTexto, prmParte); }
+        public static bool GetFind(string prmTexto, string prmParte)
+        {
+            if (IsFull(prmTexto) && IsFull(prmParte))
+                return (prmTexto.ToLower().IndexOf(prmParte.ToLower()) != -1);
+            return false;
+        }
         public static int GetPosicao(string prmTexto, string prmParte)
         {
-            if (IsFull(prmTexto))
-            {
-
+            if (IsFull(prmTexto) && IsFull(prmParte))
                 return (prmTexto.IndexOf(prmParte)) + prmParte.Length;
-            }
-
             return (0);
-
         }
         public static string GetSubstring(string prmTexto, int prmIndice) => GetSubstring(prmTexto, prmIndice, prmTamanho: prmTexto.Length - prmIndice + 1);
         public static string GetSubstring(string prmTexto, int prmIndice, int prmTamanho)
@@ -191,14 +187,14 @@ namespace Dooggy.Lib.Vars
             return ("");
         }
 
-        public static string GetFull(string prmTexto)
+        public static string GetFull(string prmTexto) => GetFull(prmTexto, prmPadrao: "");
+        public static string GetFull(string prmTexto, string prmPadrao)
         {
             if (IsFull(prmTexto))
                 return prmTexto;
 
-            return ("");
+            return (prmPadrao);
         }
-
         public static string Concat(string prmValorA, string prmValorB, string prmSeparador)
         {
 

@@ -106,7 +106,7 @@ namespace Dooggy.Factory.Data
 
         public bool IsSQLDataException(string prmTexto) => Tratamento.IsSQLDataException(prmTexto);
         public string GetTextoTratado(string prmTexto) => Tratamento.GetTextoTratado(prmTexto);
-        public string GetNextKeyDataView() => string.Format("view#{0},", next_view);
+        public string GetNextKeyDataView() => string.Format("view#{0}", next_view);
 
         public string txt(string prmTags) => output(prmTags, prmTipo: eTipoFileFormat.txt);
         public string csv(string prmTags) => output(prmTags, prmTipo: eTipoFileFormat.csv);
@@ -120,31 +120,24 @@ namespace Dooggy.Factory.Data
         private TestDataRaws Raws => (Pool.Raws);
         private TestDataViews Views => (Pool.Views);
 
-        private string varDelimitadorInicial = "$(";
+        private string varDataFlow = "#(flow)";
+
+        private string varDataInput = "#(input)";
+        private string varDataOutput = "#(output)";
+        private string varDataFull => varDataInput + "," + varDataOutput;
+
+        private string varDelimitadorInicial = "#(";
         private string varDelimitadorFinal = ")";
 
         private string fncDelimitadorPrefixo = "$";
         private string fncDelimitadorInicial = "(";
         private string fncDelimitadorFinal = ")";
 
-
         public TestDataTratamento(TestDataPool prmPool)
         {
-
             Pool = prmPool;
-
         }
-        public string GetTextoTratado(string prmTexto)
-        {
 
-            string texto = prmTexto;
-
-            texto = GetSQLVariavel(texto);
-            texto = GetSQLFuncoes(texto);
-            
-            return (texto);
-
-        }
         public string GetOutput(string prmTags, eTipoFileFormat prmTipo)
         {
 
@@ -156,68 +149,63 @@ namespace Dooggy.Factory.Data
             return data_view;
 
         }
-        private string GetVariavel(string prmTag)
+        public string GetSQLTratado(string prmSql, TestDataHeader prmHeader)
         {
+            string sql = myString.GetSubstituir(prmSql, varDataFlow, varDataFull);
 
-            if (Vars.Find(prmTag))
-                return Vars.Corrente.valor;
+            sql = GetTuplasTratadas(sql, varDataInput, prmHeader.Input);
+            sql = GetTuplasTratadas(sql, varDataOutput, prmHeader.Output.GetValues());
 
-            return ("");
-
+            return GetTextoTratado(sql);
         }
-        private string GetFuncao(string prmFuncao, string prmParametro)
+        public string GetTextoTratado(string prmTexto)
         {
+            string texto = prmTexto;
 
-            switch (prmFuncao)
+            texto = GetVariavelTratada(texto);
+            texto = GetFuncaoTratada(texto);
+
+            return (texto);
+        }
+
+        private string GetTuplasTratadas(string prmSql, string prmVariavel, myTuplas prmTuplas)
+        {
+            string sql = myString.GetSubstituir(prmSql, prmVariavel, prmTuplas.sql);
+
+            foreach (myTupla tupla in prmTuplas)
             {
+                if (tupla.TemValor)
+                    Trace.LogConsole.SetValueVariable(tupla.tag, tupla.valor_sql);
 
-                case "date":
-                    return GetDataDinamica(prmParametro);
-
-                case "now":
-                case "today":
-                    return GetDataDinamica(prmParametro);
-
+                sql = myString.GetSubstituir(sql, tupla.var_sql, tupla.valor_sql);
             }
-
-            return ("");
+            return sql;
         }
-        private string GetDataDinamica(string prmParametro)
+        
+        private string GetVariavelTratada(string prmTexto)
         {
-            return (myDate.View(prmDate: anchor, prmSintaxe: prmParametro));
-        }
-        private string GetDataEstatica(string prmParametro)
-        {
-            return (myDate.Static(prmDate: anchor, prmFormato: prmParametro));
-        }
-        private string GetSQLVariavel(string prmTexto)
-        {
-
             string sql = prmTexto; string var; string var_extendido; string var_valor;
 
             while (true)
             {
-
                 var_extendido = Bloco.GetBloco(sql, varDelimitadorInicial, varDelimitadorFinal, prmPreserve: true);
 
                 var = Bloco.GetBloco(sql, varDelimitadorInicial, varDelimitadorFinal);
 
                 if (var == "") break;
 
-                var_valor = GetVariavel(prmTag: var);
-
-                sql = myString.GetSubstituir(sql, var_extendido, var_valor);
+                var_valor = Vars.GetValor(prmTag: var);
 
                 if (var_valor == "")
                     Trace.LogConsole.FailFindVariable(var, prmTexto);
 
+                sql = myString.GetSubstituir(sql, var_extendido, var_valor);
             }
 
             return (sql);
-
         }
 
-        private string GetSQLFuncoes(string prmSQL)
+        private string GetFuncaoTratada(string prmSQL)
         {
 
             string sql = prmSQL; string funcao; string funcao_ext;
@@ -246,9 +234,31 @@ namespace Dooggy.Factory.Data
             }
 
             return (sql);
-
         }
 
+        private string GetFuncao(string prmFuncao, string prmParametro)
+        {
+
+            switch (prmFuncao)
+            {
+                case "date":
+                    return GetDataDinamica(prmParametro);
+
+                case "now":
+                case "today":
+                    return GetDataDinamica(prmParametro);
+            }
+
+            return ("");
+        }
+        private string GetDataDinamica(string prmParametro)
+        {
+            return (myDate.View(prmDate: anchor, prmSintaxe: prmParametro));
+        }
+        private string GetDataEstatica(string prmParametro)
+        {
+            return (myDate.Static(prmDate: anchor, prmFormato: prmParametro));
+        }
     }
     public class TestDataFormat : TestDataException
     {
@@ -287,8 +297,9 @@ namespace Dooggy.Factory.Data
 
         private xLista Dominio;
 
-        private string dataSQL_ZeroItens { get => GetTag("ZeroItensSQL"); }
-        private string dataSQL_NoCommand { get => GetTag("NoCommandSQL"); }
+        private string dataSQL_NoFindSQLCommand { get => GetTag("NoFindSQLCommand"); }
+        private string dataSQL_ZeroItensSQLResult { get => GetTag("ZeroItensSQLResult"); }
+
 
         public bool IsSQLDataException(string prmItem) => (Dominio.GetContido(prmItem) != 0);
 
@@ -307,24 +318,24 @@ namespace Dooggy.Factory.Data
         {
             Dominio = new xLista();
 
-            Dominio.Add(dataSQL_ZeroItens);
-            Dominio.Add(dataSQL_NoCommand);
+            Dominio.Add(dataSQL_ZeroItensSQLResult);
+            Dominio.Add(dataSQL_NoFindSQLCommand);
 
         }
 
         public string GetZeroItens()
         {
 
-            return (dataSQL_ZeroItens);
+            return (dataSQL_ZeroItensSQLResult);
 
         }
 
         public string GetNoCommand()
         {
 
-            Trace.LogData.SQLNoCommand();
+            Trace.LogData.FailFindSQLCommand();
 
-            return (dataSQL_NoCommand);
+            return (dataSQL_NoFindSQLCommand);
 
         }
     }
@@ -363,6 +374,8 @@ namespace Dooggy.Factory.Data
         public string txt(string prmTags) => (Pool.txt(prmTags));
         public string csv(string prmTags) => (Pool.csv(prmTags));
         public string json(string prmTags) => (Pool.json(prmTags));
+
+        public string output(eTipoFileFormat prmTipo) => output(prmTags: "", prmTipo);
         public string output(string prmTags, eTipoFileFormat prmTipo) => (Pool.output(prmTags, prmTipo));
 
         public string log => Pool.Bases.log();

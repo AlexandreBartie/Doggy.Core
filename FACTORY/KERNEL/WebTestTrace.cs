@@ -5,6 +5,7 @@ using System.Text;
 using Dooggy;
 using Dooggy.Factory.Console;
 using Dooggy.Lib.Vars;
+using Dooggy.Lib.Parse;
 
 namespace Dooggy.Factory
 {
@@ -81,14 +82,13 @@ namespace Dooggy.Factory
     public class TestTraceLogData : TestTraceLogData_Fail
     {
 
-        public void DBConnection(string prmTag, string prmStatus) => msgData(string.Format("act# -db:[{0}] -status: {1}", prmTag, prmStatus));
-        public void SQLExecution(string prmTag, string prmSQL, bool prmTemDados) => GetSQLExecution(prmMsg: string.Format(@"act# -db:[{0}] -sql: {1}", prmTag, prmSQL), prmTemDados);
-        public void SQLNoCommand() => msgSQL("act# -null -msg: Nenhum comando SQL foi encontrado para esse item.");
+        public void DBConnection(string prmTag, string prmStatus) => msgData(string.Format("-db:[{0}] -status: {1}", prmTag, prmStatus));
+        public void SQLExecution(string prmTag, string prmSQL, bool prmTemDados) => GetSQLExecution(prmMsg: string.Format(@"-db:[{0}] -sql: {1}", prmTag, prmSQL), prmTemDados);
 
         public void SQLViewsSelection(string prmTag, int prmQtde)
         {
             if (prmQtde > 0)
-                msgSet(string.Format(@"-view:[{0}] -itens: {1}", prmTag, prmQtde));
+                msgSet(string.Format(@"[{0}] -itens: {1}", prmTag, prmQtde));
             else
                 msgErro(string.Format(@"msg# -view[{0}] -desc: View sem dados", prmTag));
         }
@@ -109,7 +109,9 @@ namespace Dooggy.Factory
         public void FailDBConnection(string prmTag, string prmConexao, Exception prmErro) => FailConnection(prmMSG: "Conexão falhou", prmTag, prmVar: "-string", prmConexao, prmErro);
         public void FailSQLConnection(string prmTag, string prmSQL, Exception prmErro) => FailConnection(prmMSG: "SQL falhou", prmTag, prmVar: "-sql", prmSQL, prmErro);
         public void FailSQLNoDataBaseConnection(string prmTag, string prmSQL, Exception prmErro) => FailConnection(prmMSG: "DB Desconectado", prmTag, prmVar: "-sql", prmSQL, prmErro);
-        public void FailNoDataViewDetected(string prmTag) => msgErro(prmTexto: string.Format("Data View não identificada ... >>> Flow: [{0}] não executou o SQL ...", prmTag));
+        public void FailFindDataView(string prmTag) => msgErro(prmTexto: string.Format("Data View não identificada ... >>> Flow: [{0}] não executou o SQL ...", prmTag));
+
+        public void FailFindSQLCommand() => msgErro("-db: sql isnt found ...");
 
         private void FailConnection(string prmMSG, string prmTag, string prmVar, Exception prmErro) => FailConnection(prmMSG, prmTag, prmVar, GetMsgErro(prmErro));
         private void FailConnection(string prmMSG, string prmTag, string prmVar, string prmErro) => msgErro(String.Format(@"{0} >>> tag:[{1}] {2}", prmMSG, prmTag, prmVar), prmErro);
@@ -123,7 +125,7 @@ namespace Dooggy.Factory
 
     public class TestTraceLogPath : TestTraceLog
     {
-        public void SetPath(string prmContexto, string prmPath) => msgSet(String.Format(@"{0,15} -path: {1}", prmContexto, prmPath));
+        public void SetPath(string prmContexto, string prmPath) => msgDef(String.Format(@"{0,15} -path: {1}", prmContexto, prmPath));
 
     }
     public class TestTraceLogFile : TestTraceLog
@@ -224,6 +226,8 @@ namespace Dooggy.Factory
 
         public void WriteKeyWordArg(string prmArg, string prmParametros) => msgCode(String.Format("  -{0}: {1}", prmArg, prmParametros));
 
+        public void SetValueVariable(string prmVariable, string prmValue) => msgSet(String.Format("Variável modificada ... -var: {0} = {1}", prmVariable, prmValue));
+
     }
     public class TestTraceLogConsole_Fail : TestTraceLog
     {
@@ -232,6 +236,9 @@ namespace Dooggy.Factory
         public void FailActionKeyWord(string prmKeyWord) => msgErro(String.Format("Keyword não executada ... -key: {0}", prmKeyWord));
         public void FailArgNewKeyWord(string prmKeyWord, string prmArg, string prmLinha) => msgErro(String.Format("Argumento-Keyword não suportado ... -arg: {0}.{1} -line: [{2}]", prmKeyWord, prmArg, prmLinha));
         public void FailArgMergeKeyWord(string prmKeyWord, string prmLinha) => msgErro(String.Format("Argumento-Keyword foi ignorado ... -key: {0} -line: [{1}]", prmKeyWord, prmLinha));
+
+        public void FailEnterVariable(myTupla prmTupla) => msgErro(String.Format("DataEnter não encontrado ... -enter: {0} = {1}", prmTupla.var_sql, prmTupla.valor_sql));
+        public void FailCheckVariable(myTupla prmTupla) => msgErro(String.Format("DataCheck não encontrado ... -check: {0} = {1}", prmTupla.var_sql, prmTupla.valor_sql));
         public void FailFindVariable(string prmVariable, string prmCommand) => msgErro(String.Format("Variável não encontrada ... -var: {0} -cmd: {1}", prmVariable, prmCommand));
         public void FailFindFunction(string prmFunction, string prmCommand) => msgErro(String.Format("Função não encontrada ... -fnc: {0} -cmd: {1}", prmFunction, prmCommand));
 
@@ -244,17 +251,17 @@ namespace Dooggy.Factory
 
         public void msgApp(string prmTrace) => Message(prmTipo: "APP", prmTrace);
         public void msgCode(string prmTrace) => Message(prmTipo: "CODE", prmTrace);
-        public void msgSet(string prmTrace) => Message(prmTipo: "SET", prmTrace, prmPrefixo: "def" );
+        public void msgDef(string prmTrace) => Message(prmTipo: "DEF", prmTrace, prmPrefixo: "def");
+        public void msgSet(string prmTrace) => Message(prmTipo: "SET", prmTrace, prmPrefixo: "set" );
         public void msgPlay(string prmTrace) => Message(prmTipo: "PLAY", prmTrace);
 
         public void msgSQL(string prmMensagem) => Message(prmTipo: "SQL", prmMensagem);
-        public void msgData(string prmMensagem) => Message(prmTipo: "DAT", prmMensagem);
-        public void msgFile(string prmMensagem) => Message(prmTipo: "FILE", prmMensagem);
+        public void msgData(string prmMensagem) => Message(prmTipo: "DAT", prmMensagem, prmPrefixo: "act");
+
         public void msgFile(string prmTipo, string prmMensagem) => Message(prmTipo, prmMensagem);
 
-        public void msgShow(string prmMensagem) => Message(prmTipo: "SHOW", prmMensagem);
-        public void msgAviso(string prmAviso) => Message(prmTipo: "AVISO", prmAviso);
-        public void msgFalha(string prmAviso) => Message(prmTipo: "FALHA", prmAviso);
+        public void msgAviso(string prmAviso) => Message(prmTipo: "WARN", prmAviso);
+        public void msgFalha(string prmAviso) => Message(prmTipo: "FAIL", prmAviso);
 
     }
     public class TestTraceErro : TestTraceWrite

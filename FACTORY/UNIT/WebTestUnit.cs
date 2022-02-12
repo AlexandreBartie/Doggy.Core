@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Dooggy
 {
 
-    public class UTC
+    public abstract class UTC
     {
         public string input;
         public string output;
@@ -14,6 +14,8 @@ namespace Dooggy
         public string error => string.Format("{4}Gerado: <{1}>{4}{0}{4}Esperado:<{3}>{4}{2}{4}", result, TestUnityAnalise.GetAnaliseTexto(result), output, TestUnityAnalise.GetAnaliseTexto(output), Environment.NewLine);
 
         public bool IsFail() => (output != result);
+
+        public abstract void AssertTest();
     }
     public class xTestCase
     {

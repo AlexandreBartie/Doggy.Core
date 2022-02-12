@@ -13,7 +13,7 @@ using System.Windows.Forms;
 
 namespace Dooggy.Factory
 {
-    public class TestFactory 
+    public class TestFactory
     {
 
         //public myJSON args = new myJSON();

@@ -157,7 +157,7 @@ namespace Dooggy.Factory.Console
             
             SetOptions(prmOptions);
 
-            Result.SetData(prmData: Dados.output(prmTags: "", tipo));
+            Result.SetData(prmData: Dados.output(tipo));
 
             Output.SaveOUT(Result.data, tipo, encoding, extensao, Result.Log.txt);
         }
