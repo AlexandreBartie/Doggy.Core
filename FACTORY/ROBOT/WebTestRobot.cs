@@ -297,7 +297,7 @@ namespace Dooggy.Factory.Robot
 
             myTupla Target = new myTupla(prmTarget);
 
-            return Elemento.SetAction(Target.valor);
+            return Elemento.SetAction(Target.value);
         }
         public void Refresh()
         {
@@ -537,9 +537,9 @@ namespace Dooggy.Factory.Robot
             string raiz_elemento = Projeto.Parameters.GetXPathBuscaRaizElementos();
 
             if (filtro == null)
-                return (string.Format(raiz_elemento, chave.tag, chave.valor));
+                return (string.Format(raiz_elemento, chave.name, chave.value));
 
-            return (string.Format(raiz_elemento + filtro, chave.tag, chave.valor));
+            return (string.Format(raiz_elemento + filtro, chave.name, chave.value));
 
         }
         public bool IsIndiceOk(int prmIndice)
@@ -566,7 +566,7 @@ namespace Dooggy.Factory.Robot
         {
             Elemento  = prmElemento;
 
-            Setup(chave.tag, chave.valor);
+            Setup(chave.name, chave.value);
 
         }
         private void Setup(string prmTag, string prmValor)

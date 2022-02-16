@@ -12,34 +12,43 @@ namespace Dooggy.Lib.Parse
         private string delimitadorInicial = "[";
         private string delimitadorFinal = "]";
 
+        private string delimitadorDestaque = ":";
+
         private string separador = "=";
 
+        private string _name;
+        private string _value;
+
         private string _tag;
-        private string _valor;
+        private string _format;
 
         private string _bruto;
-        private string _descricao;
 
+        public string name => _name;
         public string tag => _tag;
-        public string valor => _valor;
+
+        private string format => _format;
+        public string value => _value;
+
 
         public string bruto => _bruto;
-        public string descricao => _descricao;
 
-        public string tag_sql => string.Format("{0} as {1}", var_sql, tag);
-        public string var_sql => String.Format("#({0})", tag);
-        public string valor_sql { get { if (TemValor) return valor; return "''"; } }
-
+        public string name_sql => GetSQL();
+        public string var_sql => String.Format("#({0})", name);
+        public string value_sql => GetValue();
         public string log => GetLog();
+        public string mask => GetMask();
 
-        public bool TemTag => myString.IsFull(tag);
-        public bool TemValor => !IsNull;
-        private bool TemDados => TemTag & TemValor;
-        private bool TemDescricao => (descricao != "");
+        public bool TemKey => myString.IsFull(name);
+        public bool TemValue => !IsNull;
+        public bool TemVariavel => TemValue || TemTag;
+        private bool TemDados => TemKey & TemValue;
+        
+        private bool TemTag => (tag != "");
+        private bool TemFormat => (format != "");
+        public bool IsNull => myString.IsNull(value);
 
-        public bool IsNull => myString.IsNull(valor);
-
-        public bool IsMatch(string prmTag) => (TemTag && myString.IsEqual(tag, prmTag));
+        public bool IsMatch(string prmName) => (TemKey && myString.IsEqual(name, prmName));
 
         public myTupla(string prmTexto)
         {
@@ -57,11 +66,17 @@ namespace Dooggy.Lib.Parse
         public void Parse(string prmTexto)
         {
 
+            string destaque;
+
             //
-            // Get descricao Tupla (estão entre delimitadores pré-definidos)
+            // Get destaque Tupla (estão entre delimitadores pré-definidos)
             //
 
-            _descricao = Bloco.GetBloco(prmTexto, delimitadorInicial, delimitadorFinal).Trim();
+            destaque = Bloco.GetBloco(prmTexto, delimitadorInicial, delimitadorFinal).Trim();
+
+            _tag = myString.GetFirst(destaque, prmDelimitador: delimitadorDestaque);
+
+            _format = myString.GetLast(destaque, prmDelimitador: delimitadorDestaque);
 
             //
             // Remove descricao da Tupla (para permitir identificar "tag" e "valor")
@@ -75,21 +90,21 @@ namespace Dooggy.Lib.Parse
 
             xLista lista = new xLista(bruto, separador);
 
-            _tag = lista.first;
+            _name = lista.first;
 
             if (lista.IsUnico)
-                SetValue(prmValor: null);
+                SetValue(prmValue: null);
             else
-                SetValue(prmValor: lista.last);
+                SetValue(prmValue: lista.last);
 
         }
 
-        public bool SetValue(string prmValor) { _valor = prmValor; return true; }
+        public bool SetValue(string prmValue) { _value = prmValue; return true; }
 
         public bool SetValue(myTupla prmTupla)
         {
-            if (prmTupla.IsMatch(tag))
-                return SetValue(prmTupla.valor);
+            if (prmTupla.IsMatch(name))
+                return SetValue(prmTupla.value);
 
             return (false);
         }
@@ -98,19 +113,44 @@ namespace Dooggy.Lib.Parse
         {
             string log = "";
 
-            if (TemTag)
-                log += tag;
+            if (TemKey)
+                log += name;
 
             if (TemDados)
-                log += @": '" + valor + "'";
+                log += @" = '" + value+ "'";
 
-            if (TemDescricao)
-                log += " <" + descricao + ">";
+            if (TemTag)
+                log += " <" + tag + ">";
+
+            if (TemFormat)
+                log += " <" + format + ">";
 
             return log.Trim();
-
         }
 
+        private string GetSQL()
+        {
+            if (TemVariavel)
+                return string.Format("{0} as {1}", var_sql, name);
+
+            return name;
+        }
+
+        private string GetValue()
+        {
+            if (TemValue) return value;
+
+            if (TemTag) return tag;
+
+            return "''";
+        }
+
+        private string GetMask()
+        {
+            if (TemFormat) return string.Format("{0} = {1}", name, format);
+
+            return "";
+        }
     }
 
     public class myTuplas : List<myTupla>
@@ -122,11 +162,14 @@ namespace Dooggy.Lib.Parse
 
         public string group;
 
-        public bool IsFull => (Count > 0);
+        public bool IsFull => !IsEmpty;
+        public bool IsEmpty => (Count == 0);
 
         public string txt { get => GetTXT(); }
         public string sql { get => GetSQL(); }
         public string log { get => GetLOG(); }
+        public string mask { get => GetMask(); }
+
         public bool IsMatch(string prmKey) => (myString.IsEqual(key, prmKey));
         public bool IsGroup(string prmGroup) => (myString.IsEqual(group, prmGroup));
 
@@ -164,7 +207,7 @@ namespace Dooggy.Lib.Parse
         }
         public void AddTupla(myTupla prmTupla)
         {
-            if (prmTupla.TemTag)
+            if (prmTupla.TemKey)
 
                 if (!SetValue(prmTupla))
                     this.Add(prmTupla);
@@ -188,10 +231,9 @@ namespace Dooggy.Lib.Parse
             }
 
         }
-
         public bool SetValue(myTupla prmTupla)
         {
-            if (prmTupla.TemTag)
+            if (prmTupla.TemKey)
             {
 
                 foreach (myTupla Tupla in this)
@@ -203,13 +245,24 @@ namespace Dooggy.Lib.Parse
             }
             return (false);
         }
-        public myTuplas GetValues()
+        public string GetValue(string prmName) => GetValue(prmName, prmPadrao: "");
+        public string GetValue(string prmName, string prmPadrao)
+        {
+            foreach (myTupla Tupla in this)
+            {
+                if (Tupla.IsMatch(prmName))
+                    return Tupla.value;
+            }
+            return (prmPadrao);
+        }
+        
+        public myTuplas GetVariavel()
         {
             myTuplas tuplas = new myTuplas();
 
             foreach (myTupla tupla in this)
             {
-                if (tupla.TemValor)
+                if (tupla.TemVariavel)
                     tuplas.Add(tupla);
             }
             return tuplas;
@@ -231,7 +284,7 @@ namespace Dooggy.Lib.Parse
 
             foreach (myTupla tupla in this)
             {
-                text.Add(tupla.tag);
+                text.Add(tupla.name);
             }
             return (text.txt());
         }
@@ -241,7 +294,7 @@ namespace Dooggy.Lib.Parse
 
             foreach (myTupla tupla in this)
             {
-                text.Add(tupla.tag_sql);
+                text.Add(tupla.name_sql);
             }
             return (text.txt());
         }
@@ -255,6 +308,17 @@ namespace Dooggy.Lib.Parse
             }
             return (text.txt(", "));
         }
+        private string GetMask()
+        {
+            xMemo text = new xMemo();
+
+            foreach (myTupla tupla in this)
+            {
+                text.Add(tupla.mask);
+            }
+            return (text.txt(", "));
+        }
+
     }
 
     public class myTuplasBox : List<myTuplas>
@@ -265,6 +329,7 @@ namespace Dooggy.Lib.Parse
         public string header => name + "," + columns;
         public string columns => GetTXT();
         public string columns_sql => GetSQL();
+        public string mask => GetMask();
 
         public myTuplas AddItem(string prmKey) => AddItem(prmKey, prmGroup: "main");
         public myTuplas AddItem(string prmKey, string prmGroup) => AddItem(new myTuplas().SetKey(prmKey, prmGroup));
@@ -314,7 +379,18 @@ namespace Dooggy.Lib.Parse
             xLista text = new xMemo();
 
             foreach (myTuplas Tuplas in this)
-                text.Add(Tuplas.sql);
+                if (Tuplas.IsFull)
+                    text.Add(Tuplas.sql);
+
+            return text.txt();
+        }
+        private string GetMask()
+        {
+            xLista text = new xMemo();
+
+            foreach (myTuplas Tuplas in this)
+                if (Tuplas.IsFull)
+                    text.Add(Tuplas.mask);
 
             return text.txt();
         }

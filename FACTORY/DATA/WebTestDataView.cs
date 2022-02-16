@@ -79,7 +79,7 @@ namespace Dooggy.Factory.Data
             get
             {
                 if (_cursor == null)
-                    _cursor = new DataCursorConnection(GetSQL(View), GetMask(), DataBase);
+                    _cursor = new DataCursorConnection(GetSQL(), GetMaskMerged(), DataBase);
 
                 return (_cursor);
             }
@@ -128,23 +128,15 @@ namespace Dooggy.Factory.Data
             }
             return Tratamento.GetNoCommand();
         }
-        private string GetMask()
-        {
-            if (mask == "")
-                return (View.mask);
-
-            return mask;
-        }
     }
     public class TestDataFlowSQL : TestDataMask
     {
         public TestDataView View;
 
-        private TestDataHeader Header;
+        public TestDataHeader Header;
 
         private myTuplas Input => Header.Input;
         private myTuplas Output => Header.Output;
-
         private TestTrace Trace => View.Trace;
 
         private string sql;
@@ -177,14 +169,14 @@ namespace Dooggy.Factory.Data
         private bool TemFiltro => (myString.IsFull(filter));
         private bool TemOrdem => (myString.IsFull(order));
 
-        public string GetSQL(TestDataView prmView)
+        public string GetSQL()
         {
             string comando_sql = sql;
 
             if (!TemSQLMontada)
                 comando_sql = MontarSQL();
 
-            return (prmView.Tratamento.GetSQLTratado(comando_sql, Header));
+            return (View.Tratamento.GetSQLTratado(comando_sql, Header));
         }
 
         private string MontarSQL()
@@ -229,17 +221,32 @@ namespace Dooggy.Factory.Data
                 if (!Output.SetValue(tupla))
                     Trace.LogConsole.FailCheckVariable(tupla);
         }
+
+        public myTuplas GetMaskMerged()
+        {
+            myTuplas mask = new myTuplas();
+
+            mask.Parse(View.Mask);
+
+            mask.Parse(Mask);
+
+            mask.Parse(Header.Mask);
+
+            return mask;
+        }
+
     }
     public class TestDataViewSQL : TestDataMask
     {
 
         public TestDataHeaderView Header;
 
-        public string tables;
+        public string tables => Header.tables;
+        public string colums => Header.columns;
 
         public string links;
 
-        public void SetTables(string prmTables) => tables = prmTables;
+        public void SetTables(string prmTables) => Header.SetTables(prmTables);
         public void SetLinks(string prmLinks) => links = prmLinks;
 
         internal bool TemTables => (myString.IsFull(tables));
@@ -250,12 +257,11 @@ namespace Dooggy.Factory.Data
 
     public class TestDataMask
     {
+        public myTuplas Mask = new myTuplas();
 
-        public string mask;
-
-        public void SetMask(string prmMask) => mask = prmMask;
-
+        public void SetMask(string prmLista) => Mask.Parse(prmLista);
     }
+
     public class TestDataViews : List<TestDataView>
     {
 
@@ -684,10 +690,15 @@ namespace Dooggy.Factory.Data
         public myTuplas Input;
         public myTuplas Output;
 
-        public string txt => Box.name + "," + columns;
+        public myTuplas Mask => new myTuplas(Box.mask);
+
+        public string name;
+        public string tables;
 
         public string columns => Box.Main.columns;
         public string columns_sql => Box.Main.columns_sql;
+
+        public string txt => name + "," + columns;
 
         public bool TemColumns => Input.IsFull || Output.IsFull;
 
@@ -698,8 +709,8 @@ namespace Dooggy.Factory.Data
             Input = Box.AddItem(prmKey: "input", prmGroup: "main");
             Output = Box.AddItem(prmKey: "output", prmGroup: "main");
         }
-        public void SetName(string prmName) => Box.name = prmName;
-
+        public void SetName(string prmName) => name = prmName;
+        public void SetTables(string prmTables) => tables = prmTables;
         public void Parse(TestDataHeader prmHeader) { Input.Parse(prmHeader.Input); Output.Parse(prmHeader.Output); }
 
     }

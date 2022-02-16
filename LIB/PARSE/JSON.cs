@@ -46,7 +46,7 @@ namespace Dooggy.Lib.Parse
         {
             Controle.AddCombine(prmFlow, prmMestre);
         }
-
+        
         public bool Parse(string prmFlow)
         {
 

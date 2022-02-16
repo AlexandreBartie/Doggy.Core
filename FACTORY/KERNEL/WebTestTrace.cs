@@ -82,13 +82,13 @@ namespace Dooggy.Factory
     public class TestTraceLogData : TestTraceLogData_Fail
     {
 
-        public void DBConnection(string prmTag, string prmStatus) => msgData(string.Format("-db:[{0}] -status: {1}", prmTag, prmStatus));
-        public void SQLExecution(string prmTag, string prmSQL, bool prmTemDados) => GetSQLExecution(prmMsg: string.Format(@"-db:[{0}] -sql: {1}", prmTag, prmSQL), prmTemDados);
+        public void DBConnection(string prmTag, string prmStatus) => msgData(string.Format("-db[{0}] -status: {1}", prmTag, prmStatus));
+        public void SQLExecution(string prmTag, string prmSQL, bool prmTemDados) => GetSQLExecution(prmMsg: string.Format(@"-db[{0}] -sql: {1}", prmTag, prmSQL), prmTemDados);
 
         public void SQLViewsSelection(string prmTag, int prmQtde)
         {
             if (prmQtde > 0)
-                msgSet(string.Format(@"[{0}] -itens: {1}", prmTag, prmQtde));
+                msgSet(string.Format(@"-view[{0}] -itens: {1}", prmTag, prmQtde));
             else
                 msgErro(string.Format(@"msg# -view[{0}] -desc: View sem dados", prmTag));
         }
@@ -117,7 +117,7 @@ namespace Dooggy.Factory
         private void FailConnection(string prmMSG, string prmTag, string prmVar, string prmErro) => msgErro(String.Format(@"{0} >>> tag:[{1}] {2}", prmMSG, prmTag, prmVar), prmErro);
 
         private void FailConnection(string prmMSG, string prmTag, string prmVar, string prmSQL, Exception prmErro) => FailConnection(prmMSG, prmTag, prmVar, prmSQL, GetMsgErro(prmErro));
-        private void FailConnection(string prmMSG, string prmTag, string prmVar, string prmSQL, string prmErro) => msgErro(String.Format(@"{0} ... -error: [{1}] -db:[{2}] {3}: {4} ", prmMSG, prmErro, prmTag, prmVar, prmSQL));
+        private void FailConnection(string prmMSG, string prmTag, string prmVar, string prmSQL, string prmErro) => msgErro(String.Format(@"{0} ... -error: [{1}] -db[{2}] {3}: {4} ", prmMSG, prmErro, prmTag, prmVar, prmSQL));
 
         private string GetMsgErro(Exception prmErro) { if (prmErro != null) return (prmErro.Message); return (""); }
 
@@ -131,7 +131,7 @@ namespace Dooggy.Factory
     public class TestTraceLogFile : TestTraceLog
     {
 
-        public void DataFileOpen(string prmArquivo, string prmPath) => DataFileAction(prmAcao: "READ", prmContexto: "Importado com sucesso", prmArquivo, prmPath);
+        public void DataFileOpen(string prmArquivo, string prmPath) => DataFileAction(prmAcao: "OPEN", prmContexto: "Importado com sucesso", prmArquivo, prmPath);
 
         public void DataFileSave(string prmArquivo, string prmPath) => DataFileAction(prmAcao: "CODE", prmContexto: "Script salvo com sucesso", prmArquivo, prmPath, prmEncoding: "default");
         public void DataFileSave(string prmArquivo, string prmPath, string prmEncoding) => DataFileAction(prmAcao: "SAVE", prmContexto: "Salvo com sucesso", prmArquivo, prmPath, prmEncoding);
@@ -237,8 +237,8 @@ namespace Dooggy.Factory
         public void FailArgNewKeyWord(string prmKeyWord, string prmArg, string prmLinha) => msgErro(String.Format("Argumento-Keyword não suportado ... -arg: {0}.{1} -line: [{2}]", prmKeyWord, prmArg, prmLinha));
         public void FailArgMergeKeyWord(string prmKeyWord, string prmLinha) => msgErro(String.Format("Argumento-Keyword foi ignorado ... -key: {0} -line: [{1}]", prmKeyWord, prmLinha));
 
-        public void FailEnterVariable(myTupla prmTupla) => msgErro(String.Format("DataEnter não encontrado ... -enter: {0} = {1}", prmTupla.var_sql, prmTupla.valor_sql));
-        public void FailCheckVariable(myTupla prmTupla) => msgErro(String.Format("DataCheck não encontrado ... -check: {0} = {1}", prmTupla.var_sql, prmTupla.valor_sql));
+        public void FailEnterVariable(myTupla prmTupla) => msgErro(String.Format("DataEnter não encontrado ... -enter: {0} = {1}", prmTupla.var_sql, prmTupla.value_sql));
+        public void FailCheckVariable(myTupla prmTupla) => msgErro(String.Format("DataCheck não encontrado ... -check: {0} = {1}", prmTupla.var_sql, prmTupla.value_sql));
         public void FailFindVariable(string prmVariable, string prmCommand) => msgErro(String.Format("Variável não encontrada ... -var: {0} -cmd: {1}", prmVariable, prmCommand));
         public void FailFindFunction(string prmFunction, string prmCommand) => msgErro(String.Format("Função não encontrada ... -fnc: {0} -cmd: {1}", prmFunction, prmCommand));
 
@@ -252,7 +252,7 @@ namespace Dooggy.Factory
         public void msgApp(string prmTrace) => Message(prmTipo: "APP", prmTrace);
         public void msgCode(string prmTrace) => Message(prmTipo: "CODE", prmTrace);
         public void msgDef(string prmTrace) => Message(prmTipo: "DEF", prmTrace, prmPrefixo: "def");
-        public void msgSet(string prmTrace) => Message(prmTipo: "SET", prmTrace, prmPrefixo: "set" );
+        public void msgSet(string prmTrace) => Message(prmTipo: "SET", prmTrace, prmPrefixo: "act" );
         public void msgPlay(string prmTrace) => Message(prmTipo: "PLAY", prmTrace);
 
         public void msgSQL(string prmMensagem) => Message(prmTipo: "SQL", prmMensagem);

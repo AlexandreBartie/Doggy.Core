@@ -27,7 +27,7 @@ namespace Dooggy.Lib.Data
 
         public TestTrace Trace => DataBase.Trace;
 
-        public DataCursorConnection(string prmSQL, string prmMask, DataBaseConnection prmDataBase)
+        public DataCursorConnection(string prmSQL, myTuplas prmMask, DataBaseConnection prmDataBase)
         {
 
             DataBase = prmDataBase;
@@ -104,9 +104,9 @@ namespace Dooggy.Lib.Data
 
         public bool TemDados;
 
-        public void SetMask(string prmMask)
+        public void SetMask(myTuplas prmMask)
         {
-            if (prmMask != "")
+            if (prmMask.IsFull)
                 Mask = new xMask(prmMask);
         }
 

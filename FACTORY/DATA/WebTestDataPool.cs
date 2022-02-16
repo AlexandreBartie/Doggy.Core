@@ -154,7 +154,7 @@ namespace Dooggy.Factory.Data
             string sql = myString.GetSubstituir(prmSql, varDataFlow, varDataFull);
 
             sql = GetTuplasTratadas(sql, varDataInput, prmHeader.Input);
-            sql = GetTuplasTratadas(sql, varDataOutput, prmHeader.Output.GetValues());
+            sql = GetTuplasTratadas(sql, varDataOutput, prmHeader.Output.GetVariavel());
 
             return GetTextoTratado(sql);
         }
@@ -174,10 +174,10 @@ namespace Dooggy.Factory.Data
 
             foreach (myTupla tupla in prmTuplas)
             {
-                if (tupla.TemValor)
-                    Trace.LogConsole.SetValueVariable(tupla.tag, tupla.valor_sql);
+                if (tupla.TemVariavel)
+                    Trace.LogConsole.SetValueVariable(tupla.name, tupla.value_sql);
 
-                sql = myString.GetSubstituir(sql, tupla.var_sql, tupla.valor_sql);
+                sql = myString.GetSubstituir(sql, tupla.var_sql, tupla.value_sql);
             }
             return sql;
         }
@@ -379,25 +379,6 @@ namespace Dooggy.Factory.Data
         public string output(string prmTags, eTipoFileFormat prmTipo) => (Pool.output(prmTags, prmTipo));
 
         public string log => Pool.Bases.log();
-
-    }
-    public class ITestDataLocal
-    {
-
-        private TestDataLocal _Dados;
-
-        public TestDataLocal Dados
-        {
-            get
-            {
-                if (_Dados == null)
-                    _Dados = null; // new TestDataLocal();
-
-                return _Dados;
-
-            }
-
-        }
 
     }
 }

@@ -222,21 +222,40 @@ namespace Dooggy.Lib.Generic
     public class xMask
     {
 
-        private myJSON lista;
+        //private myJSON lista;
 
-        public bool IsOK { get => (lista.IsOK); }
+        private myTuplas lista;
 
-        public xMask(string prmMask)
+        public bool IsOK { get => (lista.IsFull); }
+
+        // public bool IsOK { get => (lista); }
+
+        public xMask(string prmLista)
+        {
+            Setup(new myTuplas(prmLista));
+        }
+        public xMask(myTuplas prmLista)
         {
 
-            lista = new myJSON(prmMask);
+            //string mask = myString.GetJSON(prmMask.mask);
+
+            //lista = new myJSON(prmFlow: mask);
+
+            Setup(prmLista);
 
         }
+
+        private void Setup(myTuplas prmLista) => lista = prmLista;
+
+        //public string TextToString(string prmKey, string prmText) => myFormat.TextToString(prmText, GetFormat(prmKey));
+
+        //public string GetFormat(string prmKey) => GetFormat(prmKey, prmPadrao: "");
+        //public string GetFormat(string prmKey, string prmPadrao) => lista.GetValor(prmKey, prmPadrao);
 
         public string TextToString(string prmKey, string prmText) => myFormat.TextToString(prmText, GetFormat(prmKey));
 
         public string GetFormat(string prmKey) => GetFormat(prmKey, prmPadrao: "");
-        public string GetFormat(string prmKey, string prmPadrao) => lista.GetValor(prmKey, prmPadrao);
+        public string GetFormat(string prmKey, string prmPadrao) => lista.GetValue(prmKey, prmPadrao);
 
     }
     public class xLinhas : xMemo

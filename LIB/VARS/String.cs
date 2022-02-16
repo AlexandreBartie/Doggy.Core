@@ -195,6 +195,13 @@ namespace Dooggy.Lib.Vars
 
             return (prmPadrao);
         }
+        public static string GetJSON(string prmFluxo)
+        {
+            if (myString.IsFull(prmFluxo))
+                return string.Format("{ {0} }", prmFluxo);
+
+            return ("{ }");
+        }
         public static string Concat(string prmValorA, string prmValorB, string prmSeparador)
         {
 

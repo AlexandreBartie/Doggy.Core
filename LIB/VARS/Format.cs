@@ -11,7 +11,7 @@ namespace Dooggy.Lib.Vars
 
         private static string mark_csv = @"""";
 
-        public static string TextToString(string prmText, string prmFormat) => myMask.Get(prmText, prmFormat);
+        public static string TextToString(string prmText, string prmFormat) => myText.Get(prmText, prmFormat);
 
         public static string DateToString(string prmFormat) => DateToString(prmDate: DateTime.Now, prmFormat);
         public static string DateToString(DateTime prmDate, string prmFormat) => prmDate.ToString(GetDateFormat(prmFormat));
@@ -46,8 +46,7 @@ namespace Dooggy.Lib.Vars
         }
 
     }
-
-    public static class myCSV
+    internal static class myCSV
     {
 
         public static string TextToCSV(string prmText, string prmFormat) => myFormat.TextToString(prmText, prmFormat);
@@ -58,17 +57,19 @@ namespace Dooggy.Lib.Vars
         public static string DoubleToCSV(Double prmNumber, string prmFormat, CultureInfo prmCulture) => myFormat.DoubleToString(prmNumber, prmFormat, prmCulture, prmCSV: true);
 
     }
-    internal static class myMask
+    internal static class myText
     {
 
-        private static char[] reservado = { '#', '9' };
+        private static char[] chave = { '#', '9' };
 
-        private static bool IsLivre(char prmItem) => !IsReservado(prmItem);
+        private static char[] reserva = { '#', '9', '0' };
+
+        private static bool IsLivre(char prmItem) => !IsReserva(prmItem);
 
         internal static string Get(string prmText, string prmFormat)
         {
 
-            int cont = 0; int indice = 0; bool IsEnd = false; string resto;
+            int cont = 0; int indice = 0; bool IsTextEnd = false; string restoMask;
 
             // Verifica se existe uma formatação a ser aplicada 
 
@@ -84,37 +85,34 @@ namespace Dooggy.Lib.Vars
 
             try
             {
-
-                foreach (char item in mask)
+                foreach (char letra in mask)
                 {
-
                     indice++;
 
-                    if (!IsEnd)
+                    if (!IsTextEnd)
                     {
-
-                        if (IsReservado(item))
-                        { texto = valor[cont] + texto; cont++; }
+                        if (IsReserva(letra))
+                            { 
+                            texto = valor[cont] + texto; 
+                            cont++; 
+                            }
                         else
-                            texto = item + texto;
+                            texto = letra + texto;
 
-                        if (cont == valor.Length) IsEnd = true;
-
+                        if (cont == valor.Length) IsTextEnd = true;
                     }
                     else
                     {
-                        if (IsLivre(item))
+                        if (IsLivre(letra))
                         {
+                            restoMask = myString.GetSubstring(mask, indice);
 
-                            resto = myString.GetSubstring(mask, indice);
-
-                            if (!ContemReservado(resto))
-                                texto = item + texto;
-
+                            if (!ContemChave(restoMask))
+                                texto = letra + texto;
                         }
-
+                        else if (letra == '0')
+                           texto = letra + texto;
                     }
-
                 }
 
                 return (texto);
@@ -127,22 +125,24 @@ namespace Dooggy.Lib.Vars
             }
         }
 
-        private static bool IsReservado(char prmItem)
+        private static bool IsReserva(char prmItem)
         {
-
-            foreach (char item in reservado)
+            foreach (char item in reserva)
                 if (item == prmItem) return true;
 
             return false;
-
         }
-
-        private static bool ContemReservado(string prmText)
+        private static bool IsChave(char prmItem)
         {
+            foreach (char item in chave)
+                if (item == prmItem) return true;
 
+            return false;
+        }
+        private static bool ContemChave(string prmText)
+        {
             foreach (char item in prmText)
-                if (IsReservado(item)) return true;
-
+                if (IsChave(item)) return true;
             return false;
 
         }
