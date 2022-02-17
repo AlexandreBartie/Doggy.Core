@@ -186,7 +186,7 @@ namespace Dooggy.Factory.Data
             if (TemStructure)
             {
 
-                sql = String.Format("SELECT {0} FROM {1}", Header.columns_sql, View.tables);
+                sql = String.Format("SELECT {0} FROM {1}", Header.columns_sql, View.select);
 
                 if (TemCombinacoes)
                     condicoes = String.Format("({0}) AND ({1})", View.links, filter);
@@ -241,15 +241,15 @@ namespace Dooggy.Factory.Data
 
         public TestDataHeaderView Header;
 
-        public string tables => Header.tables;
+        public string select => Header.select;
         public string colums => Header.columns;
 
         public string links;
 
-        public void SetTables(string prmTables) => Header.SetTables(prmTables);
+        public void SetSelect(string prmSelect) => Header.SetSelect(prmSelect);
         public void SetLinks(string prmLinks) => links = prmLinks;
 
-        internal bool TemTables => (myString.IsFull(tables));
+        internal bool TemTables => (myString.IsFull(select));
         internal bool TemColumns => Header.TemColumns;
         internal bool TemLinks => (myString.IsFull(links));
 
@@ -312,8 +312,8 @@ namespace Dooggy.Factory.Data
                     Corrente.SetName(prmInstrucao);
                     break;
 
-                case "tables":
-                    Corrente.SetTables(prmInstrucao);
+                case "select":
+                    Corrente.SetSelect(prmInstrucao);
                     break;
 
                 case "links":
@@ -693,7 +693,7 @@ namespace Dooggy.Factory.Data
         public myTuplas Mask => new myTuplas(Box.mask);
 
         public string name;
-        public string tables;
+        public string select;
 
         public string columns => Box.Main.columns;
         public string columns_sql => Box.Main.columns_sql;
@@ -710,7 +710,7 @@ namespace Dooggy.Factory.Data
             Output = Box.AddItem(prmKey: "output", prmGroup: "main");
         }
         public void SetName(string prmName) => name = prmName;
-        public void SetTables(string prmTables) => tables = prmTables;
+        public void SetSelect(string prmSelect) => select = prmSelect;
         public void Parse(TestDataHeader prmHeader) { Input.Parse(prmHeader.Input); Output.Parse(prmHeader.Output); }
 
     }

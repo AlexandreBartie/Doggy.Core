@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Dooggy.Lib.Generic;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
@@ -69,17 +70,76 @@ namespace Dooggy.Lib.Vars
         internal static string Get(string prmText, string prmFormat)
         {
 
+            if (myString.IsEqual(myString.GetFirst(prmFormat), "x"))
+                return GetFormat(prmText, prmFormat);
+
+            return GetMask(prmText, prmFormat);
+
+        }
+
+        private static string GetFormat(string prmText, string prmFormat)
+        {
+
+            string format;  
+
+            format = Bloco.GetBloco(prmFormat, prmDelimitadorInicial: "(", prmDelimitadorFinal: ")");
+
+            if (myString.GetFind(format, "+"))
+                return GetSubstring(prmText, format);
+
+            if (myString.GetFind(format, "*"))
+                return GetSubPosicao(prmText, format);
+
+            if (myInt.IsNumero(format))
+                return myString.GetFirst(prmText, prmTamanho: myInt.GetNumero(format));
+
+            return ("");
+        }
+
+        private static string GetSubstring(string prmText, string prmFormat)
+        {
+
+            string arg_indice; string arg_tamanho;
+
+            arg_indice = Bloco.GetBlocoAntes(prmFormat, prmDelimitador: "+");
+
+            arg_tamanho = Bloco.GetBlocoDepois(prmFormat, prmDelimitador: "+");
+
+            if (myInt.IsNumero(arg_indice) && myInt.IsNumero(arg_tamanho))
+                return myString.GetSubstring(prmText, prmIndice: myInt.GetNumero(arg_indice), prmTamanho: myInt.GetNumero(arg_tamanho));
+
+            return ("");
+        }
+        private static string GetSubPosicao(string prmText, string prmFormat)
+        {
+
+            string arg_indice; string arg_final;
+
+            arg_indice = Bloco.GetBlocoAntes(prmFormat, prmDelimitador: "*");
+
+            arg_final = Bloco.GetBlocoDepois(prmFormat, prmDelimitador: "*");
+
+            if (myInt.IsNumero(arg_indice) && myInt.IsNumero(arg_final))
+                return myString.GetSubPosicao(prmText, prmIndice: myInt.GetNumero(arg_indice), prmIndiceFinal: myInt.GetNumero(arg_final));
+
+            return ("");
+        }
+
+
+        private static string GetMask(string prmText, string prmMask)
+        {
+
             int cont = 0; int indice = 0; bool IsTextEnd = false; string restoMask;
 
             // Verifica se existe uma formatação a ser aplicada 
 
-            if (prmFormat == "")
+            if (prmMask == "")
                 return prmText;
 
             // Inverter Valores
 
             string valor = myString.GetReverse(prmText);
-            string mask = myString.GetReverse(prmFormat);
+            string mask = myString.GetReverse(prmMask);
 
             string texto = "";
 

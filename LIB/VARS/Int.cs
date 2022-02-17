@@ -40,12 +40,25 @@ namespace Dooggy.Lib.Vars
         {
             try
             {
-                if (myString.IsFull(prmValor))
+                if (IsNumero(prmValor))
                     return (Convert.ToInt32(prmValor));
             }
             catch
             { }
             return (-1);
+
+        }
+        public static bool IsNumero(string prmValor)
+        {
+            try
+            {
+                if (myString.IsFull(prmValor))
+                    { int x = (Convert.ToInt32(prmValor)); return true;  }
+
+            }
+            catch
+            { }
+            return false;
 
         }
         public static int GetPositivo(int prmValor) => (System.Math.Abs(prmValor));

@@ -36,8 +36,8 @@ namespace Dooggy.Lib.Parse
         public string name_sql => GetSQL();
         public string var_sql => String.Format("#({0})", name);
         public string value_sql => GetValue();
-        public string log => GetLog();
         public string mask => GetMask();
+        public string log => GetLog();
 
         public bool TemKey => myString.IsFull(name);
         public bool TemValue => !IsNull;
@@ -117,7 +117,7 @@ namespace Dooggy.Lib.Parse
                 log += name;
 
             if (TemDados)
-                log += @" = '" + value+ "'";
+                log += @": '" + value+ "'";
 
             if (TemTag)
                 log += " <" + tag + ">";

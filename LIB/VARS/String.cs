@@ -61,9 +61,11 @@ namespace Dooggy.Lib.Vars
         public static string GetFirst(string prmTexto) => GetChar(prmTexto, prmIndice: 1);
         public static string GetFirst(string prmTexto, int prmTamanho)
         {
-            if (IsFull(prmTexto))
-                return GetSubstring(prmTexto, prmIndice: 1, prmTamanho);
-
+            if (IsFull(prmTexto) && prmTamanho != 0)
+                if (myInt.IsPositivo(prmTamanho))
+                    return GetSubstring(prmTexto, prmIndice: 1, prmTamanho);
+                else
+                    return GetLast(prmTexto, myInt.GetPositivo(prmTamanho));
             return ("");
 
         }
@@ -138,6 +140,9 @@ namespace Dooggy.Lib.Vars
                 return (prmTexto.IndexOf(prmParte)) + prmParte.Length;
             return (0);
         }
+
+        public static string GetSubPosicao(string prmTexto, int prmIndice, int prmIndiceFinal) => GetSubstring(prmTexto, prmIndice, prmIndiceFinal - prmIndice + 1);
+
         public static string GetSubstring(string prmTexto, int prmIndice) => GetSubstring(prmTexto, prmIndice, prmTamanho: prmTexto.Length - prmIndice + 1);
         public static string GetSubstring(string prmTexto, int prmIndice, int prmTamanho)
         {
