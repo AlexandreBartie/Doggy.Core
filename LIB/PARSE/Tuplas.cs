@@ -166,6 +166,7 @@ namespace Dooggy.Lib.Parse
         public bool IsEmpty => (Count == 0);
 
         public string txt { get => GetTXT(); }
+        public string csv { get => GetCSV(); }
         public string sql { get => GetSQL(); }
         public string log { get => GetLOG(); }
         public string mask { get => GetMask(); }
@@ -288,6 +289,16 @@ namespace Dooggy.Lib.Parse
             }
             return (text.txt());
         }
+        private string GetCSV()
+        {
+            xLista text = new xLista();
+
+            foreach (myTupla tupla in this)
+            {
+                text.Add(tupla.name);
+            }
+            return (text.csv);
+        }
         private string GetSQL()
         {
             xLista text = new xLista();
@@ -382,7 +393,7 @@ namespace Dooggy.Lib.Parse
                 if (Tuplas.IsFull)
                     text.Add(Tuplas.sql);
 
-            return text.txt();
+            return text.csv;
         }
         private string GetMask()
         {

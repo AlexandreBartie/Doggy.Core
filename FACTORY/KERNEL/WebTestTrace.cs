@@ -237,8 +237,8 @@ namespace Dooggy.Factory
         public void FailArgNewKeyWord(string prmKeyWord, string prmArg, string prmLinha) => msgErro(String.Format("Argumento-Keyword não suportado ... -arg: {0}.{1} -line: [{2}]", prmKeyWord, prmArg, prmLinha));
         public void FailArgMergeKeyWord(string prmKeyWord, string prmLinha) => msgErro(String.Format("Argumento-Keyword foi ignorado ... -key: {0} -line: [{1}]", prmKeyWord, prmLinha));
 
-        public void FailEnterVariable(myTupla prmTupla) => msgErro(String.Format("DataEnter não encontrado ... -enter: {0} = {1}", prmTupla.var_sql, prmTupla.value_sql));
-        public void FailCheckVariable(myTupla prmTupla) => msgErro(String.Format("DataCheck não encontrado ... -check: {0} = {1}", prmTupla.var_sql, prmTupla.value_sql));
+        public void FailEnterVariable(myTupla prmTupla) => msgErro(String.Format("DataEnter não encontrado em campos INPUT ... -enter: {0} = {1}", prmTupla.var_sql, prmTupla.value_sql));
+        public void FailCheckVariable(myTupla prmTupla) => msgErro(String.Format("DataCheck não encontrado em campos OUTPUT... -check: {0} = {1}", prmTupla.var_sql, prmTupla.value_sql));
         public void FailFindVariable(string prmVariable, string prmCommand) => msgErro(String.Format("Variável não encontrada ... -var: {0} -cmd: {1}", prmVariable, prmCommand));
         public void FailFindFunction(string prmFunction, string prmCommand) => msgErro(String.Format("Função não encontrada ... -fnc: {0} -cmd: {1}", prmFunction, prmCommand));
 

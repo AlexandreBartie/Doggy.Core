@@ -11,10 +11,11 @@ namespace Dooggy.Lib.Vars
         public static bool IsFull(string prmTexto)
         {
             if (prmTexto != null)
-                return (prmTexto.Trim() != "");
+                return (prmTexto != "");
             return (false);
-
+             
         }
+        //public static bool IsFullEx(string prmTexto) => (GetCount(prmTexto) > 0);
         public static bool IsNull(string prmTexto) => (prmTexto == null);
         public static bool IsEmpty(string prmTexto) => !(IsFull(prmTexto));
 
@@ -161,35 +162,37 @@ namespace Dooggy.Lib.Vars
 
         public static string GetSubstituir(string prmTexto, string prmVelho, string prmNovo)
         {
+            string txt = GetFull(prmTexto);
+            string novo = GetFull(prmNovo);
+            string velho = GetFull(prmVelho);
 
-            if (IsFull(prmTexto))
-                return (prmTexto.Replace(prmVelho, prmNovo));
+            if (IsFull(velho))
+                return (txt.Replace(velho, novo));
 
-            return ("");
-
+            return txt;
         }
         
         public static string GetRemove(string prmTexto, string prmParte)
         {
-
             return (GetSubstituir(prmTexto, prmVelho: prmParte, prmNovo: ""));
-
         }
         public static string GetReverse(string prmTexto)
         {
-
             if (IsFull(prmTexto))
                 return (new string(prmTexto.Reverse().ToArray()));
-
             return ("");
         }
         public static string GetNoBlank(string prmTexto)
         {
-
             if (IsFull(prmTexto))
                 return (GetRemove(prmTexto, " "));
-
             return ("");
+        }
+        public static int GetCount(string prmTexto)
+        {
+            if (IsFull(prmTexto))
+                return (prmTexto.Length);
+            return (0);
         }
 
         public static string GetFull(string prmTexto) => GetFull(prmTexto, prmPadrao: "");
@@ -200,6 +203,14 @@ namespace Dooggy.Lib.Vars
 
             return (prmPadrao);
         }
+        //public static string GetFullEx(string prmTexto) => GetFullEx(prmTexto, prmPadrao: "");
+        //public static string GetFullEx(string prmTexto, string prmPadrao)
+        //{
+        //    if (IsFullEx(prmTexto))
+        //        return prmTexto;
+
+        //    return (prmPadrao);
+        //}
         public static string GetJSON(string prmFluxo)
         {
             if (myString.IsFull(prmFluxo))

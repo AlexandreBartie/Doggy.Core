@@ -183,8 +183,8 @@ namespace Dooggy.Lib.Generic
             return (resultado);
         }
 
-        public string memo { get => txt(prmSeparador: Environment.NewLine); }
-        public string csv { get => txt(", "); }
+        public string memo => txt(prmSeparador: Environment.NewLine);
+        public string csv => txt(", ");
         public string txt() => txt(separador);
 
         public string txt(string prmSeparador)

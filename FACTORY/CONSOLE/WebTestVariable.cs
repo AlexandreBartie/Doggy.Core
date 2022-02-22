@@ -42,9 +42,7 @@ namespace Dooggy.Factory.Console
 
         public TestDataVars(TestDataPool prmPool)
         {
-
             Pool = prmPool;
-
         }
 
         public string Criar(string prmVar, DataBaseConnection prmDataBase)

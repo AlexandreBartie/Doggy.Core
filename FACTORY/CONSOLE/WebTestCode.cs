@@ -284,9 +284,9 @@ namespace Dooggy.Factory.Console
         {
             eTipoTestCommand tipo = Sintaxe.tipo;
 
-            return (tipo == eTipoTestCommand.raw || tipo == eTipoTestCommand.view || tipo == eTipoTestCommand.item);
+            return (tipo == eTipoTestCommand.eCommandRaw || tipo == eTipoTestCommand.eCommandView || tipo == eTipoTestCommand.eCommandFlow);
         }
-        private bool GetTipoSave() => Sintaxe.tipo == eTipoTestCommand.save;
+        private bool GetTipoSave() => Sintaxe.tipo == eTipoTestCommand.eCommandSave;
         //{
         //    eTipoTestCommand tipo = Sintaxe.tipo;
 
@@ -314,14 +314,11 @@ public class TestCommandAction
 
         private TestDataPool Pool { get => Dados.Pool; }
 
-        private bool IsAction() => (Sintaxe.tipo > eTipoTestCommand.note);
         private string target { get => Sintaxe.target; }
 
         public TestCommandAction(TestCommand prmCommand)
         {
-
             Command = prmCommand;
-
         }
 
         public void Play()
@@ -329,34 +326,44 @@ public class TestCommandAction
 
             Trace.LogConsole.PlayCommand(Sintaxe.comando, Sintaxe.keyword, Sintaxe.target);
 
-            if (IsAction())
+            if (Sintaxe.IsPlay)
             {
 
                 switch (tipo)
                 {
+                    case eTipoTestCommand.eCommandNote:
+                        break;
 
-                    case eTipoTestCommand.var:
+                    case eTipoTestCommand.eCommandVar:
                         ActionAddDataVar();
                         break;
 
-                    case eTipoTestCommand.raw:
+                    case eTipoTestCommand.eCommandRaw:
                         ActionSetDataRaw(Sintaxe.options);
                         break;
 
-                    case eTipoTestCommand.view:
+                    case eTipoTestCommand.eCommandView:
                         ActionAddDataView();
                         break;
 
-                    case eTipoTestCommand.item:
+                    case eTipoTestCommand.eCommandFlow:
                         ActionAddDataFlow();
                         break;
 
-                    case eTipoTestCommand.save:
-                        ActionSaveFile();
+                    case eTipoTestCommand.eCommandSave:
+                        ActionScriptSave();
+                        break;
+
+                    case eTipoTestCommand.eCommandBreak:
+                        ActionScriptBreak();
+                        break;
+
+                    case eTipoTestCommand.eCommandBehavior:
                         break;
 
                     default:
-                        Trace.LogConsole.FailActionKeyWord(Sintaxe.keyword);
+                        if (!Sintaxe.IsAction)
+                            Trace.LogConsole.FailActionKeyWord(Sintaxe.keyword);
                         return;
                 }
 
@@ -377,22 +384,26 @@ public class TestCommandAction
             switch (tipo)
             {
 
-                case eTipoTestCommand.var:
+                case eTipoTestCommand.eCommandVar:
                     ActionSetDataVar(prmArg, prmInstrucao);
                     break;
 
-                case eTipoTestCommand.raw:
+                case eTipoTestCommand.eCommandRaw:
                     ActionAddDataRaw(prmArg, prmInstrucao);
                     break;
 
-                case eTipoTestCommand.view:
+                case eTipoTestCommand.eCommandView:
                     ActionSetDataView(prmArg, prmInstrucao);
                     break;
 
-                case eTipoTestCommand.item:
+                case eTipoTestCommand.eCommandFlow:
                     ActionSetDataFlow(prmArg, prmInstrucao);
                     break;
 
+                case eTipoTestCommand.eCommandBehavior:
+                    ActionSetDataScript(prmArg, prmInstrucao);
+                    break;
+                
                 default:
                     return;
             }
@@ -410,7 +421,11 @@ public class TestCommandAction
         private void ActionAddDataFlow() => Dados.AddDataFlow(prmTag: target);
         private void ActionSetDataFlow(string prmArg, string prmInstrucao) => Pool.SetDataFlow(prmArg, prmInstrucao);
 
-        private void ActionSaveFile() => Script.Save(prmOptions: Sintaxe.options);
+        private void ActionSetDataScript(string prmArg, string prmInstrucao) => Script.SetArgumento(prmArg, prmInstrucao);
+
+        private void ActionScriptSave() => Script.Save(prmOptions: Sintaxe.options);
+        private void ActionScriptBreak() => Script.Break(Sintaxe.options);
+
 
     }
     public class TestCommandParameter

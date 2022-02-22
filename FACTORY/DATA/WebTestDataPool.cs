@@ -156,7 +156,9 @@ namespace Dooggy.Factory.Data
             sql = GetTuplasTratadas(sql, varDataInput, prmHeader.Input);
             sql = GetTuplasTratadas(sql, varDataOutput, prmHeader.Output.GetVariavel());
 
-            return GetTextoTratado(sql);
+            sql = GetTextoTratado(sql);
+
+            return sql;
         }
         public string GetTextoTratado(string prmTexto)
         {
@@ -184,22 +186,22 @@ namespace Dooggy.Factory.Data
         
         private string GetVariavelTratada(string prmTexto)
         {
-            string sql = prmTexto; string var; string var_extendido; string var_valor;
+            string sql = prmTexto; string arg; string arg_extendido; string arg_valor;
 
             while (true)
             {
-                var_extendido = Bloco.GetBloco(sql, varDelimitadorInicial, varDelimitadorFinal, prmPreserve: true);
+                arg_extendido = Bloco.GetBloco(sql, varDelimitadorInicial, varDelimitadorFinal, prmPreserve: true);
 
-                var = Bloco.GetBloco(sql, varDelimitadorInicial, varDelimitadorFinal);
+                arg = Bloco.GetBloco(sql, varDelimitadorInicial, varDelimitadorFinal);
 
-                if (var == "") break;
+                if (arg == "") break;
 
-                var_valor = Vars.GetValor(prmTag: var);
+                arg_valor = Vars.GetValor(prmTag: arg);
 
-                if (var_valor == "")
-                    Trace.LogConsole.FailFindVariable(var, prmTexto);
+                if (arg_valor == "")
+                    Trace.LogConsole.FailFindVariable(arg, prmTexto);
 
-                sql = myString.GetSubstituir(sql, var_extendido, var_valor);
+                sql = myString.GetSubstituir(sql, arg_extendido, arg_valor);
             }
 
             return (sql);

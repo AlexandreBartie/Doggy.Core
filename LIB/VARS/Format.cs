@@ -133,7 +133,7 @@ namespace Dooggy.Lib.Vars
 
             // Verifica se existe uma formatação a ser aplicada 
 
-            if (prmMask == "")
+            if (myString.IsEmpty(prmMask))
                 return prmText;
 
             // Inverter Valores

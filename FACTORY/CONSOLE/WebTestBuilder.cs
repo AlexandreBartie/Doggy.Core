@@ -12,17 +12,19 @@ namespace Dooggy.Factory.Console
 
     public enum eTipoTestCommand : int
     {
-        fail = -1,
+        eCommandFail = -1,
 
-        note = 0,
-        var = 1,
+        eCommandNote = 10,
+        eCommandVar = 11,
 
-        raw = 10,
+        eCommandRaw = 20,
+        eCommandView = 21,
+        eCommandFlow = 22,
 
-        view = 20,
-        item = 21,
+        eCommandBreak = 50,
+        eCommandBehavior = 51,
 
-        save = 50,
+        eCommandSave = 60,
     }
 
     public class TestBuilder
@@ -111,9 +113,7 @@ namespace Dooggy.Factory.Console
         private bool TemOption() => (options != "");
         public TestSintaxe(TestBuilder prmBuilder)
         {
-
             Builder = prmBuilder;
-
         }
 
         public bool IsNewLine(string prmLinha)
@@ -129,14 +129,10 @@ namespace Dooggy.Factory.Console
 
         public bool IsNewTag()
         {
-
             return (false);
-
-
         }
         public bool IsNewCommand()
         {
-
             if (IsPrefixoNote())
                 GetTargetNote();
 
@@ -147,7 +143,6 @@ namespace Dooggy.Factory.Console
                 { Setup(); return (true); }
 
             return (false);
-
         }
 
         public bool IsNewParametro() => Argumento.IsNewParametro(linha);
@@ -243,6 +238,11 @@ namespace Dooggy.Factory.Console
 
         public eTipoTestCommand tipo;
 
+        public bool IsPlay => GetPlay();
+
+        public bool IsAction => (tipo >= eTipoTestCommand.eCommandBreak);
+
+
         public string comando { get => GetComando(); }
 
         public TestSintaxeArgumento Argumento;
@@ -261,41 +261,51 @@ namespace Dooggy.Factory.Console
 
                 case ">>":
                 case "note":
-                    tipo = eTipoTestCommand.note;
+                    tipo = eTipoTestCommand.eCommandNote;
                     break;
 
                 case "raw":
                 case "data":
-                    tipo = eTipoTestCommand.raw;
+                    tipo = eTipoTestCommand.eCommandRaw;
                     args = "header;null;*";
                     break;
 
                 case "var":
                 case "variavel":
-                    tipo = eTipoTestCommand.var;
+                    tipo = eTipoTestCommand.eCommandVar;
                     args = "sql";
                     break;
 
                 case "view":
                 case "dataview":
-                    tipo = eTipoTestCommand.view;
+                    tipo = eTipoTestCommand.eCommandView;
                     args = "name;select;links;input;output;alias,mask";
                     break;
 
                 case "item":
                 case "dataflow":
-                    tipo = eTipoTestCommand.item;
-                    args = "enter;check;sql;filter;order;mask";
+                    tipo = eTipoTestCommand.eCommandFlow;
+                    args = "enter;check;sql;filter;order;mask;index";
                     break;
 
                 case "save":
                 case "datasave":
-                    tipo = eTipoTestCommand.save;
+                    tipo = eTipoTestCommand.eCommandSave;
                     args = "";//args = "encode;extensao";
                     break;
 
+                case "break":
+                    tipo = eTipoTestCommand.eCommandBreak;
+                    args = "";//args = "encode;extensao";
+                    break;
+
+                case "behavior":
+                    tipo = eTipoTestCommand.eCommandBehavior;
+                    args = "view";
+                    break;
+
                 default:
-                    tipo = eTipoTestCommand.fail;
+                    tipo = eTipoTestCommand.eCommandFail;
                     Trace.LogConsole.FailFindKeyWord(keyword);
 
                     return;
@@ -313,26 +323,30 @@ namespace Dooggy.Factory.Console
             switch (tipo)
             {
 
-                case eTipoTestCommand.note:
+                case eTipoTestCommand.eCommandFail:
+                    return "fail";
+
+                case eTipoTestCommand.eCommandBreak:
+                    return "break";
+
+                case eTipoTestCommand.eCommandNote:
                     return "note";
 
-                case eTipoTestCommand.raw:
+                case eTipoTestCommand.eCommandRaw:
                     return "data";
 
-                case eTipoTestCommand.var:
+                case eTipoTestCommand.eCommandVar:
                     return "variavel";
 
-                case eTipoTestCommand.view:
+                case eTipoTestCommand.eCommandView:
                     return "dataview";
 
-                case eTipoTestCommand.item:
+                case eTipoTestCommand.eCommandFlow:
                     return "dataFlow";
 
-                case eTipoTestCommand.save:
+                case eTipoTestCommand.eCommandSave:
                     return "save";
 
-                case eTipoTestCommand.fail:
-                    return "fail";
             }
 
             return("null");
@@ -346,6 +360,14 @@ namespace Dooggy.Factory.Console
             target = "";
             options = "";
 
+        }
+
+        private bool GetPlay()
+        {
+            if (Script.IsBreak)
+                return (IsAction);
+
+            return (true);
         }
 
     }

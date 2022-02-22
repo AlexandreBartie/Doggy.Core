@@ -141,14 +141,17 @@ namespace Dooggy.Factory.Data
 
         private string sql;
 
-
-        private string filter;
+        public myArgs filter;
 
         private string order;
+
+        private int index;
 
         public TestDataFlowSQL()
         {
             Header = new TestDataHeader();
+
+            filter = new myArgs();
         }
 
         public void SetHeader(TestDataHeader prmHeader) => Header.Parse(prmHeader);
@@ -156,8 +159,9 @@ namespace Dooggy.Factory.Data
         public void SetCheck(string prmLista) => SetOutput(new myTuplas(prmLista));
 
         public void SetSQL(string prmSQL) => sql = prmSQL;
-        public void SetFilter(string prmFilter) => filter = prmFilter;
+        public void SetFilter(string prmFilter) => filter.Add(prmFilter);
         public void SetOrder(string prmOrder) => order = prmOrder;
+        public void SetIndex(string prmIndex) => index = myInt.GetNumero(prmIndex);
 
         public bool TemSQL => (TemSQLMontada || TemStructure);
 
@@ -166,7 +170,7 @@ namespace Dooggy.Factory.Data
         private bool TemLinks => View.TemLinks;
         private bool TemCombinacoes => TemLinks && TemFiltro;
         private bool TemCondicoes => TemLinks || TemFiltro;
-        private bool TemFiltro => (myString.IsFull(filter));
+        private bool TemFiltro => filter.IsFull;
         private bool TemOrdem => (myString.IsFull(order));
 
         public string GetSQL()
@@ -181,21 +185,20 @@ namespace Dooggy.Factory.Data
 
         private string MontarSQL()
         {
-            string condicoes = ""; string ordenacao = ""; string sql = "";
+            string condicoes = ""; string ordenacao = ""; string indexado = "";  string sql = "";
 
             if (TemStructure)
             {
-
                 sql = String.Format("SELECT {0} FROM {1}", Header.columns_sql, View.select);
 
                 if (TemCombinacoes)
-                    condicoes = String.Format("({0}) AND ({1})", View.links, filter);
+                    condicoes = String.Format("({0}) AND ({1})", View.links.sql, filter.sql);
 
                 else if (TemLinks)
-                    condicoes = View.links;
+                    condicoes = View.links.sql;
 
                 else if (TemFiltro)
-                    condicoes = filter;
+                    condicoes = filter.sql;
 
                 if (TemCondicoes)
                     condicoes = String.Format(" WHERE {0}", condicoes);
@@ -203,7 +206,9 @@ namespace Dooggy.Factory.Data
                 if (TemOrdem)
                     ordenacao = String.Format(" ORDER BY {0}", order);
 
-                sql += condicoes + ordenacao;
+                indexado = String.Format(" offset {0} row fetch first 1 row only", index);
+
+                sql += condicoes + ordenacao + indexado;
             }
             return (sql.Trim());
         }
@@ -241,17 +246,22 @@ namespace Dooggy.Factory.Data
 
         public TestDataHeaderView Header;
 
-        public string select => Header.select;
+        public string select => Header.Select.csv;
         public string colums => Header.columns;
 
-        public string links;
+        public myArgs links;
+
+        public TestDataViewSQL()
+        {
+            links = new myArgs();
+        }
 
         public void SetSelect(string prmSelect) => Header.SetSelect(prmSelect);
-        public void SetLinks(string prmLinks) => links = prmLinks;
+        public void SetLinks(string prmLinks) => links.Add(prmLinks);
 
-        internal bool TemTables => (myString.IsFull(select));
+        internal bool TemTables => Header.Select.IsFull;
         internal bool TemColumns => Header.TemColumns;
-        internal bool TemLinks => (myString.IsFull(links));
+        internal bool TemLinks => links.IsFull;
 
     }
 
@@ -261,7 +271,6 @@ namespace Dooggy.Factory.Data
 
         public void SetMask(string prmLista) => Mask.Parse(prmLista);
     }
-
     public class TestDataViews : List<TestDataView>
     {
 
@@ -464,6 +473,9 @@ namespace Dooggy.Factory.Data
 
                 case "mask":
                     Corrente.SetMask(prmInstrucao); break;
+
+                case "index":
+                    Corrente.SetIndex(prmInstrucao); break;
             }
 
         }
@@ -593,32 +605,23 @@ namespace Dooggy.Factory.Data
         }
         public void SetOptions(string prmOptions)
         {
-
             switch (prmOptions)
             {
-
                 case "off":
                     IsON = false;
                     break;
-
             }
-
         }
         public void SetArgumento(string prmArg, string prmInstrucao)
         {
-
             switch (prmArg)
             {
-
                 case "null":
                     Itens.Add(prmInstrucao);
                     break;
-
                 case "*":
                     break;
-
             }
-
         }
         public string GetOutput(string prmDados, eTipoFileFormat prmTipo)
         {
@@ -693,11 +696,10 @@ namespace Dooggy.Factory.Data
         public myTuplas Mask => new myTuplas(Box.mask);
 
         public string name;
-        public string select;
+        public myArgs Select;
 
         public string columns => Box.Main.columns;
         public string columns_sql => Box.Main.columns_sql;
-
         public string txt => name + "," + columns;
 
         public bool TemColumns => Input.IsFull || Output.IsFull;
@@ -708,9 +710,12 @@ namespace Dooggy.Factory.Data
 
             Input = Box.AddItem(prmKey: "input", prmGroup: "main");
             Output = Box.AddItem(prmKey: "output", prmGroup: "main");
+
+            Select = new myArgs();
+
         }
         public void SetName(string prmName) => name = prmName;
-        public void SetSelect(string prmSelect) => select = prmSelect;
+        public void SetSelect(string prmSelect) => Select.Add(prmSelect);
         public void Parse(TestDataHeader prmHeader) { Input.Parse(prmHeader.Input); Output.Parse(prmHeader.Output); }
 
     }

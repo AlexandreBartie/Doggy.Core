@@ -51,6 +51,8 @@ namespace Dooggy.Factory.Console
             if (!FindScript(prmKey))
                 NewScript(prmKey);
 
+            Corrente.Setup();
+
             Pool.Cleanup();
         }
 
@@ -91,7 +93,7 @@ namespace Dooggy.Factory.Console
         }
 
     }
-    public class TestScript : TestScriptSave
+    public class TestScript : TestScriptBehaviour
     {
 
         public TestTags Tags;
@@ -119,6 +121,9 @@ namespace Dooggy.Factory.Console
             Tags = new TestTags(this);
 
         }
+
+        public void Setup() => SetBreakOFF();
+
         public void Load(string prmArquivoINI, bool prmPlay)
         {
 
@@ -131,6 +136,57 @@ namespace Dooggy.Factory.Console
         public void SetCode(string prmCode) => Result.SetCode(prmCode);
         public void Play(string prmCode, string prmArquivoOUT) => Code.Play(prmCode, prmArquivoOUT);
         public void AddLog(TestTraceMsg prmMsg) => Result.AddLog(prmTipo: prmMsg.tipo, prmTexto: prmMsg.texto);
+
+    }
+
+    public class TestScriptBehaviour : TestScritpBreak
+    {
+
+        public bool IsDataIndex;
+
+        public void SetArgumento(string prmArg, string prmInstrucao)
+        {
+            switch (prmArg)
+            {
+                case "view":
+                    SetDataIndex(prmInstrucao);
+                    break;
+            }
+        }
+
+        public void SetDataIndex(string prmInstrucao) => SetDataIndex(prmActive: myString.IsEqual(prmInstrucao,"index"));
+        public void SetDataIndex(bool prmActive) => IsDataIndex = prmActive;
+
+    }
+
+
+    public class TestScritpBreak : TestScriptSave
+    {
+
+        public bool IsBreak;
+
+        public void Break(string prmOptions)
+        {
+            switch (prmOptions)
+            {
+                case "":
+                    SetBreak();
+                    break;
+                
+                case "on":
+                    SetBreakON();
+                    break;
+
+                case "off":
+                    SetBreakOFF();
+                    break;
+            }
+
+        }
+
+        private void SetBreak() => IsBreak = !IsBreak;
+        private void SetBreakON() => IsBreak = true; 
+        public void SetBreakOFF() => IsBreak = false;
 
     }
 
