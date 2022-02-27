@@ -1,15 +1,14 @@
 ﻿using System.Diagnostics;
 using System.Data;
-using System.Data.OracleClient;
 using System.Collections.Generic;
 using System;
-using Oracle.ManagedDataAccess.Client;
 using System.IO;
 using Dooggy.Factory.Data;
 using Dooggy;
 using Dooggy.Lib.Parse;
 using Dooggy.Factory;
 using Dooggy.Lib.Generic;
+using Dooggy.Tools.Calc;
 
 namespace Dooggy.Lib.Data
 {
@@ -17,13 +16,9 @@ namespace Dooggy.Lib.Data
     public class DataCursorConnection : DataCursorDados
     {
 
-        public Exception erro;
-
         private string _sql;
 
         public string sql => _sql;
-
-        public bool IsOK => (erro == null);
 
         public TestTrace Trace => DataBase.Trace;
 
@@ -32,77 +27,40 @@ namespace Dooggy.Lib.Data
 
             DataBase = prmDataBase;
 
-            string sql = GetTratarSQL(prmSQL);
+            _sql = GetTratarSQL(prmSQL);
 
             if (DataBase.IsOK)
             {
-                SetQuery(sql); SetMask(prmMask);
+                SetQuery(); SetMask(prmMask);
             }
             else
-            { Trace.LogData.FailSQLNoDataBaseConnection(DataBase.tag, sql, DataBase.erro); erro = DataBase.erro; }
+            { Trace.LogData.FailSQLNoDataBaseConnection(DataBase.tag, sql, DataBase.erro); Erro = DataBase.erro; }
         }
 
-        private void SetQuery(string prmSQL)
+        private void SetQuery()
         {
-            _sql = prmSQL;
 
-            if (GetReader(prmTimeOut: DataBase.Pool.Connect.command_timeout))
+            if (GetRequest(sql, prmTimeOut: DataBase.Pool.Connect.command_timeout))
             {
-                TemDados = Next();
-
-                Trace.LogData.SQLExecution(DataBase.tag, sql, TemDados);
+                Trace.OnSqlExecutado(DataBase.tag, sql, TemDados, TimeCursor.Elapsed.milliseconds);
             }
             else
-                Trace.LogData.FailSQLConnection(DataBase.tag, sql, erro);
-        }
-        
-        private bool GetReader(int prmTimeOut)
-        {
-            try
-            {
-                OracleCommand query = new OracleCommand(sql, DataBase.Conexao);
-
-                query.CommandTimeout = prmTimeOut;
-
-                reader = query.ExecuteReader();
-
-                return (true);
-            }
-            catch (Exception e)
-            { erro = e; }
-
-            return (false);
-        }
-
-        public bool Next() => reader.Read();
-
-        public bool Fechar()
-        {
-            if (IsOK)
-            { reader.Close(); }
-
-            return (IsOK);
+                Trace.LogData.FailSQLConnection(DataBase.tag, sql, Erro);
         }
 
         private string GetTratarSQL(string prmSQL) => Bloco.GetBlocoTroca(prmSQL, prmDelimitadorInicial: "<##>", prmDelimitadorFinal: "<##>", prmDelimitadorNovo: "'");
 
     }
 
-    public class DataCursorDados
+    public class DataCursorDados : DataCursorReader
     {
         
-        public DataBaseConnection DataBase;
-
         public TestDataTratamento Tratamento => DataBase.Pool.Tratamento;
 
         private DataTypesField DataTypes => DataBase.DataTypes;
 
-        public OracleDataReader reader;
-
         private xMask Mask;
         public bool IsMask { get => (Mask != null); }
-
-        public bool TemDados;
 
         public void SetMask(myTuplas prmMask)
         {
@@ -112,11 +70,11 @@ namespace Dooggy.Lib.Data
 
         public bool IsDBNull(int prmIndice) => reader.IsDBNull(prmIndice);
         public string GetName(int prmIndice) => reader.GetName(prmIndice);
-        public string GetType(int prmIndice) => reader.GetDataTypeName(prmIndice).ToLower();
+        public string GetType(int prmIndice) => reader.GetType(prmIndice);
         public string GetValor(int prmIndice) => GetValorTratado(prmIndice);
         public string GetValor(string prmCampo) => GetValorTratado(prmCampo);
 
-        private string GetValorTratado(string prmCampo) => GetValorTratado(prmIndice: reader.GetOrdinal(prmCampo));
+        private string GetValorTratado(string prmCampo) => GetValorTratado(prmIndice: reader.GetIndex(prmCampo));
         private string GetValorTratado(int prmIndice)
         {
             string tipo = GetType(prmIndice);
@@ -129,7 +87,7 @@ namespace Dooggy.Lib.Data
             if (DataTypes.IsTypeDouble(tipo))
                return GetMaskDouble(campo, prmNumber: reader.GetDouble(prmIndice));
 
-            return GetMask(campo, prmText: reader.GetOracleValue(prmIndice).ToString());
+            return GetMask(campo, prmText: reader.GetString(prmIndice));
         }
 
         private string GetMask(string prmCampo, string prmText)
@@ -163,7 +121,7 @@ namespace Dooggy.Lib.Data
             {
 
 
-                for (int cont = 0; cont < reader.VisibleFieldCount; cont++)
+                for (int cont = 0; cont < reader.GetFieldCount; cont++)
                 {
                     if (IsDBNull(cont))
                         texto = "";
@@ -188,7 +146,7 @@ namespace Dooggy.Lib.Data
 
             if (TemDados)
             {
-                for (int cont = 0; cont < reader.VisibleFieldCount; cont++)
+                for (int cont = 0; cont < reader.GetFieldCount; cont++)
                 {
                     if (!IsDBNull(cont))
                     {
@@ -209,11 +167,77 @@ namespace Dooggy.Lib.Data
         public string GetTupla(int prmIndice) => string.Format("'{0}': '{1}'", GetName(prmIndice), GetValor(prmIndice));
 
     }
- 
+
+    public class DataCursorReader : DataCursorBase
+    {
+
+        internal Cronometro TimeCursor;
+
+        private DataCommandVirtual query;
+
+        public bool TemDados;
+
+        public DataCursorReader()
+        {
+            TimeCursor = new Cronometro();
+        }
+
+        public bool GetRequest(string prmSQL, int prmTimeOut)
+        {
+
+            Erro = null; TemDados = false;
+
+            try
+            {
+                query = new DataCommandVirtual(prmSQL, DataBase.Conexao, prmTimeOut);
+
+                TimeCursor.Start();
+
+                reader = query.GetReader();
+
+                TemDados = Next();
+            }
+            catch (Exception e)
+            { Erro = e; }
+
+            finally
+            {
+                TimeCursor.Stop(); 
+            }
+
+            return (IsOK);
+        }
+
+        public bool Next() => reader.Next();
+        public bool Fechar()
+        {
+            if (IsOK)
+            { reader.Close(); }
+
+            return (IsOK);
+        }
+
+    }
+
+    public class DataCursorBase
+    {
+
+        public DataBaseConnection DataBase;
+
+        public DataReaderVirtual reader;
+
+        public Exception Erro;
+
+        public bool IsOK => (Erro == null);
+
+    }
+
     public class DataBaseConnection
     {
 
         public TestDataPool Pool;
+
+        public DataBaseConnectVirtual Conexao;
 
         public string tag;
 
@@ -222,9 +246,6 @@ namespace Dooggy.Lib.Data
         public string stringConnection;
 
         private string baseConnection;
-
-
-        public OracleConnection Conexao;
 
         public Exception erro;
 
@@ -265,9 +286,7 @@ namespace Dooggy.Lib.Data
             try
             {
 
-                int x = Pool.Connect.command_timeout;
-
-                Conexao = new OracleConnection(stringConnection);
+                Conexao = new DataBaseConnectVirtual(stringConnection);
 
                 Conexao.Open();
 
@@ -293,6 +312,7 @@ namespace Dooggy.Lib.Data
         }
 
     }
+
     public class DataBasesConnection : List<DataBaseConnection>
     {
 
@@ -380,6 +400,7 @@ namespace Dooggy.Lib.Data
         public bool IsTypeDouble(string prmType) => TypesDouble.IsContem(prmType);
 
     }
+
 }
 
 

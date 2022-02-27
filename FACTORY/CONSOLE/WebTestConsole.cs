@@ -55,7 +55,7 @@ namespace Dooggy.Factory.Console
 
         }
 
-        public void EXE(string prmArquivoCFG) => Setup(prmArquivoCFG, prmPlay: true);
+        public bool EXE(string prmArquivoCFG) => Setup(prmArquivoCFG, prmPlay: true);
 
         public bool Setup(string prmArquivoCFG) => Setup(prmArquivoCFG, prmPlay: false);
         public bool Setup(string prmArquivoCFG, bool prmPlay) => Config.Setup(prmArquivoCFG, prmPlay);
@@ -63,8 +63,10 @@ namespace Dooggy.Factory.Console
         public void SetAnchor(DateTime prmAncora) => Config.CSV.SetToday(prmAncora);
 
         public void SetDBStatus(bool prmBloqueado) => Pool.SetDBStatus(prmBloqueado);
-        public void AddLog() => Scripts.AddLog();
 
+        public void AddLogItem() => Scripts.AddLogItem();
+        public void AddLogSQL() => Scripts.AddLogSQL();
+        
         public void Load() => Load(prmPlay: false);
         public void Load(bool prmPlay) => Input.Load(prmPlay);
 

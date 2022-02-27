@@ -88,7 +88,7 @@ namespace Dooggy.Factory.Data
         public string header_txt => View.Header.txt;
 
         public bool IsOK => Cursor.IsOK;
-        public Exception erro => Cursor.erro;
+        public Exception Erro => Cursor.Erro;
 
         public TestDataFlow(string prmTag, string prmSQL, string prmMask, TestDataView prmDataView)
         {

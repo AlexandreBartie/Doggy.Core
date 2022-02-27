@@ -43,16 +43,14 @@ namespace Dooggy.Factory
 
             Trace = new TestTrace();
 
-            Trace.LogExecutado += TraceExecutado;
-
+            Trace.LogExecutado += TraceLogExecutado;
+            Trace.SqlExecutado += TraceSqlExecutado;
         }
 
-        public void TraceExecutado()
-        {
+        public void TraceLogExecutado() => Console.AddLogItem();
 
-            Console.AddLog();
+        public void TraceSqlExecutado() => Console.AddLogSQL();
 
-        }
         public void EXE(string prmArquivoCFG, bool prmPlay, string prmAppName, string prmAppVersion)
         {
             Trace.LogApp.SetApp(prmAppName, prmAppVersion);

@@ -317,7 +317,7 @@ namespace Dooggy.Factory.Console
 
         public bool IsOK;
 
-        public string nome { get { if (IsOK) return File.nome; return ""; } }
+        private string pathCFG;
         private string nome_completo => File.nome_completo;
 
         private string grupo;
@@ -328,6 +328,8 @@ namespace Dooggy.Factory.Console
         private string prefixo_parametro = "-";
 
         private string delimitador = ":";
+
+        private string var_pathCFG = "#(PathArquivoCFG)";
 
         public TestConfigImport(TestConsoleConfig prmConfig)
         {
@@ -342,10 +344,12 @@ namespace Dooggy.Factory.Console
             if (File.Open(prmArquivoCFG))
             {
 
+                pathCFG = File.path;
+
                 if (Run(prmBloco: File.txt()))
-                { Trace.LogConfig.LoadConfig(prmArquivoCFG: nome_completo); IsOK = true; return true; }
+                { Trace.LogConfig.LoadConfig(prmArquivoCFG: nome_completo, prmPathCFG: pathCFG); IsOK = true; return true; }
                 else
-                { Trace.LogConfig.FailLoadConfig(prmArquivoCFG: nome_completo, Config.status()); return (false); }
+                { Trace.LogConfig.FailLoadConfig(Config.status(), prmArquivoCFG: nome_completo, prmPathCFG: pathCFG); return (false); }
 
             }
 
@@ -415,19 +419,22 @@ namespace Dooggy.Factory.Console
 
         private void SetGroupPath(string prmTag, string prmValor)
         {
+
+            string path = myString.GetSubstituir(prmValor, var_pathCFG, pathCFG);
+            
             switch (prmTag)
             {
                 case "ini":
-                    Config.Path.SetINI(prmValor); break;
+                    Config.Path.SetINI(path); break;
 
                 case "out":
-                    Config.Path.SetOUT(prmValor); break;
+                    Config.Path.SetOUT(path); break;
 
                 case "log":
-                    Config.Path.SetLOG(prmValor); break;
+                    Config.Path.SetLOG(path); break;
 
                 default:
-                    Trace.LogConfig.FailFindParameter(prmTag, prmValor); break;
+                    Trace.LogConfig.FailFindParameter(prmTag, path); break;
             }
         }
         private void SetGroupDBase(string prmTag, string prmSigla, string prmValor)

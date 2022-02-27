@@ -32,10 +32,15 @@ namespace Dooggy.Factory.Console
         public void Load(string prmArquivoINI, bool prmPlay) { GetScript(prmArquivoINI); Corrente.Load(prmArquivoINI, prmPlay); }
         public void Play(string prmCode, string prmArquivoOUT) { GetScript(prmArquivoOUT); Corrente.Play(prmCode, prmArquivoOUT); }
 
-        public void AddLog()
+        public void AddLogItem()
         {
             if (TemCorrente)
-                Corrente.AddLog(Trace.Msg);
+                Corrente.AddLogItem(Trace.Msg);
+        }
+        public void AddLogSQL()
+        {
+            if (TemCorrente)
+                Corrente.AddLogSQL(Trace.Msg);
         }
 
         public string GetLog()
@@ -135,8 +140,9 @@ namespace Dooggy.Factory.Console
 
         public void SetCode(string prmCode) => Result.SetCode(prmCode);
         public void Play(string prmCode, string prmArquivoOUT) => Code.Play(prmCode, prmArquivoOUT);
-        public void AddLog(TestTraceMsg prmMsg) => Result.AddLog(prmTipo: prmMsg.tipo, prmTexto: prmMsg.texto);
 
+        public void AddLogItem(TestTraceMsg prmMsg) => Result.AddLogItem(prmTipo: prmMsg.tipo, prmTexto: prmMsg.texto);
+        public void AddLogSQL(TestTraceMsg prmMsg) => Result.AddLogSQL(prmSQL: prmMsg.texto, prmTimeElapsed: prmMsg.time_elapsed);
     }
 
     public class TestScriptBehaviour : TestScritpBreak

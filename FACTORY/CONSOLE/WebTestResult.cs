@@ -1,4 +1,5 @@
 ﻿using Dooggy;
+using Dooggy.Factory;
 using Dooggy.Lib.Generic;
 using Dooggy.Lib.Vars;
 using System;
@@ -26,8 +27,7 @@ namespace Dooggy.Factory.Console
         public string code { get => _code; }
         public string data { get => _data; }
 
-        public bool IsError => Log.erro;
-
+        public bool IsError => Log.IsError;
         public bool IsData => (myString.IsFull(data));
 
         public bool IsDataSaved;
@@ -35,6 +35,8 @@ namespace Dooggy.Factory.Console
 
         public TestResultLog Log;
 
+        public TestResultBase Err => Log.Err;
+        public TestResultSQL SQL => Log.SQL;
 
         public TestResult(TestScript prmScript)
         {
@@ -57,53 +59,117 @@ namespace Dooggy.Factory.Console
         public void LogStart(string prmArquivoOUT) { Log.Start(); name_OUT = prmArquivoOUT; IsDataSaved = false; }
         public void LogStop() => Log.Stop();
 
-        public void AddLog(string prmTipo, string prmTexto) => Log.AddNew(prmTipo, prmTexto);
-
+        public void AddLogItem(string prmTipo, string prmTexto) => Log.AddItem(prmTipo, prmTexto);
+        public void AddLogSQL(string prmSQL, long prmTimeElapsed) => Log.AddSQL(prmSQL, prmTimeElapsed);
         public void SetSave(string prmCode) { _codeZero = prmCode; SetCode(_codeZero); }
         public void SetCode(string prmCode) => _code = prmCode;
         public void SetData(string prmData) { _data = prmData; IsDataSaved = true; }
         public void UndoCode() => SetSave(prmCode: Script.Console.Input.GetCode(name_INI));
 
     }
-    public class TestResultLog : List<TestItemLog>
+    public class TestResultLog
     {
 
         public bool ativo;
 
-        public bool erro = false;
+        public TestResultMain Main;
 
-        public void Start() { Clear(); ativo = true; erro = false; }
-        public void Stop() => ativo = false;
+        public TestResultSQL SQL;
 
-        private xMemo memo;
+        public TestResultBase Err => Main.Err;
 
-        public string txt { get => GetTXT(); }
+        public string txt => Main.txt;
+
+        public bool IsError => Err.IsFull;
 
         public TestResultLog()
         {
-            memo = new xMemo();
+            Clear();
         }
 
-        public void AddNew(string prmTipo, string prmTexto)
+        private void Clear()
+        {
+            Main = new TestResultMain(); SQL = new TestResultSQL();
+        }
+
+        public void Start() { Clear(); ativo = true; }
+        public void AddItem(string prmTipo, string prmTexto)
         {
             if (ativo)
             {
-                Add(new TestItemLog(prmTipo, prmTexto));
 
-                erro = erro || myString.IsEqual(prmTipo, "erro");
+                TestItemLog item = new TestItemLog(prmTipo, prmTexto);
+
+                Main.Add(item);
+
             }
 
         }
+        public void AddSQL(string prmSQL, long prmTimeElapsed)
+        {
+            if (ativo)
+            {
+
+                TestItemLog item = new TestItemLog(prmSQL, prmTimeElapsed);
+
+                SQL.Add(item);
+
+            }
+
+        }
+        public void Stop() => ativo = false;
+
+    }
+
+    public class TestResultMain : TestResultBase
+    {
+
+        public TestResultBase Err => GetErr();
+
+        private TestResultBase GetErr()
+        {
+
+            TestResultBase result = new TestResultBase();
+
+            foreach (TestItemLog item in this)
+                if (item.IsErr)
+                    result.Add(item);
+
+            return (result);
+        }
+
+    }
+
+    public class TestResultSQL : TestResultBase
+    {
+        public string log => GetLog();
+
+        private string GetLog()
+        {
+
+            xMemo log = new xMemo();
+
+            foreach (TestItemLog item in this)
+                log.Add(item.time);
+
+            return (log.memo_ext);
+        }
+    }
+
+    public class TestResultBase : List<TestItemLog>
+    {
+        public string txt => GetTXT();
+        public bool IsFull => (this.Count > 0);
 
         private string GetTXT()
         {
 
-            memo.Clear();
+            xMemo log = new xMemo();
 
             foreach (TestItemLog item in this)
-                memo.Add(item.msg);
+                log.Add(item.msg);
 
-            return (memo.memo_ext);
+            return (log.memo_ext);
         }
 
     }

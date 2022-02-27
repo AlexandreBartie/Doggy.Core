@@ -10,13 +10,14 @@ using Dooggy.Lib.Parse;
 namespace Dooggy.Factory
 {
 
-    public delegate void Notify();
+    public delegate void NotifyLOG();
+    public delegate void NotifySQL();
 
     public class TestTrace : TestTraceWrite
     {
 
-        public event Notify LogExecutado;
-
+        public event NotifyLOG LogExecutado;
+        public event NotifySQL SqlExecutado;
 
         public TestTraceLog Geral;
 
@@ -69,8 +70,15 @@ namespace Dooggy.Factory
         {
             LogExecutado?.Invoke();
         }
+        public void OnSqlExecutado(string prmTag, string prmSQL, bool prmDados, long prmTimeElapsed)
+        {
 
-        public bool Exibir(string prmTipo, string prmTexto) => Msg.Exibir(prmTipo, prmTexto);
+            Trace.LogData.SQLExecution(prmTag, prmSQL, prmDados, prmTimeElapsed);
+
+            SqlExecutado?.Invoke();
+
+        }
+        public bool Exibir(string prmTipo, string prmTexto, long prmTimeElapsed) => Msg.Exibir(prmTipo, prmTexto, prmTimeElapsed);
 
     }
     public class TestTraceLogApp : TestTraceLog
@@ -83,7 +91,7 @@ namespace Dooggy.Factory
     {
 
         public void DBConnection(string prmTag, string prmStatus) => msgData(string.Format("-db[{0}] -status: {1}", prmTag, prmStatus));
-        public void SQLExecution(string prmTag, string prmSQL, bool prmTemDados) => GetSQLExecution(prmMsg: string.Format(@"-db[{0}] -sql: {1}", prmTag, prmSQL), prmTemDados);
+        public void SQLExecution(string prmTag, string prmSQL, bool prmTemDados, long prmTimeElapsed) => GetSQLExecution(prmMsg: string.Format(@"-db[{0}] -sql: {1}", prmTag, prmSQL), prmTemDados, prmTimeElapsed);
 
         public void SQLViewsSelection(string prmTag, int prmQtde)
         {
@@ -93,10 +101,10 @@ namespace Dooggy.Factory
                 msgErro(string.Format(@"msg# -view[{0}] -desc: View sem dados", prmTag));
         }
 
-        private void GetSQLExecution(string prmMsg, bool prmTemDados)
+        private void GetSQLExecution(string prmMsg, bool prmTemDados, long prmTimeElapsed)
         {
             if (prmTemDados)
-                msgSQL(prmMsg);
+                msgSQL(prmMsg, prmTimeElapsed);
             else
                 msgErro(prmMsg, prmErro: "ZERO Results");
         }
@@ -205,9 +213,9 @@ namespace Dooggy.Factory
     }
     public class TestTraceLogConfig : TestTraceLog
     {
-        public void LoadConfig(string prmArquivoCFG) => msgSet(String.Format("Arquivo CFG carregado ... -file: {0}", prmArquivoCFG));
+        public void LoadConfig(string prmArquivoCFG, string prmPathCFG) => msgSet(String.Format("Arquivo CFG carregado ... -file: {0} -path: {1}", prmArquivoCFG, prmPathCFG));
 
-        public void FailLoadConfig(string prmArquivoCFG, string prmStatus) => msgSet(String.Format("Parâmetros incompletos no arquivo CFG ... -file: {0} -status: {1}", prmArquivoCFG, prmStatus));
+        public void FailLoadConfig(string prmStatus, string prmArquivoCFG, string prmPathCFG) => msgSet(String.Format("Parâmetros incompletos no arquivo CFG ... -status: {0} -file: {1} -path: {2}", prmStatus, prmArquivoCFG, prmPathCFG));
 
         public void FailFindGroup(string prmGroup) => msgErro(String.Format("Grupo do arquivo CFG não encontrado ... -grp: {0}", prmGroup));
 
@@ -255,7 +263,7 @@ namespace Dooggy.Factory
         public void msgSet(string prmTrace) => Message(prmTipo: "SET", prmTrace, prmPrefixo: "act" );
         public void msgPlay(string prmTrace) => Message(prmTipo: "PLAY", prmTrace);
 
-        public void msgSQL(string prmMensagem) => Message(prmTipo: "SQL", prmMensagem);
+        public void msgSQL(string prmSQL, long prmTimeElapsed) => Message(prmTipo: "SQL", prmSQL, prmTimeElapsed);
         public void msgData(string prmMensagem) => Message(prmTipo: "DAT", prmMensagem, prmPrefixo: "act");
 
         public void msgFile(string prmTipo, string prmMensagem) => Message(prmTipo, prmMensagem);
@@ -286,15 +294,24 @@ namespace Dooggy.Factory
 
         }
 
+        protected void Message(string prmTipo, string prmTexto, long prmTimeElapsed) => Message(prmTipo, prmTexto, prmPrefixo: "", prmTimeElapsed);
         protected void Message(string prmTipo, string prmTexto) => Message(prmTipo, prmTexto, prmPrefixo: "");
-        protected void Message(string prmTipo, string prmTexto, string prmPrefixo)
+        protected void Message(string prmTipo, string prmTexto, string prmPrefixo) => Message(prmTipo, prmTexto, prmPrefixo, prmTimeElapsed: 0);
+        protected void Message(string prmTipo, string prmTexto, string prmPrefixo, long prmTimeElapsed)
         {
             string texto = prmTexto;
 
             if (prmPrefixo != "")
                 texto = prmPrefixo + "# " + texto;
 
-            if (Trace.Exibir(prmTipo, texto))
+            LogTrace(prmTipo, texto, prmTimeElapsed);
+
+        }
+
+        private void LogTrace(string prmTipo, string prmTexto, long prmTimeElapsed)
+        {
+
+            if (Trace.Exibir(prmTipo, prmTexto, prmTimeElapsed))
                 Trace.OnLogExecutado();
         }
 
@@ -302,13 +319,15 @@ namespace Dooggy.Factory
     public class TestTraceMsg : TestItemLog
     {
 
-        public bool Exibir(string prmTipo, string prmTexto)
+        public bool Exibir(string prmTipo, string prmTexto, long prmTimeElapsed)
         {
 
             tipo = prmTipo;
             texto = prmTexto;
 
-            if (!IsVisivel) return false;
+            time_elapsed = prmTimeElapsed;
+
+            if (IsHide) return false;
 
 #if DEBUG
 
@@ -332,9 +351,15 @@ namespace Dooggy.Factory
         public string tipo;
         public string texto;
 
+        public long time_elapsed;
+
         public string msg => String.Format("[{0,4}] {1} ", tipo, texto);
 
-        public bool IsVisivel => ((tipo != "CODE") && (tipo != "PLAY"));
+        public string time => String.Format("[{0,6}] {1} ", time_elapsed, texto);
+
+        public bool IsHide => (myString.IsEqual(tipo, "CODE") || myString.IsEqual(tipo, "PLAY"));
+        public bool IsErr => myString.IsEqual(tipo, "ERRO");
+        public bool IsSQL => myString.IsEqual(tipo, "SQL");
 
         public TestItemLog() { }
 
@@ -344,6 +369,17 @@ namespace Dooggy.Factory
             tipo = prmTipo;
 
             texto = prmTexto;
+
+        }
+
+        public TestItemLog(string prmSQL, long prmTimeElapsed)
+        {
+
+            tipo = "SQL";
+
+            texto = prmSQL;
+
+            time_elapsed = prmTimeElapsed;
 
         }
 
