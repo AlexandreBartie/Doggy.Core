@@ -11,7 +11,7 @@ namespace Dooggy.Factory.Data
     public class TestDataFile
     {
 
-        private TestDataLocal Dados;
+        private TestDataSource Dados;
 
         private TestDataFileIO File;
 
@@ -19,7 +19,7 @@ namespace Dooggy.Factory.Data
 
         private string extensao_padrao;
 
-        public TestDataFile(TestDataLocal prmDados, string prmExtensao)
+        public TestDataFile(TestDataSource prmDados, string prmExtensao)
         {
 
             Dados = prmDados;

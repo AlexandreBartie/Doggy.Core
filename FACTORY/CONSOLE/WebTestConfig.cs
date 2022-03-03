@@ -25,6 +25,8 @@ namespace Dooggy.Factory.Console
         public TestConfigPath Path;
         public TestConfigTimeout Timeout;
 
+        public TestConfigGlobal Global;
+
         public TestConfigValidation Validation;
 
         public TestDataPool Pool => Console.Pool;
@@ -48,6 +50,8 @@ namespace Dooggy.Factory.Console
 
             Timeout = new TestConfigTimeout(this);
 
+            Global = new TestConfigGlobal(this);
+
             Validation = new TestConfigValidation(this);
 
         }
@@ -67,14 +71,17 @@ namespace Dooggy.Factory.Console
         private string GetStatus()
         {
             
-            string status = Console.Dados.log;
+            xLista status = new xLista(Console.Dados.log, prmSeparador: " | ");
 
             if (Console.IsDbOK)
-                status += " | " + Timeout.log + " | " + CSV.log + " | " + Path.log;
+            {
+                status.Add(Timeout.log); status.Add(CSV.log); status.Add(Path.log);
 
-            status += " | " + Validation.log;
+            }
 
-            return status;
+            status.Add(Validation.log);
+
+            return status.txt();
       
         }
 
@@ -304,6 +311,25 @@ namespace Dooggy.Factory.Console
         public string log => String.Format(">path: -ini: '{0}', -out: '{1}', -log: '{2}'", INI.path, OUT.path, LOG.path);
 
     }
+
+    public class TestConfigGlobal
+    {
+
+        private TestConsoleConfig Config;
+
+        private TestDataTags Tags => Config.Pool.Tags;
+
+        
+        public TestConfigGlobal(TestConsoleConfig prmConfig)
+        {
+            Config = prmConfig;
+        }
+
+        public void SetTag(string prmTag) => Tags.AddItem(prmTag);
+
+        //public string log => String.Format(">path: -ini: '{0}', -out: '{1}', -log: '{2}'", INI.path, OUT.path, LOG.path);
+
+    }
     public class TestConfigImport
     {
         public TestConsoleConfig Config;
@@ -411,6 +437,9 @@ namespace Dooggy.Factory.Console
                 case "csv":
                     SetGroupCSV(tag, valor); break;
 
+                case "global":
+                    SetGroupGlobal(tag, valor); break;
+
                 default:
                     Trace.LogConfig.FailFindGroup(grupo); break;
             }
@@ -477,6 +506,17 @@ namespace Dooggy.Factory.Console
 
                 case "save":
                     Config.CSV.SetFormatSave(prmValor); break;
+
+                default:
+                    Trace.LogConfig.FailFindParameter(prmTag, prmValor); break;
+            }
+        }
+        private void SetGroupGlobal(string prmTag, string prmValor)
+        {
+            switch (prmTag)
+            {
+                case "tag":
+                    Config.Global.SetTag(prmValor); break;
 
                 default:
                     Trace.LogConfig.FailFindParameter(prmTag, prmValor); break;

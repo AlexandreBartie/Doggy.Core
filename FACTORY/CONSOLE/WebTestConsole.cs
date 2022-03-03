@@ -26,7 +26,7 @@ namespace Dooggy.Factory.Console
 
         public TestDataPool Pool => Factory.Pool;
         public TestTrace Trace => Factory.Trace;
-        public TestDataLocal Dados => Pool.Dados;
+        public TestDataSource Dados => Pool.Dados;
 
         public TestConfigPath Path => Config.Path;
 
@@ -145,7 +145,7 @@ namespace Dooggy.Factory.Console
         internal TestConfigPath Path => Console.Config.Path;
         internal TestScript Script => Console.Script;
         internal TestResult Result => Script.Result;
-        internal TestDataLocal Dados => Console.Dados;
+        internal TestDataSource Dados => Console.Dados;
         internal TestTrace Trace => Console.Trace;
 
         internal string GetNameScriptOrigem()

@@ -1,12 +1,42 @@
 ﻿using Dooggy.Factory.Data;
 using Dooggy.Lib.Data;
+using Dooggy.Lib.Generic;
 using Dooggy.Lib.Vars;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Dooggy.Factory.Console
+namespace Dooggy.Factory.Data
 {
+
+    public class TestDataTag : myDominio
+    {
+
+        public TestDataTag(string prmKey, string prmLista) : base(prmKey, prmLista)
+        { }
+
+    }
+
+    public class TestDataTags : myDominios
+    {
+
+        private string key_start = "[";
+        private string key_finish = "]";
+        public void AddItem(string prmTag)
+        {
+
+            string key = Bloco.GetBloco(prmTag, key_start, key_finish);
+            string lista = Bloco.GetBlocoDepois(prmTag, key_finish,prmTRIM: true);
+
+            if (myString.IsFull(key) && myString.IsFull(lista))
+                AddItem(key, lista);
+
+        }
+    
+    }
+
+
+
     public class TestDataVar
     {
 

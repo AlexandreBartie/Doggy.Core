@@ -107,7 +107,7 @@ namespace Dooggy.Factory.Console
 
         public TestTrace Trace => Dados.Trace;
 
-        private TestDataLocal Dados => Console.Dados;
+        private TestDataSource Dados => Console.Dados;
         private TestConsoleInput Input => Console.Input;
 
         public string key;
@@ -209,7 +209,7 @@ namespace Dooggy.Factory.Console
         public string encoding;
         public string extensao;
 
-        private TestDataLocal Dados => Console.Dados;
+        private TestDataSource Dados => Console.Dados;
 
         private TestConfigPath Path => Console.Config.Path;
         private TestConsoleOutput Output => Console.Output;

@@ -57,7 +57,7 @@ namespace Dooggy.Lib.Data
         
         public TestDataTratamento Tratamento => DataBase.Pool.Tratamento;
 
-        private DataTypesField DataTypes => DataBase.DataTypes;
+        private DataTypesField DataTypes => DataBase.Pool.DataTypes;
 
         private xMask Mask;
         public bool IsMask { get => (Mask != null); }
@@ -252,7 +252,6 @@ namespace Dooggy.Lib.Data
         private bool _isOpen;
 
         public TestTrace Trace => (Pool.Trace);
-        public DataTypesField DataTypes => Pool.DataTypes;
 
         public DataBaseConnection(string prmTag, string prmConexao, TestDataPool prmPool)
         {
@@ -383,18 +382,18 @@ namespace Dooggy.Lib.Data
 
         public DataTypesField()
         {
-            TypesDate = new myDominio(prmLista: "date");
-            TypesDouble = new myDominio(prmLista: "double");
+            TypesDate = new myDominio(prmKey: "date", prmLista: "date");
+            TypesDouble = new myDominio(prmKey: "number", prmLista: "double");
         }
 
-        public void SetTypesDate(string prmTypes)
-        {
-            myDominio TypesDate = new myDominio(prmTypes);
-        }
-        public void SetTypesNumber(string prmTypes)
-        {
-            myDominio TypesNumber = new myDominio(prmTypes);
-        }
+        //public void SetTypesDate(string prmTypes)
+        //{
+        //    myDominio TypesDate = new myDominio(prmTypes);
+        //}
+        //public void SetTypesNumber(string prmTypes)
+        //{
+        //    myDominio TypesNumber = new myDominio(prmTypes);
+        //}
 
         public bool IsTypeDate(string prmType) => TypesDate.IsContem(prmType);
         public bool IsTypeDouble(string prmType) => TypesDouble.IsContem(prmType);

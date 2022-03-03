@@ -279,7 +279,7 @@ namespace Dooggy.Factory.Console
                 case "view":
                 case "dataview":
                     tipo = eTipoTestCommand.eCommandView;
-                    args = "name;select;links;input;output;alias,mask";
+                    args = "name;tables;links;input;output;alias,mask";
                     break;
 
                 case "item":

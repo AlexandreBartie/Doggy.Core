@@ -20,7 +20,7 @@ namespace Dooggy.Factory
 
         public TestDataPool Pool;
 
-        public TestDataLocal Dados => Pool.Dados;
+        public TestDataSource Dados => Pool.Dados;
 
         public TestConsole Console;
 

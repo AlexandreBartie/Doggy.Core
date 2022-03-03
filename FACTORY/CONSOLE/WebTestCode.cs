@@ -261,7 +261,7 @@ namespace Dooggy.Factory.Console
 
         public string keyword { get => Sintaxe.keyword; }
         public TestTrace Trace { get => Console.Trace; }
-        private TestDataLocal Dados { get => Console.Dados; }
+        private TestDataSource Dados { get => Console.Dados; }
 
         public bool IsTipoData => GetTipoData();
         public bool IsTipoSave => GetTipoSave();
@@ -310,7 +310,7 @@ public class TestCommandAction
 
         private TestTrace Trace { get => Sintaxe.Trace; }
 
-        private TestDataLocal Dados { get => Console.Dados; }
+        private TestDataSource Dados { get => Console.Dados; }
 
         private TestDataPool Pool { get => Dados.Pool; }
 

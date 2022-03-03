@@ -29,15 +29,9 @@ namespace Dooggy.Factory.Data
 
         public TestFactory Factory;
 
-        public DataBasesConnection Bases;
+        public TestDataGlobal Global;
 
-        public TestDataConnect Connect;
-
-        public TestDataLocal Dados;
-
-        public TestDataVars Vars;
-        public TestDataRaws Raws;
-        public TestDataViews Views;
+        public TestDataLocal Local;
 
         public TestDataTratamento Tratamento;
 
@@ -46,12 +40,20 @@ namespace Dooggy.Factory.Data
 
         private bool bloqueado = false;
 
-        public TestDataFlows Flows => (DataViewCorrente.Flows);
+        public DataBasesConnection Bases => (Global.Bases);
+        public TestDataConnect Connect => (Global.Connect);
+        public TestDataSource Dados => (Global.Dados);
+        public TestDataTags Tags => (Global.Tags);
+
+        public TestDataViews Views => (Local.Views);
+        public TestDataFlows Flows => (Local.Flows);
+        public TestDataRaws Raws => (Local.Raws);
+        public TestDataVars Vars => (Local.Vars);
 
         public DataTypesField DataTypes => (Bases.DataTypes);
+
         public DataBaseConnection DataBaseCorrente => (Bases.Corrente);
         public TestDataView DataViewCorrente => (Views.Corrente);
-        public TestDataFlow DataFlowCorrente => (Flows.Corrente);
 
         public bool IsDbOK => (Bases.IsOK);
         public bool IsDbBlocked => bloqueado;
@@ -63,11 +65,9 @@ namespace Dooggy.Factory.Data
 
             Factory = prmFactory;
 
-            Bases = new DataBasesConnection(new DataTypesField());
+            Global = new TestDataGlobal(this);
 
-            Dados = new TestDataLocal(this);
-
-            Connect = new TestDataConnect(this);
+            Local = new TestDataLocal(this);
 
             Tratamento = new TestDataTratamento(this);
 
@@ -93,14 +93,7 @@ namespace Dooggy.Factory.Data
         public void SetDataView(string prmArg, string prmInstrucao) => Views.SetArgumento(prmArg, prmInstrucao);
         public void SetDataFlow(string prmArg, string prmInstrucao) => Flows.SetArgumento(prmArg, prmInstrucao);
 
-        public void Cleanup()
-        {
-
-            Vars = new TestDataVars(this);
-            Raws = new TestDataRaws(this);
-            Views = new TestDataViews(this);
-
-        }
+        public void Cleanup() => Local.Cleanup();
 
         public void SetDBStatus(bool prmBloqueado) => bloqueado = prmBloqueado;
 
@@ -114,234 +107,65 @@ namespace Dooggy.Factory.Data
         public string output(string prmTags, eTipoFileFormat prmTipo) => Tratamento.GetOutput(prmTags, prmTipo);
 
     }
-    public class TestDataTratamento : TestDataFormat
-    {
-        private TestDataVars Vars => Pool.Vars;
-        private TestDataRaws Raws => (Pool.Raws);
-        private TestDataViews Views => (Pool.Views);
 
-        private string varDataFlow = "#(flow)";
-
-        private string varDataInput = "#(input)";
-        private string varDataOutput = "#(output)";
-        private string varDataFull => varDataInput + "," + varDataOutput;
-
-        private string varDelimitadorInicial = "#(";
-        private string varDelimitadorFinal = ")";
-
-        private string fncDelimitadorPrefixo = "$";
-        private string fncDelimitadorInicial = "(";
-        private string fncDelimitadorFinal = ")";
-
-        public TestDataTratamento(TestDataPool prmPool)
-        {
-            Pool = prmPool;
-        }
-
-        public string GetOutput(string prmTags, eTipoFileFormat prmTipo)
-        {
-
-            string data_view = Views.output(prmTags, prmTipo);
-
-            if (Raws.IsON)
-                return Raws.GetOutput(data_view, prmTipo);
-
-            return data_view;
-
-        }
-        public string GetSQLTratado(string prmSql, TestDataHeader prmHeader)
-        {
-            string sql = myString.GetSubstituir(prmSql, varDataFlow, varDataFull);
-
-            sql = GetTuplasTratadas(sql, varDataInput, prmHeader.Input);
-            sql = GetTuplasTratadas(sql, varDataOutput, prmHeader.Output.GetVariavel());
-
-            sql = GetTextoTratado(sql);
-
-            return sql;
-        }
-        public string GetTextoTratado(string prmTexto)
-        {
-            string texto = prmTexto;
-
-            texto = GetVariavelTratada(texto);
-            texto = GetFuncaoTratada(texto);
-
-            return (texto);
-        }
-
-        private string GetTuplasTratadas(string prmSql, string prmVariavel, myTuplas prmTuplas)
-        {
-            string sql = myString.GetSubstituir(prmSql, prmVariavel, prmTuplas.sql);
-
-            foreach (myTupla tupla in prmTuplas)
-            {
-                if (tupla.TemVariavel)
-                    Trace.LogConsole.SetValueVariable(tupla.name, tupla.value_sql);
-
-                sql = myString.GetSubstituir(sql, tupla.var_sql, tupla.value_sql);
-            }
-            return sql;
-        }
-        
-        private string GetVariavelTratada(string prmTexto)
-        {
-            string sql = prmTexto; string arg; string arg_extendido; string arg_valor;
-
-            while (true)
-            {
-                arg_extendido = Bloco.GetBloco(sql, varDelimitadorInicial, varDelimitadorFinal, prmPreserve: true);
-
-                arg = Bloco.GetBloco(sql, varDelimitadorInicial, varDelimitadorFinal);
-
-                if (arg == "") break;
-
-                arg_valor = Vars.GetValor(prmTag: arg);
-
-                if (arg_valor == "")
-                    Trace.LogConsole.FailFindVariable(arg, prmTexto);
-
-                sql = myString.GetSubstituir(sql, arg_extendido, arg_valor);
-            }
-
-            return (sql);
-        }
-
-        private string GetFuncaoTratada(string prmSQL)
-        {
-
-            string sql = prmSQL; string funcao; string funcao_ext;
-            string code; string parametro; string valor;
-
-            while (true)
-            {
-
-                funcao = Bloco.GetBloco(sql, fncDelimitadorPrefixo, fncDelimitadorInicial);
-
-                funcao_ext = Bloco.GetBloco(sql, fncDelimitadorPrefixo, fncDelimitadorInicial, prmPreserve: true);
-
-                code = Bloco.GetBloco(sql, prmDelimitadorInicial: funcao_ext, fncDelimitadorFinal, prmPreserve: true);
-
-                parametro = Bloco.GetBloco(sql, prmDelimitadorInicial: funcao_ext, fncDelimitadorFinal);
-
-                if ((myString.IsEmpty(funcao)) || (myString.IsEmpty(parametro))) break;
-
-                valor = GetFuncao(funcao, parametro);
-
-                if (valor == "")
-                    Trace.LogConsole.FailFindFunction(funcao, code);
-
-                sql = myString.GetSubstituir(sql, code, valor);
-
-            }
-
-            return (sql);
-        }
-
-        private string GetFuncao(string prmFuncao, string prmParametro)
-        {
-
-            switch (prmFuncao)
-            {
-                case "date":
-                    return GetDataDinamica(prmParametro);
-
-                case "now":
-                case "today":
-                    return GetDataDinamica(prmParametro);
-            }
-
-            return ("");
-        }
-        private string GetDataDinamica(string prmParametro)
-        {
-            return (myDate.View(prmDate: anchor, prmSintaxe: prmParametro));
-        }
-        private string GetDataEstatica(string prmParametro)
-        {
-            return (myDate.Static(prmDate: anchor, prmFormato: prmParametro));
-        }
-    }
-    public class TestDataFormat : TestDataException
+    public class TestDataGlobal
     {
 
-        public TestConfigCSV CSV => Pool.Console.Config.CSV;
+        private TestDataPool Pool;
 
-        public DateTime anchor => CSV.anchor;
+        public DataBasesConnection Bases;
 
-        public string formatDateDefault => CSV.formatDateDefault;
+        public TestDataConnect Connect;
 
-        public string GetDateAnchor() => GetDateAnchor(formatDateDefault);
-        public string GetDateAnchor(string prmFormat) => GetDateFormat(anchor, prmFormat);
+        public TestDataSource Dados;
 
-        public string GetTextFormat(string prmText, string prmFormat) => CSV.TextToCSV(prmText, prmFormat);
+        public TestDataTags Tags;
 
-        public string GetDateFormat(DateTime prmDate) => GetDateFormat(prmDate, prmFormat: "");
-        public string GetDateFormat(DateTime prmDate, string prmFormat)
+        public TestDataGlobal(TestDataPool prmPool)
         {
-            string format = prmFormat;
+            Pool = prmPool; Cleanup();
 
-            if (myString.IsEmpty(format))
-                format = formatDateDefault;
+            Bases = new DataBasesConnection(new DataTypesField());
 
-            return CSV.DateToCSV(prmDate, format);
-        }
-        public string GetDoubleFormat(double prmNumber) => GetDoubleFormat(prmNumber, prmFormat: "");
-        public string GetDoubleFormat(double prmNumber, string prmFormat) => CSV.DoubleToCSV(prmNumber, prmFormat);
+            Connect = new TestDataConnect(prmPool);
 
-
-
-    }
-    public class TestDataException
-    {
-
-        public TestDataPool Pool;
-
-        private xLista Dominio;
-
-        private string dataSQL_NoFindSQLCommand { get => GetTag("NoFindSQLCommand"); }
-        private string dataSQL_ZeroItensSQLResult { get => GetTag("ZeroItensSQLResult"); }
-
-
-        public bool IsSQLDataException(string prmItem) => (Dominio.GetContido(prmItem) != 0);
-
-        private string GetTag(string prmTexto) => string.Format("<#$#{0}#$#>", prmTexto);
-
-        public TestTrace Trace => (Pool.Trace);
-
-        public TestDataException()
-        {
-
-            PopularDominio();
+            Dados = new TestDataSource(prmPool);
 
         }
 
-        private void PopularDominio()
+        public void Cleanup()
         {
-            Dominio = new xLista();
-
-            Dominio.Add(dataSQL_ZeroItensSQLResult);
-            Dominio.Add(dataSQL_NoFindSQLCommand);
-
-        }
-
-        public string GetZeroItens()
-        {
-
-            return (dataSQL_ZeroItensSQLResult);
-
-        }
-
-        public string GetNoCommand()
-        {
-
-            Trace.LogData.FailFindSQLCommand();
-
-            return (dataSQL_NoFindSQLCommand);
-
+            Tags = new TestDataTags();
         }
     }
     public class TestDataLocal
+    {
+
+        private TestDataPool Pool;
+
+        public TestDataVars Vars;
+        public TestDataRaws Raws;
+        public TestDataViews Views;
+
+        public TestDataFlows Flows => (Views.Corrente.Flows);
+
+        public TestDataLocal(TestDataPool prmPool)
+        {
+            Pool = prmPool; Cleanup();
+        }
+
+        public void Cleanup()
+        {
+
+            Vars = new TestDataVars(Pool);
+            Raws = new TestDataRaws(Pool);
+            Views = new TestDataViews(Pool);
+
+        }
+
+
+    }
+    public class TestDataSource
     {
 
         public TestDataPool Pool;
@@ -354,7 +178,7 @@ namespace Dooggy.Factory.Data
 
         public bool IsHaveData => Pool.IsHaveData;
 
-        public TestDataLocal(TestDataPool prmPool)
+        public TestDataSource(TestDataPool prmPool)
         {
 
             Pool = prmPool;
