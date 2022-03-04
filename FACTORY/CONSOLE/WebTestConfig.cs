@@ -66,7 +66,7 @@ namespace Dooggy.Factory.Console
             return false;
         }
 
-        public bool Run(string prmBloco) => Import.Run(prmBloco);
+        public bool Parse(string prmBloco) => Import.Parse(prmBloco);
 
         private string GetStatus()
         {
@@ -235,19 +235,29 @@ namespace Dooggy.Factory.Console
 
         private TestTrace Trace => Config.Console.Trace;
 
+        public Diretorio CFG;
         public Diretorio INI;
         public Diretorio OUT;
         public Diretorio LOG;
 
-        public bool IsOK => INI.IsFull && OUT.IsFull && LOG.IsFull;
+        public bool IsOK => CFG.IsFull && INI.IsFull && OUT.IsFull && LOG.IsFull;
 
         public TestConfigPath(TestConsoleConfig prmConfig)
         {
             Config = prmConfig;
 
+            CFG = new Diretorio();
             INI = new Diretorio();
             OUT = new Diretorio();
             LOG = new Diretorio();
+
+        }
+        public void SetCFG(string prmPath)
+        {
+
+            CFG.SetPath(prmPath);
+
+            Trace.LogPath.SetPath(prmContexto: "ConfiguracaoGeral", prmPath);
 
         }
 
@@ -256,7 +266,7 @@ namespace Dooggy.Factory.Console
 
             INI.SetPath(prmPath);
 
-            Trace.LogPath.SetPath(prmContexto: "OrigemMassaTestes", prmPath);
+            Trace.LogPath.SetPath(prmContexto: "OrigemScriptTestes", prmPath);
 
         }
 
@@ -308,10 +318,9 @@ namespace Dooggy.Factory.Console
 
         public string GetPathFullOUT(eTipoFileFormat prmTipo) => (GetPathOUT(prmSubPath: GetExtensao(prmTipo)));
 
-        public string log => String.Format(">path: -ini: '{0}', -out: '{1}', -log: '{2}'", INI.path, OUT.path, LOG.path);
+        public string log => String.Format(">path: -cfg: '{0}', -ini: '{1}', -out: '{2}', -log: '{3}'", CFG.path, INI.path, OUT.path, LOG.path);
 
     }
-
     public class TestConfigGlobal
     {
 
@@ -339,12 +348,15 @@ namespace Dooggy.Factory.Console
         private TestTrace Trace => Console.Trace;
         private TestDataConnect Connect => Console.Pool.Connect;
 
-        private FileTXT File;
-
         public bool IsOK;
 
+        private FileTXT File;
+
         private string pathCFG;
-        private string nome_completo => File.nome_completo;
+
+        private string var_pathCFG = "#(PathArquivoCFG)";
+
+        private Arquivos GetArquivosCFG() => Config.Path.CFG.Filtro("*.cfg");
 
         private string grupo;
 
@@ -355,8 +367,6 @@ namespace Dooggy.Factory.Console
 
         private string delimitador = ":";
 
-        private string var_pathCFG = "#(PathArquivoCFG)";
-
         public TestConfigImport(TestConsoleConfig prmConfig)
         {
             Config = prmConfig;
@@ -365,25 +375,46 @@ namespace Dooggy.Factory.Console
         public bool Setup(string prmArquivoCFG)
         {
 
-            File = new FileTXT(); IsOK = false;
+            IsOK = false;
+
+            if (Load(prmArquivoCFG, prmMain: true))
+            {
+                LoadPathCFG();  IsOK = true; return true;
+            }
+
+            return false;
+        }
+
+        private void LoadPathCFG()
+        {
+            foreach (Arquivo file in GetArquivosCFG())
+                Load(prmArquivoCFG: file.nome_completo);
+        }
+
+        private bool Load(string prmArquivoCFG) => Load(prmArquivoCFG, prmMain: false);
+        private bool Load(string prmArquivoCFG, bool prmMain)
+        {
+
+            File = new FileTXT();
 
             if (File.Open(prmArquivoCFG))
             {
 
-                pathCFG = File.path;
+                if (prmMain)
+                    pathCFG = File.path;
 
-                if (Run(prmBloco: File.txt()))
-                { Trace.LogConfig.LoadConfig(prmArquivoCFG: nome_completo, prmPathCFG: pathCFG); IsOK = true; return true; }
+                if (Parse(prmBloco: File.txt()))
+                { Trace.LogConfig.LoadConfig(prmFile: File); return true; }
                 else
-                { Trace.LogConfig.FailLoadConfig(Config.status(), prmArquivoCFG: nome_completo, prmPathCFG: pathCFG); return (false); }
+                { Trace.LogConfig.FailLoadConfig(prmFile: File, Config.status()); return (false); }
 
             }
 
-            Trace.LogFile.FailDataFileOpen(nome_completo, File.path);
+            Trace.LogFile.FailDataFileOpen(prmFile: File);
 
             return false;
         }
-        public bool Run(string prmBloco)
+        public bool Parse(string prmBloco)
         {
             foreach (string line in new xMemo(prmBloco, prmSeparador: Environment.NewLine))
             {
@@ -453,6 +484,9 @@ namespace Dooggy.Factory.Console
             
             switch (prmTag)
             {
+                case "cfg":
+                    Config.Path.SetCFG(path); break;
+
                 case "ini":
                     Config.Path.SetINI(path); break;
 

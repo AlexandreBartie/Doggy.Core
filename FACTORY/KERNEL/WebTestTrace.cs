@@ -6,6 +6,7 @@ using Dooggy;
 using Dooggy.Factory.Console;
 using Dooggy.Lib.Vars;
 using Dooggy.Lib.Parse;
+using Dooggy.Lib.Files;
 
 namespace Dooggy.Factory
 {
@@ -139,14 +140,14 @@ namespace Dooggy.Factory
     public class TestTraceLogFile : TestTraceLog
     {
 
-        public void DataFileOpen(string prmArquivo, string prmPath) => DataFileAction(prmAcao: "OPEN", prmContexto: "Importado com sucesso", prmArquivo, prmPath);
+        public void DataFileOpen(FileTXT prmFile) => DataFileAction(prmAcao: "OPEN", prmContexto: "Importado com sucesso", prmFile);
 
-        public void DataFileSave(string prmArquivo, string prmPath) => DataFileAction(prmAcao: "CODE", prmContexto: "Script salvo com sucesso", prmArquivo, prmPath, prmEncoding: "default");
-        public void DataFileSave(string prmArquivo, string prmPath, string prmEncoding) => DataFileAction(prmAcao: "SAVE", prmContexto: "Salvo com sucesso", prmArquivo, prmPath, prmEncoding);
-        public void DataFileMute(string prmArquivo, string prmPath, string prmEncoding) => DataFileAction(prmAcao: "MUTE", prmContexto: "Silenciado com sucesso", prmArquivo, prmPath, prmEncoding);
+        public void DataFileSave(FileTXT prmFile) => DataFileAction(prmAcao: "CODE", prmContexto: "Script salvo com sucesso", prmFile, prmEncoding: "default");
+        public void DataFileSave(FileTXT prmFile, string prmEncoding) => DataFileAction(prmAcao: "SAVE", prmContexto: "Salvo com sucesso", prmFile, prmEncoding);
+        public void DataFileMute(FileTXT prmFile, string prmEncoding) => DataFileAction(prmAcao: "MUTE", prmContexto: "Silenciado com sucesso", prmFile, prmEncoding);
 
-        private void DataFileAction(string prmAcao, string prmContexto, string prmArquivo, string prmPath) => DataFileAction(prmAcao, prmContexto, prmArquivo, prmPath, prmEncoding: "");
-        private void DataFileAction(string prmAcao, string prmContexto, string prmArquivo, string prmPath, string prmEncoding)
+        private void DataFileAction(string prmAcao, string prmContexto, FileTXT prmFile) => DataFileAction(prmAcao, prmContexto, prmFile, prmEncoding: "");
+        private void DataFileAction(string prmAcao, string prmContexto, FileTXT prmFile, string prmEncoding)
         {
 
             string txt;
@@ -163,9 +164,9 @@ namespace Dooggy.Factory
             if (myString.IsFull(prmEncoding))
                 msg += @" -encoding: " + prmEncoding;
             
-            if (myString.GetFirst(prmArquivo, prmDelimitador: ".") != "")
+            if (myString.GetFirst(prmFile.nome, prmDelimitador: ".") != "")
             {
-                msg += @" -file: " + prmArquivo;
+                msg += @" -file: " + prmFile.nome;
 
             }
 
@@ -179,8 +180,8 @@ namespace Dooggy.Factory
         public void DataFileFormatJSON(string prmConteudo) => msgFile(prmTipo: "JSON", prmConteudo);
 
         public void FailDataFileEncoding(string prmEncoding) => msgErro(String.Format("Formato encoding [{0}] não encontrado ...", prmEncoding));
-        public void FailDataFileSave(string prmArquivo, string prmPath) => msgErro(String.Format("Falha na criação do arquivo ... -file: {0} -path: {1}", prmArquivo, prmPath));
-        public void FailDataFileOpen(string prmArquivo, string prmPath) => FailDataFileOpenDefault(prmLocal: String.Format("-file: {0} -path: {1}", prmArquivo, prmPath));
+        //public void FailDataFileSave(string prmArquivo, string prmPath) => msgErro(String.Format("Falha na criação do arquivo ... -file: {0} -path: {1}", prmArquivo, prmPath));
+        public void FailDataFileOpen(FileTXT prmFile) => FailDataFileOpenDefault(prmLocal: String.Format("-file: {0} -path: {1}", prmFile.nome, prmFile.path));
         public void FailJSONFormat(string prmContexto, string prmFlow, Exception prmErro) => msgErro(prmTexto: String.Format(@"Flow JSON: [invalid format] ... contexto: {0} Flow: {1}", prmContexto, prmFlow));
 
         private void FailDataFileOpenDefault(string prmLocal) => msgErro(String.Format("Falha na abertura do arquivo ... {0}", prmLocal));
@@ -213,9 +214,9 @@ namespace Dooggy.Factory
     }
     public class TestTraceLogConfig : TestTraceLog
     {
-        public void LoadConfig(string prmArquivoCFG, string prmPathCFG) => msgSet(String.Format("Arquivo CFG carregado ... -file: {0} -path: {1}", prmArquivoCFG, prmPathCFG));
+        public void LoadConfig(FileTXT prmFile) => msgSet(String.Format("Arquivo CFG carregado ... -file: {0} -path: {1}", prmFile.nome, prmFile.path));
 
-        public void FailLoadConfig(string prmStatus, string prmArquivoCFG, string prmPathCFG) => msgSet(String.Format("Parâmetros incompletos no arquivo CFG ... -status: {0} -file: {1} -path: {2}", prmStatus, prmArquivoCFG, prmPathCFG));
+        public void FailLoadConfig(FileTXT prmFile, string prmStatus) => msgSet(String.Format("Parâmetros incompletos no arquivo CFG ... -status: {2} -file: {0} -path: {1}", prmFile.nome, prmFile.path, prmStatus));
 
         public void FailFindGroup(string prmGroup) => msgErro(String.Format("Grupo do arquivo CFG não encontrado ... -grp: {0}", prmGroup));
 

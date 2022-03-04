@@ -89,7 +89,7 @@ namespace Dooggy.Factory.Console
     public class TestConsoleInput : TestConsoleIO
     {
 
-        public Arquivos GetArquivosINI() => Path.INI.files.GetFiltro("*.ini");
+        public Arquivos GetArquivosINI() => Path.INI.Filtro("*.ini");
 
         public TestConsoleInput(TestConsole prmConsole)
         {

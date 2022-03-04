@@ -15,7 +15,7 @@ namespace Dooggy.Lib.Files
         public string arquivo;
 
         public string path => System.IO.Path.GetDirectoryName(arquivo);
-        public string nome_completo => System.IO.Path.GetFileName(arquivo);
+        public string nome => System.IO.Path.GetFileName(arquivo);
 
         private Diretorio _diretorio;
 

@@ -35,8 +35,6 @@ namespace Dooggy.Factory.Data
     
     }
 
-
-
     public class TestDataVar
     {
 

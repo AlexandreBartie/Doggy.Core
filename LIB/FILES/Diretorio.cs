@@ -80,6 +80,8 @@ namespace Dooggy.Lib.Files
 
         public Arquivos files;
 
+        public Arquivos Filtro(string prmFiltro) => files.GetFiltro(prmFiltro);
+
         public Diretorio()
         {
 

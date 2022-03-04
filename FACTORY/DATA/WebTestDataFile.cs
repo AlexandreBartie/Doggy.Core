@@ -69,13 +69,13 @@ namespace Dooggy.Factory.Data
             if (File.Open(prmPath, prmArquivo))
             {
 
-                Trace.LogFile.DataFileOpen(prmArquivo, prmPath);
+                Trace.LogFile.DataFileOpen(File);
 
                 return File.txt();
 
             }
 
-            Trace.LogFile.FailDataFileOpen(prmArquivo, prmPath);
+            Trace.LogFile.FailDataFileOpen(File);
 
             return ("");
 
@@ -91,17 +91,17 @@ namespace Dooggy.Factory.Data
                 if (File.Save(prmPath, prmArquivo, prmConteudo, prmEncoding: Encode.Find(prmEncoding)))
                 {
 
-                    Trace.LogFile.DataFileSave(prmArquivo, prmPath, prmEncoding);
+                    Trace.LogFile.DataFileSave(File, prmEncoding);
 
                     return (true);
 
                 }
 
-                Trace.LogFile.DataFileSave(prmArquivo, prmPath);
+                Trace.LogFile.DataFileSave(File);
 
             }
             else
-                Trace.LogFile.DataFileMute(prmArquivo, prmPath, prmEncoding);
+                Trace.LogFile.DataFileMute(File, prmEncoding);
 
             return (false);
         }
