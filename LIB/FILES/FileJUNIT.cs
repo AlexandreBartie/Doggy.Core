@@ -191,7 +191,7 @@ namespace Dooggy.Lib.Files
             return ("{ "+ lista + " }");
 
         }
-        public string txt() => Lista.txt(TestCase.separador);
+        public string txt => Lista.Export(TestCase.separador);
  
     }
     public class TestDataJUnit
@@ -265,7 +265,7 @@ namespace Dooggy.Lib.Files
             foreach (xMemo Flow in Dados)
             {
 
-                lista += aux + (Flow.txt(File.separador));
+                lista += aux + (Flow.Export(File.separador));
 
                 aux = Environment.NewLine;
 

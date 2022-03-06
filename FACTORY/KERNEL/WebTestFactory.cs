@@ -16,8 +16,6 @@ namespace Dooggy.Factory
     public class TestFactory
     {
 
-        //public myJSON args = new myJSON();
-
         public TestDataPool Pool;
 
         public TestDataSource Dados => Pool.Dados;

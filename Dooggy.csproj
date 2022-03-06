@@ -27,6 +27,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeCoverage" Version="17.0.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="2.2.8" />
+    <PackageReference Include="MSTest.TestFramework" Version="2.2.8" />
     <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="3.21.50" />
     <PackageReference Include="Selenium.Support" Version="4.1.0" />
     <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="97.0.4692.7100" />

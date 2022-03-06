@@ -6,9 +6,14 @@ using System.Text;
 
 namespace Dooggy.FACTORY.UNIT
 {
-    public static class TestUnityAnalise
+    public static class TestUnityLog
     {
-        public static string GetAnaliseTexto(string prmTexto)
+        public static string GetAnalise(string prmGerado, string prmEsperado)
+        {
+            return string.Format("{4}Gerado: <{1}>{4}{0}{4}Esperado:<{3}>{4}{2}{4}", prmGerado, GetAnaliseTexto(prmGerado), prmEsperado, GetAnaliseTexto(prmEsperado), Environment.NewLine);
+        }
+
+        private static string GetAnaliseTexto(string prmTexto)
         {
 
             try

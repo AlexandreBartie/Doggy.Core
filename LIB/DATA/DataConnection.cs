@@ -369,7 +369,7 @@ namespace Dooggy.Lib.Data
                 foreach (DataBaseConnection db in this)
                 lista.Add(db.log);
 
-            return ">dbase: " + lista.txt();
+            return ">dbase: " + lista.txt;
         }
 
     }

@@ -9,15 +9,15 @@ using System.Text;
 namespace Dooggy.Factory.Data
 {
 
-    public class TestDataTag : myDominio
+    public class TestConsoleTag : myDominio
     {
 
-        public TestDataTag(string prmKey, string prmLista) : base(prmKey, prmLista)
+        public TestConsoleTag(string prmKey, string prmLista) : base(prmKey, prmLista)
         { }
 
     }
 
-    public class TestDataTags : myDominios
+    public class TestConsoleTags : myDominios
     {
 
         private string key_start = "[";

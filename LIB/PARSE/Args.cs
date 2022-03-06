@@ -7,7 +7,7 @@ namespace Dooggy.Lib.Parse
 {
     public class myArgs: xMemo
     {
-        public string sql { get => txt(" and "); }
+        public string sql { get => Export(" and "); }
 
     }
 }

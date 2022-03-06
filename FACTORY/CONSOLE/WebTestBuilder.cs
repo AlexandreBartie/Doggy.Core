@@ -16,13 +16,13 @@ namespace Dooggy.Factory.Console
 
         eCommandNote = 10,
         eCommandVar = 11,
+        eCommandTag = 12,
 
         eCommandRaw = 20,
         eCommandView = 21,
         eCommandFlow = 22,
 
         eCommandBreak = 50,
-        eCommandBehavior = 51,
 
         eCommandSave = 60,
     }
@@ -264,16 +264,21 @@ namespace Dooggy.Factory.Console
                     tipo = eTipoTestCommand.eCommandNote;
                     break;
 
-                case "raw":
-                case "data":
-                    tipo = eTipoTestCommand.eCommandRaw;
-                    args = "header;null;*";
+                case "tag":
+                    tipo = eTipoTestCommand.eCommandTag;
+                    args = "null";
                     break;
-
+                
                 case "var":
                 case "variavel":
                     tipo = eTipoTestCommand.eCommandVar;
                     args = "sql";
+                    break;
+
+                case "raw":
+                case "data":
+                    tipo = eTipoTestCommand.eCommandRaw;
+                    args = "header;null;*";
                     break;
 
                 case "view":
@@ -297,11 +302,6 @@ namespace Dooggy.Factory.Console
                 case "break":
                     tipo = eTipoTestCommand.eCommandBreak;
                     args = "";//args = "encode;extensao";
-                    break;
-
-                case "behavior":
-                    tipo = eTipoTestCommand.eCommandBehavior;
-                    args = "view";
                     break;
 
                 default:
@@ -332,17 +332,20 @@ namespace Dooggy.Factory.Console
                 case eTipoTestCommand.eCommandNote:
                     return "note";
 
+                case eTipoTestCommand.eCommandTag:
+                    return "tag";
+
+                case eTipoTestCommand.eCommandVar:
+                    return "var";
+
                 case eTipoTestCommand.eCommandRaw:
                     return "data";
 
-                case eTipoTestCommand.eCommandVar:
-                    return "variavel";
-
                 case eTipoTestCommand.eCommandView:
-                    return "dataview";
+                    return "view";
 
                 case eTipoTestCommand.eCommandFlow:
-                    return "dataFlow";
+                    return "flow";
 
                 case eTipoTestCommand.eCommandSave:
                     return "save";

@@ -334,6 +334,9 @@ public class TestCommandAction
                     case eTipoTestCommand.eCommandNote:
                         break;
 
+                    case eTipoTestCommand.eCommandTag:
+                        break;
+
                     case eTipoTestCommand.eCommandVar:
                         ActionAddDataVar();
                         break;
@@ -358,9 +361,6 @@ public class TestCommandAction
                         ActionScriptBreak();
                         break;
 
-                    case eTipoTestCommand.eCommandBehavior:
-                        break;
-
                     default:
                         if (!Sintaxe.IsAction)
                             Trace.LogConsole.FailActionKeyWord(Sintaxe.keyword);
@@ -376,13 +376,17 @@ public class TestCommandAction
         private void PlayParametros()
         {
             foreach (TestCommandParameter Parametro in Command.Parametros)
-                PlayArg(Parametro.arg, Parametro.Instrucao.txt());
+                PlayArg(Parametro.arg, Parametro.Instrucao.txt);
         }
 
         private void PlayArg(string prmArg, string prmInstrucao)
         {
             switch (tipo)
             {
+
+                case eTipoTestCommand.eCommandTag:
+                    ActionSetDataTag(prmArg, prmInstrucao);
+                    break;
 
                 case eTipoTestCommand.eCommandVar:
                     ActionSetDataVar(prmArg, prmInstrucao);
@@ -399,29 +403,25 @@ public class TestCommandAction
                 case eTipoTestCommand.eCommandFlow:
                     ActionSetDataFlow(prmArg, prmInstrucao);
                     break;
-
-                case eTipoTestCommand.eCommandBehavior:
-                    ActionSetDataScript(prmArg, prmInstrucao);
-                    break;
                 
                 default:
                     return;
             }
         }
 
-        private void ActionSetDataRaw(string prmOptions) => Pool.SetDataRaw(prmOptions);
-        private void ActionAddDataRaw(string prmArg, string prmInstrucao) => Pool.AddDataRaw(prmArg, prmInstrucao);
+        private void ActionSetDataTag(string prmArg, string prmInstrucao) => Script.SetTag(prmArg, prmInstrucao);
 
         private void ActionAddDataVar() => Pool.AddDataVar(prmVar: target);
-        private void ActionSetDataVar(string prmArg, string prmInstrucao) => Pool.SetDataVar(prmArg, prmInstrucao); 
+        private void ActionSetDataVar(string prmArg, string prmInstrucao) => Pool.SetDataVar(prmArg, prmInstrucao);
+
+        private void ActionSetDataRaw(string prmOptions) => Pool.SetDataRaw(prmOptions);
+        private void ActionAddDataRaw(string prmArg, string prmInstrucao) => Pool.AddDataRaw(prmArg, prmInstrucao);
         
         private void ActionAddDataView() => Dados.AddDataView(prmTag: target);
         private void ActionSetDataView(string prmArg, string prmInstrucao) => Pool.SetDataView(prmArg, prmInstrucao);
 
         private void ActionAddDataFlow() => Dados.AddDataFlow(prmTag: target);
         private void ActionSetDataFlow(string prmArg, string prmInstrucao) => Pool.SetDataFlow(prmArg, prmInstrucao);
-
-        private void ActionSetDataScript(string prmArg, string prmInstrucao) => Script.SetArgumento(prmArg, prmInstrucao);
 
         private void ActionScriptSave() => Script.Save(prmOptions: Sintaxe.options);
         private void ActionScriptBreak() => Script.Break(Sintaxe.options);

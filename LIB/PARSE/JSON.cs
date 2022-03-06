@@ -176,7 +176,7 @@ namespace Dooggy.Lib.Parse
 
             }
 
-            return ("{ " + Memo.txt(", ") + " }");
+            return ("{ " + Memo.csv + " }");
 
         }
         public bool Save()

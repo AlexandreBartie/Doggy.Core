@@ -98,21 +98,21 @@ namespace Dooggy.Factory.Console
         }
 
     }
-    public class TestScript : TestScriptBehaviour
+    public class TestScript : TestScritpBreak
     {
-
-        public TestTags Tags;
 
         private TestCode Code;
 
+        public TestScriptTags Tags;
+
         public TestTrace Trace => Dados.Trace;
+
+        public TestDataPool Pool => Console.Pool;
 
         private TestDataSource Dados => Console.Dados;
         private TestConsoleInput Input => Console.Input;
 
         public string key;
-
-        public string tags => Tags.txt;
 
         public TestScript(TestConsole prmConsole)
         {
@@ -123,7 +123,7 @@ namespace Dooggy.Factory.Console
 
             Result = new TestResult(this);
 
-            Tags = new TestTags(this);
+            Tags = new TestScriptTags(this);
 
         }
 
@@ -138,33 +138,13 @@ namespace Dooggy.Factory.Console
 
         }
 
+        public void SetTag(string prmTag, string prmValue) => Tags.SetTag(prmTag, prmValue);
         public void SetCode(string prmCode) => Result.SetCode(prmCode);
         public void Play(string prmCode, string prmArquivoOUT) => Code.Play(prmCode, prmArquivoOUT);
 
         public void AddLogItem(TestTraceMsg prmMsg) => Result.AddLogItem(prmTipo: prmMsg.tipo, prmTexto: prmMsg.texto);
         public void AddLogSQL(TestTraceMsg prmMsg) => Result.AddLogSQL(prmSQL: prmMsg.texto, prmTimeElapsed: prmMsg.time_elapsed);
     }
-
-    public class TestScriptBehaviour : TestScritpBreak
-    {
-
-        public bool IsDataIndex;
-
-        public void SetArgumento(string prmArg, string prmInstrucao)
-        {
-            switch (prmArg)
-            {
-                case "view":
-                    SetDataIndex(prmInstrucao);
-                    break;
-            }
-        }
-
-        public void SetDataIndex(string prmInstrucao) => SetDataIndex(prmActive: myString.IsEqual(prmInstrucao,"index"));
-        public void SetDataIndex(bool prmActive) => IsDataIndex = prmActive;
-
-    }
-
 
     public class TestScritpBreak : TestScriptSave
     {
@@ -236,7 +216,7 @@ namespace Dooggy.Factory.Console
         }
 
     }
-    public class TestTag
+    public class TestScriptTag
     {
 
         public string _key;
@@ -247,7 +227,12 @@ namespace Dooggy.Factory.Console
 
         public string txt => String.Format("[{0,12} {1}], ", key, valor);
 
-        public TestTag(string prmKey, string prmValor)
+        public TestScriptTag(string prmKey)
+        {
+            _key = prmKey;
+        }
+        
+        public TestScriptTag(string prmKey, string prmValor)
         {
             _key = prmKey; _valor = prmValor;
         }
@@ -255,43 +240,54 @@ namespace Dooggy.Factory.Console
         public void SetValor(string prmValor) => _valor = prmValor;
 
     }
-    public class TestTags : List<TestTag>
+    public class TestScriptTags : List<TestScriptTag>
     {
 
         private TestScript Script;
 
-        //private TestTag Corrente;
+        private TestTrace Trace => Script.Trace;
+
+        private TestConsoleTags MainTags => Script.Pool.Tags;
 
         public string txt => GetTXT();
 
-        public TestTags(TestScript prmScript)
+        public TestScriptTags(TestScript prmScript)
         {
             Script = prmScript;
         }
 
-        public void AddTag(string prmKey, string prmValor)
+        private void Setup()
         {
+            foreach (TestConsoleTag item in MainTags)
+                Add(new TestScriptTag(item.key));
+        }
 
-            foreach (TestTag Tag in this)
+        public void SetTag(string prmTag, string prmValue)
+        {
+            if (MainTags.FindIt(prmTag))
+                if (MainTags.Find(prmTag).IsContem(prmValue))
+                    SetValue(prmTag, prmValue);
+                else
+                    Trace.LogConsole.FailFindDominioTag(prmTag, prmValue);
+            else
+                Trace.LogConsole.FailFindDominioTag(prmTag, prmValue);
+        }
+        
+        private void SetValue(string prmTag, string prmValue)
+        {
+            foreach (TestScriptTag Tag in this)
 
-                if (myString.IsEqual(Tag.key, prmKey))
+                if (myString.IsEqual(Tag.key, prmTag))
                 {
-
-                    Tag.SetValor(prmValor);
-
-                    return;
-
+                    Tag.SetValor(prmValue); return;
                 }
-
-            Add(new TestTag(prmKey, prmValor));
-
         }
         private string GetTXT()
         {
 
             xMemo memo = new xMemo();
 
-            foreach (TestTag Tag in this)
+            foreach (TestScriptTag Tag in this)
                 memo.Add(Tag.txt);
 
             return memo.memo;

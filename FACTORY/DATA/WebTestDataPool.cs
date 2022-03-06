@@ -29,9 +29,9 @@ namespace Dooggy.Factory.Data
 
         public TestFactory Factory;
 
-        public TestDataGlobal Global;
-
         public TestDataLocal Local;
+
+        public TestDataResume Resume;
 
         public TestDataTratamento Tratamento;
 
@@ -40,10 +40,10 @@ namespace Dooggy.Factory.Data
 
         private bool bloqueado = false;
 
-        public DataBasesConnection Bases => (Global.Bases);
-        public TestDataConnect Connect => (Global.Connect);
-        public TestDataSource Dados => (Global.Dados);
-        public TestDataTags Tags => (Global.Tags);
+        public DataBasesConnection Bases => (Resume.Bases);
+        public TestDataConnect Connect => (Resume.Connect);
+        public TestDataSource Dados => (Resume.Dados);
+        public TestConsoleTags Tags => (Resume.Tags);
 
         public TestDataViews Views => (Local.Views);
         public TestDataFlows Flows => (Local.Flows);
@@ -65,9 +65,9 @@ namespace Dooggy.Factory.Data
 
             Factory = prmFactory;
 
-            Global = new TestDataGlobal(this);
-
             Local = new TestDataLocal(this);
+
+            Resume = new TestDataResume(this);
 
             Tratamento = new TestDataTratamento(this);
 
@@ -108,7 +108,7 @@ namespace Dooggy.Factory.Data
 
     }
 
-    public class TestDataGlobal
+    public class TestDataResume
     {
 
         private TestDataPool Pool;
@@ -119,9 +119,9 @@ namespace Dooggy.Factory.Data
 
         public TestDataSource Dados;
 
-        public TestDataTags Tags;
+        public TestConsoleTags Tags;
 
-        public TestDataGlobal(TestDataPool prmPool)
+        public TestDataResume(TestDataPool prmPool)
         {
             Pool = prmPool; Cleanup();
 
@@ -135,7 +135,7 @@ namespace Dooggy.Factory.Data
 
         public void Cleanup()
         {
-            Tags = new TestDataTags();
+            Tags = new TestConsoleTags();
         }
     }
     public class TestDataLocal

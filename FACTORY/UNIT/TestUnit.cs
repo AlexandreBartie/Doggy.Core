@@ -1,22 +1,85 @@
 ﻿using Dooggy.FACTORY.UNIT;
+using Dooggy.Lib.Generic;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 
-namespace Dooggy
+namespace Dooggy.FACTORY.UNIT
 {
 
-    public abstract class UTC
+    public class UTC
     {
+        
+        public LinesUTC inputList;
+        public LinesUTC outputList;
+        public LinesUTC resultList;
+
         public string input;
         public string output;
-        public string result;
 
-        public string error => string.Format("{4}Gerado: <{1}>{4}{0}{4}Esperado:<{3}>{4}{2}{4}", result, TestUnityAnalise.GetAnaliseTexto(result), output, TestUnityAnalise.GetAnaliseTexto(output), Environment.NewLine);
+        public string log => _log;
 
-        public bool IsFail() => (output != result);
+        private string _log;
 
-        public abstract void AssertTest();
+        public UTC()
+        {
+            Setup();
+        }
+
+        private void Setup()
+        {
+
+            input = "";
+            output = "";
+
+            inputList = new LinesUTC();
+            outputList = new LinesUTC();
+            resultList = new LinesUTC();
+        }
+
+        public void AssertTest(string prmResult)
+        {
+
+            inputList.Add(input);
+            outputList.Add(output);
+            resultList.Add(prmResult);
+
+            _log = TestUnityLog.GetAnalise(prmGerado: prmResult, prmEsperado: outputList.txt);
+
+            // assert
+            if (!outputList.IsEqual(resultList.txt))
+                Assert.Fail(log);
+        }
+
     }
+
+    public class LinesUTC : List<string>
+    {
+
+        public bool IsFull => (this.Count > 0);
+        public bool IsEqual(string prmText) => (txt == prmText);
+
+        public string txt => GetTXT();
+
+        public void Add() => Add(prmText: "");
+        public new void Add(string prmText)
+        {
+            if (prmText != null)
+                base.Add(prmText);
+        }
+        private string GetTXT()
+        {
+            string txt = "";
+
+            foreach (string texto in this)
+                txt += texto + Environment.NewLine;
+
+            return txt;
+        }
+
+
+    }
+
     public class xTestCase
     {
         //private String selector;

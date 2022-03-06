@@ -81,7 +81,7 @@ namespace Dooggy.Factory.Console
 
             status.Add(Validation.log);
 
-            return status.txt();
+            return status.txt;
       
         }
 
@@ -326,7 +326,7 @@ namespace Dooggy.Factory.Console
 
         private TestConsoleConfig Config;
 
-        private TestDataTags Tags => Config.Pool.Tags;
+        private TestConsoleTags Tags => Config.Pool.Tags;
 
         
         public TestConfigGlobal(TestConsoleConfig prmConfig)
