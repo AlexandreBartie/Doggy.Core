@@ -114,10 +114,10 @@ namespace Dooggy.Lib.Parse
             string log = "";
 
             if (TemKey)
-                log += name;
+                log += name + @": '" + value + "'";
 
-            if (TemDados)
-                log += @": '" + value+ "'";
+            //if (TemDados)
+              //  log += @": '" + value+ "'";
 
             if (TemTag)
                 log += " <" + tag + ">";
@@ -303,10 +303,9 @@ namespace Dooggy.Lib.Parse
             xMemo text = new xMemo();
 
             foreach (myTupla tupla in this)
-            {
                 text.Add(tupla.log);
-            }
-            return (text.Export(", "));
+
+            return (text.csv);
         }
         private string GetMask()
         {

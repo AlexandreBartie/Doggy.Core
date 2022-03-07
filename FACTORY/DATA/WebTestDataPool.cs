@@ -43,12 +43,11 @@ namespace Dooggy.Factory.Data
         public DataBasesConnection Bases => (Resume.Bases);
         public TestDataConnect Connect => (Resume.Connect);
         public TestDataSource Dados => (Resume.Dados);
-        public TestConsoleTags Tags => (Resume.Tags);
 
         public TestDataViews Views => (Local.Views);
         public TestDataFlows Flows => (Local.Flows);
         public TestDataRaws Raws => (Local.Raws);
-        public TestDataVars Vars => (Local.Vars);
+        public TestResumeVars Vars => (Local.Vars);
 
         public DataTypesField DataTypes => (Bases.DataTypes);
 
@@ -110,16 +109,15 @@ namespace Dooggy.Factory.Data
 
     public class TestDataResume
     {
-
         private TestDataPool Pool;
-
-        public DataBasesConnection Bases;
 
         public TestDataConnect Connect;
 
+        public DataBasesConnection Bases;
+
         public TestDataSource Dados;
 
-        public TestConsoleTags Tags;
+        public TestResumeTags Tags;
 
         public TestDataResume(TestDataPool prmPool)
         {
@@ -130,12 +128,11 @@ namespace Dooggy.Factory.Data
             Connect = new TestDataConnect(prmPool);
 
             Dados = new TestDataSource(prmPool);
-
         }
 
         public void Cleanup()
         {
-            Tags = new TestConsoleTags();
+            Tags = new TestResumeTags();
         }
     }
     public class TestDataLocal
@@ -143,7 +140,7 @@ namespace Dooggy.Factory.Data
 
         private TestDataPool Pool;
 
-        public TestDataVars Vars;
+        public TestResumeVars Vars;
         public TestDataRaws Raws;
         public TestDataViews Views;
 
@@ -157,7 +154,7 @@ namespace Dooggy.Factory.Data
         public void Cleanup()
         {
 
-            Vars = new TestDataVars(Pool);
+            Vars = new TestResumeVars(Pool);
             Raws = new TestDataRaws(Pool);
             Views = new TestDataViews(Pool);
 

@@ -9,33 +9,31 @@ using System.Text;
 namespace Dooggy.Factory.Data
 {
 
-    public class TestConsoleTag : myDominio
+    public class TestResumeTag : myDominio
     {
 
-        public TestConsoleTag(string prmKey, string prmLista) : base(prmKey, prmLista)
+        public TestResumeTag(string prmKey, string prmLista) : base(prmKey, prmLista)
         { }
 
     }
 
-    public class TestConsoleTags : myDominios
+    public class TestResumeTags : myDominios
     {
 
         private string key_start = "[";
         private string key_finish = "]";
-        public void AddItem(string prmTag)
+        public new void AddItem(string prmTag)
         {
-
             string key = Bloco.GetBloco(prmTag, key_start, key_finish);
             string lista = Bloco.GetBlocoDepois(prmTag, key_finish,prmTRIM: true);
 
             if (myString.IsFull(key) && myString.IsFull(lista))
                 AddItem(key, lista);
-
         }
     
     }
 
-    public class TestDataVar
+    public class TestResumeVar
     {
 
         private DataBaseConnection DataBase;
@@ -46,29 +44,27 @@ namespace Dooggy.Factory.Data
 
         public string sql;
 
-        public TestDataVar(string prmTag, string prmValor, DataBaseConnection prmDataBase)
+        public TestResumeVar(string prmTag, string prmValor, DataBaseConnection prmDataBase)
         {
-
             DataBase = prmDataBase;
 
             tag = prmTag;
 
             valor = prmValor;
-
         }
 
     }
 
-    public class TestDataVars : List<TestDataVar>
+    public class TestResumeVars : List<TestResumeVar>
     {
 
         public TestDataPool Pool;
 
-        public TestDataVar Corrente;
+        public TestResumeVar Corrente;
 
         private TestTrace Trace { get => Pool.Trace; }
 
-        public TestDataVars(TestDataPool prmPool)
+        public TestResumeVars(TestDataPool prmPool)
         {
             Pool = prmPool;
         }
@@ -90,7 +86,7 @@ namespace Dooggy.Factory.Data
             if (!Find(tag, valor))
             {
 
-                Corrente = new TestDataVar(tag, valor, prmDataBase);
+                Corrente = new TestResumeVar(tag, valor, prmDataBase);
 
                 Add(Corrente);
 
@@ -121,7 +117,7 @@ namespace Dooggy.Factory.Data
 
         public bool Find(string prmTag)
         {
-            foreach (TestDataVar var in this)
+            foreach (TestResumeVar var in this)
 
                 if (myString.IsEqual(var.tag, prmTag))
                 {

@@ -29,7 +29,11 @@ namespace Dooggy.Factory.Console
 
         public TestConfigValidation Validation;
 
+
         public TestDataPool Pool => Console.Pool;
+
+        public TestDataResume Resume => Console.Pool.Resume;
+
         private DataBasesConnection Bases => Pool.Bases;
 
         public string status() => GetStatus();
@@ -58,12 +62,18 @@ namespace Dooggy.Factory.Console
 
         public bool Setup(string prmArquivoCFG, bool prmPlay)
         {
-            Mode.SetMode(prmPlay);
-
-            if (Import.Setup(prmArquivoCFG))
+            if (Load(prmArquivoCFG, prmPlay))
                 { Console.Load(prmPlay); return true; }
 
             return false;
+        }
+
+        public bool Load(string prmArquivoCFG) => Load(prmArquivoCFG, prmPlay: false);
+        private bool Load(string prmArquivoCFG, bool prmPlay)
+        {
+            Mode.SetMode(prmPlay);
+
+            return (Import.Setup(prmArquivoCFG));
         }
 
         public bool Parse(string prmBloco) => Import.Parse(prmBloco);
@@ -278,6 +288,15 @@ namespace Dooggy.Factory.Console
             Trace.LogPath.SetPath(prmContexto: "DestinoMassaTestes", prmPath);
 
         }
+        public void SetSubOUT(string prmSubPath)
+        {
+
+            OUT.SetSubPath(prmSubPath);
+
+            Trace.LogPath.SetSubPath(prmContexto: "... DestinoMassaTestes", prmSubPath);
+
+        }
+        
         public void SetLOG(string prmPath)
         {
 
@@ -326,7 +345,7 @@ namespace Dooggy.Factory.Console
 
         private TestConsoleConfig Config;
 
-        private TestConsoleTags Tags => Config.Pool.Tags;
+        private TestResumeTags Tags => Config.Resume.Tags;
 
         
         public TestConfigGlobal(TestConsoleConfig prmConfig)
@@ -379,19 +398,18 @@ namespace Dooggy.Factory.Console
 
             if (Load(prmArquivoCFG, prmMain: true))
             {
-                LoadPathCFG();  IsOK = true; return true;
+                LoadPath();  IsOK = true; return true;
             }
 
             return false;
         }
 
-        private void LoadPathCFG()
+        private void LoadPath()
         {
             foreach (Arquivo file in GetArquivosCFG())
-                Load(prmArquivoCFG: file.nome_completo);
+                Load(prmArquivoCFG: file.nome_completo, prmMain: false);
         }
 
-        private bool Load(string prmArquivoCFG) => Load(prmArquivoCFG, prmMain: false);
         private bool Load(string prmArquivoCFG, bool prmMain)
         {
 

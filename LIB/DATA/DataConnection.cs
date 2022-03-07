@@ -366,7 +366,7 @@ namespace Dooggy.Lib.Data
         {
             xMemo lista = new xMemo(prmSeparador: ", ");
 
-                foreach (DataBaseConnection db in this)
+            foreach (DataBaseConnection db in this)
                 lista.Add(db.log);
 
             return ">dbase: " + lista.txt;

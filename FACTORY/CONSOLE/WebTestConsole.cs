@@ -60,6 +60,8 @@ namespace Dooggy.Factory.Console
         public bool Setup(string prmArquivoCFG) => Setup(prmArquivoCFG, prmPlay: false);
         public bool Setup(string prmArquivoCFG, bool prmPlay) => Config.Setup(prmArquivoCFG, prmPlay);
 
+        public bool LoadCFG(string prmArquivoCFG) => Config.Load(prmArquivoCFG);
+
         public void SetAnchor(DateTime prmAncora) => Config.CSV.SetToday(prmAncora);
 
         public void SetDBStatus(bool prmBloqueado) => Pool.SetDBStatus(prmBloqueado);
@@ -70,9 +72,9 @@ namespace Dooggy.Factory.Console
         public void Load() => Load(prmPlay: false);
         public void Load(bool prmPlay) => Input.Load(prmPlay);
 
-        public void Import(string prmArquivoINI) => Load(prmArquivoINI, prmPlay: true);
-        public void Load(string prmArquivoINI) => Load(prmArquivoINI, prmPlay: false);
-        public void Load(string prmArquivoINI, bool prmPlay) => Scripts.Load(prmArquivoINI, prmPlay);
+        public void Import(string prmArquivoINI) => LoadINI(prmArquivoINI, prmPlay: true);
+        public void LoadINI(string prmArquivoINI) => LoadINI(prmArquivoINI, prmPlay: false);
+        public void LoadINI(string prmArquivoINI, bool prmPlay) => Scripts.Load(prmArquivoINI, prmPlay);
 
         public void Play(string prmCode) => Play(prmCode, prmArquivoOUT: "");
         public void Play(string prmCode, string prmArquivoOUT) => Scripts.Play(prmCode, prmArquivoOUT);
@@ -101,7 +103,7 @@ namespace Dooggy.Factory.Console
         public void Load(bool prmPlay)
         {
             foreach (Arquivo file in GetArquivosINI())
-                Console.Load(prmArquivoINI: file.nome_curto, prmPlay);
+                Console.LoadINI(prmArquivoINI: file.nome_curto, prmPlay);
         }
         public bool SaveINI(string prmCode)
         {

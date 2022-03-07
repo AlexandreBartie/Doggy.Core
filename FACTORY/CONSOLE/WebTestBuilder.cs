@@ -265,6 +265,7 @@ namespace Dooggy.Factory.Console
                     break;
 
                 case "tag":
+                case "tags":
                     tipo = eTipoTestCommand.eCommandTag;
                     args = "null";
                     break;

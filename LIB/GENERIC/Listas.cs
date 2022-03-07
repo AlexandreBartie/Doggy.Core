@@ -184,7 +184,7 @@ namespace Dooggy.Lib.Generic
         }
 
         public string memo => Export(prmSeparador: Environment.NewLine);
-        public string txt => Export(",");
+        public string txt => Export(separador);
         public string csv => Export(", ");
         public string Export(string prmSeparador)
         {

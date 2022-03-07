@@ -136,6 +136,8 @@ namespace Dooggy.Factory
     {
         public void SetPath(string prmContexto, string prmPath) => msgDef(String.Format(@"{0,15} -path: {1}", prmContexto, prmPath));
 
+        public void SetSubPath(string prmContexto, string prmPath) => msgDef(String.Format(@"{0,15} -subpath: {1}", prmContexto, prmPath));
+
     }
     public class TestTraceLogFile : TestTraceLog
     {
@@ -250,7 +252,9 @@ namespace Dooggy.Factory
         public void FailCheckVariable(myTupla prmTupla) => msgErro(String.Format("DataCheck não encontrado em campos OUTPUT... -check: {0} = {1}", prmTupla.var_sql, prmTupla.value_sql));
 
         public void FailFindTag(string prmTag, string prmCommand) => msgErro(String.Format("Tag não encontrada ... -tag: {0} -cmd: {1}", prmTag, prmCommand));
-        public void FailFindDominioTag(string prmTag, string prmValue) => msgErro(String.Format("Domínio Tag não encontrada ... -tag: {0} -value: {1}", prmTag, prmValue));
+        public void FailFindTagElement(string prmTag, string prmValue) => msgErro(String.Format("Elemento Tag não encontrada ... -tag: {0} -value: {1}", prmTag, prmValue));
+        public void FailScriptTag(string prmTag, string prmValue) => msgErro(String.Format("Script TAG não atualizada ... -tag: {0} -value: {1}", prmTag, prmValue));
+
         public void FailFindVariable(string prmVariable, string prmCommand) => msgErro(String.Format("Variável não encontrada ... -var: {0} -cmd: {1}", prmVariable, prmCommand));
         public void FailFindFunction(string prmFunction, string prmCommand) => msgErro(String.Format("Função não encontrada ... -fnc: {0} -cmd: {1}", prmFunction, prmCommand));
 

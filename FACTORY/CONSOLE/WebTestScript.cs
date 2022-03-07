@@ -107,7 +107,7 @@ namespace Dooggy.Factory.Console
 
         public TestTrace Trace => Dados.Trace;
 
-        public TestDataPool Pool => Console.Pool;
+        public TestDataResume Resume => Console.Pool.Resume;
 
         private TestDataSource Dados => Console.Dados;
         private TestConsoleInput Input => Console.Input;
@@ -138,7 +138,7 @@ namespace Dooggy.Factory.Console
 
         }
 
-        public void SetTag(string prmTag, string prmValue) => Tags.SetTag(prmTag, prmValue);
+        public void SetTag(string prmLinha) => Tags.SetTag(prmLinha);
         public void SetCode(string prmCode) => Result.SetCode(prmCode);
         public void Play(string prmCode, string prmArquivoOUT) => Code.Play(prmCode, prmArquivoOUT);
 
@@ -222,10 +222,12 @@ namespace Dooggy.Factory.Console
         public string _key;
         public string _valor;
 
-        public string key => _key.ToLower();
-        public string valor => _valor.ToUpper();
+        public string key => myString.GetLower(_key);
+        public string valor => myString.GetUpper(_valor);
 
-        public string txt => String.Format("[{0,12} {1}], ", key, valor);
+        public bool IsEqual(string prmKey) => myString.IsEqual(key, prmKey);
+
+        public string log => String.Format("[{0,10}] '{1}'", key, valor);
 
         public TestScriptTag(string prmKey)
         {
@@ -237,7 +239,13 @@ namespace Dooggy.Factory.Console
             _key = prmKey; _valor = prmValor;
         }
 
-        public void SetValor(string prmValor) => _valor = prmValor;
+        public bool SetValor(string prmValor) { _valor = prmValor; return true; }
+        public bool SetValor(string prmValor, string prmKey)
+        {
+            if (IsEqual(prmKey))
+                return SetValor(prmValor);
+            return false;
+        }
 
     }
     public class TestScriptTags : List<TestScriptTag>
@@ -247,50 +255,60 @@ namespace Dooggy.Factory.Console
 
         private TestTrace Trace => Script.Trace;
 
-        private TestConsoleTags MainTags => Script.Pool.Tags;
+        private TestResumeTags MainTags => Script.Resume.Tags;
 
-        public string txt => GetTXT();
+        private string delimitador = "=";
+
+        public string log => GetLOG();
 
         public TestScriptTags(TestScript prmScript)
         {
-            Script = prmScript;
+            Script = prmScript; Setup();
         }
 
         private void Setup()
         {
-            foreach (TestConsoleTag item in MainTags)
+            foreach (var item in MainTags)
                 Add(new TestScriptTag(item.key));
         }
 
-        public void SetTag(string prmTag, string prmValue)
+        public void SetTag(string prmLinha)
+        {
+
+            string tag = myString.GetFirst(prmLinha, prmDelimitador: delimitador).Trim();
+            string valor = myString.GetLast(prmLinha, prmDelimitador: delimitador).Trim();
+
+            SetTag(prmTag: tag, prmValue: valor, prmCommand: prmLinha);
+
+        }
+        private void SetTag(string prmTag, string prmValue, string prmCommand)
         {
             if (MainTags.FindIt(prmTag))
                 if (MainTags.Find(prmTag).IsContem(prmValue))
                     SetValue(prmTag, prmValue);
                 else
-                    Trace.LogConsole.FailFindDominioTag(prmTag, prmValue);
+                    Trace.LogConsole.FailFindTagElement(prmTag, prmValue);
             else
-                Trace.LogConsole.FailFindDominioTag(prmTag, prmValue);
+                Trace.LogConsole.FailFindTag(prmTag, prmCommand);
         }
         
         private void SetValue(string prmTag, string prmValue)
         {
             foreach (TestScriptTag Tag in this)
+                if (Tag.SetValor(prmValue, prmTag))
+                    return;
 
-                if (myString.IsEqual(Tag.key, prmTag))
-                {
-                    Tag.SetValor(prmValue); return;
-                }
+            Trace.LogConsole.FailScriptTag(prmTag, prmValue);
         }
-        private string GetTXT()
+        private string GetLOG()
         {
 
-            xMemo memo = new xMemo();
+            xMemo log = new xMemo();
 
             foreach (TestScriptTag Tag in this)
-                memo.Add(Tag.txt);
+                log.Add(Tag.log);
 
-            return memo.memo;
+            return log.memo;
 
         }
 

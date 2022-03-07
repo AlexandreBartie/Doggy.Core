@@ -12,14 +12,21 @@ namespace Dooggy.FACTORY.UNIT
         
         public LinesUTC inputList;
         public LinesUTC outputList;
-        public LinesUTC resultList;
-
-        public string input;
-        public string output;
-
-        public string log => _log;
+        private LinesUTC resultList;
 
         private string _log;
+
+        public void input() => input(prmText: "");
+        public void input(string prmText) => inputList.Add(prmText);
+
+        public void output() => output(prmText: "");
+        public void output(string prmText) => outputList.Add(prmText);
+
+        public string inputTXT => inputList.txt;
+        public string outputTXT => outputList.txt;
+
+        public string resultTXT => resultList.txt;
+        public string log => _log;
 
         public UTC()
         {
@@ -28,10 +35,6 @@ namespace Dooggy.FACTORY.UNIT
 
         private void Setup()
         {
-
-            input = "";
-            output = "";
-
             inputList = new LinesUTC();
             outputList = new LinesUTC();
             resultList = new LinesUTC();
@@ -40,11 +43,9 @@ namespace Dooggy.FACTORY.UNIT
         public void AssertTest(string prmResult)
         {
 
-            inputList.Add(input);
-            outputList.Add(output);
             resultList.Add(prmResult);
 
-            _log = TestUnityLog.GetAnalise(prmGerado: prmResult, prmEsperado: outputList.txt);
+            _log = TestUnityLog.GetAnalise(prmGerado: prmResult, prmEsperado: outputTXT);
 
             // assert
             if (!outputList.IsEqual(resultList.txt))

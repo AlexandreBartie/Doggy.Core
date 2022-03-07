@@ -46,15 +46,19 @@ namespace Dooggy.Lib.Vars
             return (false);
 
         }
+        public static string GetUpper(string prmTexto)
+        {
+            if (IsFull(prmTexto))
+                return (prmTexto.ToUpper().Trim());
 
+            return ("");
+        }
         public static string GetLower(string prmTexto)
         {
-
             if (IsFull(prmTexto))
                 return (prmTexto.ToLower().Trim());
 
             return ("");
-
         }
 
         public static string GetChar(string prmTexto, int prmIndice) => (GetSubstring(prmTexto, prmIndice, 1));
@@ -128,7 +132,6 @@ namespace Dooggy.Lib.Vars
 
         }
 
-        //public static bool GetFindEx(string prmTexto, string prmParte) { if (myString.IsNull(prmParte)) return false; return GetFind(prmTexto, prmParte); }
         public static bool GetFind(string prmTexto, string prmParte)
         {
             if (IsFull(prmTexto) && IsFull(prmParte))
@@ -203,14 +206,6 @@ namespace Dooggy.Lib.Vars
 
             return (prmPadrao);
         }
-        //public static string GetFullEx(string prmTexto) => GetFullEx(prmTexto, prmPadrao: "");
-        //public static string GetFullEx(string prmTexto, string prmPadrao)
-        //{
-        //    if (IsFullEx(prmTexto))
-        //        return prmTexto;
-
-        //    return (prmPadrao);
-        //}
         public static string GetJSON(string prmFluxo)
         {
             if (myString.IsFull(prmFluxo))

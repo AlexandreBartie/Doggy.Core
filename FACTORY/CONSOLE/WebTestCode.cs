@@ -385,7 +385,7 @@ public class TestCommandAction
             {
 
                 case eTipoTestCommand.eCommandTag:
-                    ActionSetDataTag(prmArg, prmInstrucao);
+                    ActionSetDataTag(prmInstrucao);
                     break;
 
                 case eTipoTestCommand.eCommandVar:
@@ -409,7 +409,7 @@ public class TestCommandAction
             }
         }
 
-        private void ActionSetDataTag(string prmArg, string prmInstrucao) => Script.SetTag(prmArg, prmInstrucao);
+        private void ActionSetDataTag(string prmInstrucao) => Script.SetTag(prmInstrucao);
 
         private void ActionAddDataVar() => Pool.AddDataVar(prmVar: target);
         private void ActionSetDataVar(string prmArg, string prmInstrucao) => Pool.SetDataVar(prmArg, prmInstrucao);

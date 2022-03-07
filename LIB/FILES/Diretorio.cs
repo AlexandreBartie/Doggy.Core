@@ -30,6 +30,8 @@ namespace Dooggy.Lib.Files
             return(IsFull);
 
         }
+        public bool SetSubPath(string prmSubPath) => SetPath(prmPath: path + prmSubPath);
+
         public bool Criar() => Criar(path);
         public bool Criar(string prmPath)
         {
