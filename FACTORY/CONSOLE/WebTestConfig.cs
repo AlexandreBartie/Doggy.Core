@@ -25,14 +25,14 @@ namespace Dooggy.Factory.Console
         public TestConfigPath Path;
         public TestConfigTimeout Timeout;
 
-        public TestConfigGlobal Global;
+        public TestConfigMain Main;
 
         public TestConfigValidation Validation;
 
 
         public TestDataPool Pool => Console.Pool;
 
-        public TestDataResume Resume => Console.Pool.Resume;
+        public TestDataGlobal Global => Console.Pool.Global;
 
         private DataBasesConnection Bases => Pool.Bases;
 
@@ -54,7 +54,7 @@ namespace Dooggy.Factory.Console
 
             Timeout = new TestConfigTimeout(this);
 
-            Global = new TestConfigGlobal(this);
+            Main = new TestConfigMain(this);
 
             Validation = new TestConfigValidation(this);
 
@@ -340,15 +340,15 @@ namespace Dooggy.Factory.Console
         public string log => String.Format(">path: -cfg: '{0}', -ini: '{1}', -out: '{2}', -log: '{3}'", CFG.path, INI.path, OUT.path, LOG.path);
 
     }
-    public class TestConfigGlobal
+    public class TestConfigMain
     {
 
         private TestConsoleConfig Config;
 
-        private TestResumeTags Tags => Config.Resume.Tags;
+        private TestDataTags Tags => Config.Pool.Global.Tags;
 
         
-        public TestConfigGlobal(TestConsoleConfig prmConfig)
+        public TestConfigMain(TestConsoleConfig prmConfig)
         {
             Config = prmConfig;
         }
@@ -568,7 +568,7 @@ namespace Dooggy.Factory.Console
             switch (prmTag)
             {
                 case "tag":
-                    Config.Global.SetTag(prmValor); break;
+                    Config.Main.SetTag(prmValor); break;
 
                 default:
                     Trace.LogConfig.FailFindParameter(prmTag, prmValor); break;

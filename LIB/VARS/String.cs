@@ -174,7 +174,19 @@ namespace Dooggy.Lib.Vars
 
             return txt;
         }
-        
+        public static string GetRepetir(string prmTexto, int prmVezes)
+        {
+            string txt = ""; int cont = prmVezes;
+
+            while (cont > 0)
+            {
+                txt += prmTexto;
+
+                cont--;
+            }
+
+            return txt;
+        }
         public static string GetRemove(string prmTexto, string prmParte)
         {
             return (GetSubstituir(prmTexto, prmVelho: prmParte, prmNovo: ""));

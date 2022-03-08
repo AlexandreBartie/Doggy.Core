@@ -31,7 +31,7 @@ namespace Dooggy.Factory.Data
 
         public TestDataLocal Local;
 
-        public TestDataResume Resume;
+        private TestDataResume Resume;
 
         public TestDataTratamento Tratamento;
 
@@ -43,11 +43,12 @@ namespace Dooggy.Factory.Data
         public DataBasesConnection Bases => (Resume.Bases);
         public TestDataConnect Connect => (Resume.Connect);
         public TestDataSource Dados => (Resume.Dados);
+        public TestDataGlobal Global => (Resume.Global);
 
         public TestDataViews Views => (Local.Views);
         public TestDataFlows Flows => (Local.Flows);
         public TestDataRaws Raws => (Local.Raws);
-        public TestResumeVars Vars => (Local.Vars);
+        public TestDataVars Vars => (Local.Vars);
 
         public DataTypesField DataTypes => (Bases.DataTypes);
 
@@ -78,7 +79,12 @@ namespace Dooggy.Factory.Data
 
         public bool AddDataBase(string prmTag, string prmConexao) => Bases.Criar(prmTag, prmConexao, this);
 
-        public string AddDataVar(string prmVar) => Vars.Criar(prmVar, DataBaseCorrente);
+        public string AddGlobalVAR(string prmVar) => Global.Vars.Criar(prmVar);
+        public void SetGlobalVAR(string prmArg, string prmInstrucao) => Global.Vars.SetArgumento(prmArg, prmInstrucao);
+
+        public string AddLocalVAR(string prmVar) => Vars.Criar(prmVar);
+        public void SetLocalVAR(string prmArg, string prmInstrucao) => Vars.SetArgumento(prmArg, prmInstrucao);
+
 
         public string AddDataView(string prmTag) => AddDataView(prmTag, prmMask: "");
         public string AddDataView(string prmTag, string prmMask) => Views.Criar(prmTag, prmMask, DataBaseCorrente);
@@ -88,7 +94,7 @@ namespace Dooggy.Factory.Data
         public void SetDataRaw(string prmOptions) => Raws.SetOptions(prmOptions);
         public void AddDataRaw(string prmArg, string prmInstrucao) => Raws.SetArgumento(prmArg, prmInstrucao);
 
-        public void SetDataVar(string prmArg, string prmInstrucao) => Vars.SetArgumento(prmArg, prmInstrucao);
+
         public void SetDataView(string prmArg, string prmInstrucao) => Views.SetArgumento(prmArg, prmInstrucao);
         public void SetDataFlow(string prmArg, string prmInstrucao) => Flows.SetArgumento(prmArg, prmInstrucao);
 
@@ -117,30 +123,54 @@ namespace Dooggy.Factory.Data
 
         public TestDataSource Dados;
 
-        public TestResumeTags Tags;
+        public TestDataGlobal Global;
 
         public TestDataResume(TestDataPool prmPool)
         {
-            Pool = prmPool; Cleanup();
+            Pool = prmPool; 
 
             Bases = new DataBasesConnection(new DataTypesField());
 
             Connect = new TestDataConnect(prmPool);
 
             Dados = new TestDataSource(prmPool);
+
+            Global = new TestDataGlobal(prmPool);
         }
 
         public void Cleanup()
         {
-            Tags = new TestResumeTags();
+            Global.Cleanup();
         }
+    }
+    public class TestDataGlobal
+    {
+
+        private TestDataPool Pool;
+
+        public TestDataTags Tags;
+
+        public TestDataVars Vars;
+
+        public TestDataGlobal(TestDataPool prmPool)
+        {
+            Pool = prmPool;  Cleanup();
+        }
+
+        public void Cleanup()
+        {
+            Tags = new TestDataTags();
+
+            Vars = new TestDataVars();
+        }
+
     }
     public class TestDataLocal
     {
 
         private TestDataPool Pool;
 
-        public TestResumeVars Vars;
+        public TestDataVars Vars;
         public TestDataRaws Raws;
         public TestDataViews Views;
 
@@ -154,7 +184,7 @@ namespace Dooggy.Factory.Data
         public void Cleanup()
         {
 
-            Vars = new TestResumeVars(Pool);
+            Vars = new TestDataVars();// Pool);
             Raws = new TestDataRaws(Pool);
             Views = new TestDataViews(Pool);
 

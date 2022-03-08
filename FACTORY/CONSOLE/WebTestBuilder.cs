@@ -15,12 +15,15 @@ namespace Dooggy.Factory.Console
         eCommandFail = -1,
 
         eCommandNote = 10,
-        eCommandVar = 11,
-        eCommandTag = 12,
+        eCommandInclude = 11,
 
-        eCommandRaw = 20,
-        eCommandView = 21,
-        eCommandFlow = 22,
+        eCommandTag = 21,
+        eCommandVar = 22,
+
+        eCommandLoc = 30,
+        eCommandRaw = 31,
+        eCommandView = 32,
+        eCommandFlow = 33,
 
         eCommandBreak = 50,
 
@@ -269,10 +272,15 @@ namespace Dooggy.Factory.Console
                     tipo = eTipoTestCommand.eCommandTag;
                     args = "null";
                     break;
-                
+
                 case "var":
-                case "variavel":
                     tipo = eTipoTestCommand.eCommandVar;
+                    args = "sql";
+                    break;
+
+                case "loc":
+                case "local":
+                    tipo = eTipoTestCommand.eCommandLoc;
                     args = "sql";
                     break;
 
@@ -338,6 +346,9 @@ namespace Dooggy.Factory.Console
 
                 case eTipoTestCommand.eCommandVar:
                     return "var";
+
+                case eTipoTestCommand.eCommandLoc:
+                    return "loc";
 
                 case eTipoTestCommand.eCommandRaw:
                     return "data";

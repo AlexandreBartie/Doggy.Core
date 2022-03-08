@@ -107,7 +107,7 @@ namespace Dooggy.Factory.Console
 
         public TestTrace Trace => Dados.Trace;
 
-        public TestDataResume Resume => Console.Pool.Resume;
+        public TestDataGlobal Global => Console.Pool.Global;
 
         private TestDataSource Dados => Console.Dados;
         private TestConsoleInput Input => Console.Input;
@@ -255,7 +255,7 @@ namespace Dooggy.Factory.Console
 
         private TestTrace Trace => Script.Trace;
 
-        private TestResumeTags MainTags => Script.Resume.Tags;
+        private TestDataTags MainTags => Script.Global.Tags;
 
         private string delimitador = "=";
 

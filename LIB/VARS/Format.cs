@@ -14,6 +14,13 @@ namespace Dooggy.Lib.Vars
 
         public static string TextToString(string prmText, string prmFormat) => myText.Get(prmText, prmFormat);
 
+        public static string RandomToString() => RandomToString(prmTamanho: 0);
+        public static string RandomToString(int prmTamanho) => RandomToString(prmDate: DateTime.Now, prmTamanho);
+        public static string RandomToString(DateTime prmDate, int prmTamanho) => prmDate.ToString(GetRandomFormat(prmTamanho));
+
+        public static string TimeToString(string prmFormat) => TimeToString(prmDate: DateTime.Now, prmFormat);
+        public static string TimeToString(DateTime prmDate, string prmFormat) => prmDate.ToString(GetTimeFormat(prmFormat));
+
         public static string DateToString(string prmFormat) => DateToString(prmDate: DateTime.Now, prmFormat);
         public static string DateToString(DateTime prmDate, string prmFormat) => prmDate.ToString(GetDateFormat(prmFormat));
 
@@ -44,6 +51,29 @@ namespace Dooggy.Lib.Vars
 
             return (formato);
 
+        }
+
+        private static string GetTimeFormat(string prmFormato)
+        {
+
+            string formato = prmFormato;
+
+            formato = myString.GetSubstituir(formato, "h", "H");
+            formato = myString.GetSubstituir(formato, "M", "m");
+            formato = myString.GetSubstituir(formato, "S", "s");
+
+            return (formato);
+
+        }
+
+        private static string GetRandomFormat(int prmTamanho)
+        {
+            string formato = "fffssmmhhddMMyyyy";
+
+            if (prmTamanho != 0)
+                return myString.GetFirst(formato, prmTamanho);
+
+            return (formato);
         }
 
     }

@@ -10,7 +10,7 @@ namespace Dooggy.Factory.Data
 {
     public class TestDataTratamento : TestDataFormat
     {
-        private TestResumeVars Vars => Pool.Vars;
+        private TestDataVars Vars => Pool.Vars;
         private TestDataRaws Raws => (Pool.Raws);
         private TestDataViews Views => (Pool.Views);
 

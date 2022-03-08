@@ -338,7 +338,11 @@ public class TestCommandAction
                         break;
 
                     case eTipoTestCommand.eCommandVar:
-                        ActionAddDataVar();
+                        ActionAddGlobalVAR();
+                        break;
+
+                    case eTipoTestCommand.eCommandLoc:
+                        ActionAddLocalVAR();
                         break;
 
                     case eTipoTestCommand.eCommandRaw:
@@ -389,7 +393,11 @@ public class TestCommandAction
                     break;
 
                 case eTipoTestCommand.eCommandVar:
-                    ActionSetDataVar(prmArg, prmInstrucao);
+                    ActionSetGlobalVAR(prmArg, prmInstrucao);
+                    break;
+
+                case eTipoTestCommand.eCommandLoc:
+                    ActionSetLocalVAR(prmArg, prmInstrucao);
                     break;
 
                 case eTipoTestCommand.eCommandRaw:
@@ -411,8 +419,11 @@ public class TestCommandAction
 
         private void ActionSetDataTag(string prmInstrucao) => Script.SetTag(prmInstrucao);
 
-        private void ActionAddDataVar() => Pool.AddDataVar(prmVar: target);
-        private void ActionSetDataVar(string prmArg, string prmInstrucao) => Pool.SetDataVar(prmArg, prmInstrucao);
+        private void ActionAddGlobalVAR() => Pool.AddGlobalVAR(prmVar: target);
+        private void ActionSetGlobalVAR(string prmArg, string prmInstrucao) => Pool.SetGlobalVAR(prmArg, prmInstrucao);
+
+        private void ActionAddLocalVAR() => Pool.AddLocalVAR(prmVar: target);
+        private void ActionSetLocalVAR(string prmArg, string prmInstrucao) => Pool.SetLocalVAR(prmArg, prmInstrucao);
 
         private void ActionSetDataRaw(string prmOptions) => Pool.SetDataRaw(prmOptions);
         private void ActionAddDataRaw(string prmArg, string prmInstrucao) => Pool.AddDataRaw(prmArg, prmInstrucao);
