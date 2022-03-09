@@ -5,8 +5,10 @@ using System.Text;
 
 namespace Dooggy.Lib.Generic
 {
+
     public static class Bloco
     {
+
         public static string GetBloco(string prmTexto, string prmDelimitador) => GetBloco(prmTexto, prmDelimitador, prmDelimitador);
         public static string GetBloco(string prmTexto, string prmDelimitador, bool prmPreserve) => GetBloco(prmTexto, prmDelimitador, prmDelimitador, prmPreserve);
         public static string GetBloco(string prmTexto, string prmDelimitadorInicial, string prmDelimitadorFinal) => GetBloco(prmTexto, prmDelimitadorInicial, prmDelimitadorFinal, prmPreserve: false);
@@ -132,6 +134,18 @@ namespace Dooggy.Lib.Generic
             return (texto);
 
         }
+
+    }
+
+    public static class BlocoParametro
+    {
+
+        public static bool TemParametro(string prmTexto) => myString.IsFull(GetParametro(prmTexto));
+
+        public static string GetParametro(string prmTexto) => Bloco.GetBloco(prmTexto, prmDelimitadorInicial: "[", prmDelimitadorFinal: "]").Trim();
+
+        public static string GetPrefixo(string prmTexto) => Bloco.GetBlocoAntes(prmTexto, prmDelimitador: "[");
+        public static string GetSufixo(string prmTexto) => Bloco.GetBlocoDepois(prmTexto, prmDelimitador: "]");
 
     }
 

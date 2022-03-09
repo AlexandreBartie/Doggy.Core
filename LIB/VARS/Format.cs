@@ -12,11 +12,30 @@ namespace Dooggy.Lib.Vars
 
         private static string mark_csv = @"""";
 
+        private static string mark_random_inicial = "[";
+
+
         public static string TextToString(string prmText, string prmFormat) => myText.Get(prmText, prmFormat);
 
-        public static string RandomToString() => RandomToString(prmTamanho: 0);
-        public static string RandomToString(int prmTamanho) => RandomToString(prmDate: DateTime.Now, prmTamanho);
-        public static string RandomToString(DateTime prmDate, int prmTamanho) => prmDate.ToString(GetRandomFormat(prmTamanho));
+        public static string RandomToString() => RandomToString(prmFormat: "");
+        public static string RandomToString(string prmFormat) => RandomToString(prmDate: DateTime.Now, prmFormat);
+        public static string RandomToString(DateTime prmDate, string prmFormat)
+        {
+
+            string prefixo = ""; string parametro; int tamanho;
+
+            if (BlocoParametro.TemParametro(prmFormat))
+            {
+                prefixo = BlocoParametro.GetPrefixo(prmFormat);
+                parametro = BlocoParametro.GetParametro(prmFormat);
+            }
+            else
+                parametro = prmFormat;
+
+            tamanho = myInt.GetNumero(parametro, prmPadrao: 0);
+
+            return prefixo + prmDate.ToString(GetRandomFormat(tamanho));
+        }
 
         public static string TimeToString(string prmFormat) => TimeToString(prmDate: DateTime.Now, prmFormat);
         public static string TimeToString(DateTime prmDate, string prmFormat) => prmDate.ToString(GetTimeFormat(prmFormat));

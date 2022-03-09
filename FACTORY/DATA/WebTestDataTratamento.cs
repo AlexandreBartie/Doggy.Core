@@ -143,17 +143,24 @@ namespace Dooggy.Factory.Data
                 case "now":
                 case "today":
                     return GetDataDinamica(prmParametro);
+
+                case "random":
+                    return GetNumberRandom(prmParametro);
             }
 
             return ("");
         }
         private string GetDataDinamica(string prmParametro)
         {
-            return (myDate.View(prmDate: anchor, prmSintaxe: prmParametro));
+            return myDate.View(prmDate: anchor, prmSintaxe: prmParametro);
         }
         private string GetDataEstatica(string prmParametro)
         {
-            return (myDate.Static(prmDate: anchor, prmFormato: prmParametro));
+            return myDate.Static(prmDate: anchor, prmFormato: prmParametro);
+        }
+        private string GetNumberRandom(string prmParametro)
+        {
+            return myFormat.RandomToString(prmDate: anchor, prmParametro);
         }
     }
     public class TestDataFormat : TestDataException

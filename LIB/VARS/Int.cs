@@ -36,7 +36,8 @@ namespace Dooggy.Lib.Vars
             return (-prmValor);
 
         }
-        public static int GetNumero(string prmValor)
+        public static int GetNumero(string prmValor) => GetNumero(prmValor, prmPadrao: -1);
+        public static int GetNumero(string prmValor, int prmPadrao)
         {
             try
             {
@@ -45,7 +46,7 @@ namespace Dooggy.Lib.Vars
             }
             catch
             { }
-            return (-1);
+            return (prmPadrao);
 
         }
         public static bool IsNumero(string prmValor)
