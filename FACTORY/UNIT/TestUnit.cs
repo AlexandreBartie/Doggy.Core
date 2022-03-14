@@ -1,10 +1,10 @@
-﻿using Dooggy.FACTORY.UNIT;
-using Dooggy.Lib.Generic;
+﻿using BlueRocket.CORE.FACTORY.UNIT;
+using BlueRocket.CORE.Lib.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 
-namespace Dooggy.FACTORY.UNIT
+namespace BlueRocket.CORE.FACTORY.UNIT
 {
 
     public class UTC

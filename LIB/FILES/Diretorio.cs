@@ -1,14 +1,14 @@
-﻿using Dooggy.Lib.Files;
-using Dooggy;
+﻿using BlueRocket.CORE.Lib.Files;
+using BlueRocket.CORE;
 using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Dooggy.Lib.Vars;
-using Dooggy.Lib.Generic;
+using BlueRocket.CORE.Lib.Vars;
+using BlueRocket.CORE.Lib.Generic;
 
-namespace Dooggy.Lib.Files
+namespace BlueRocket.CORE.Lib.Files
 {
 
     public class Path

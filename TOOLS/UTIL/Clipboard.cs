@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
 
-namespace Dooggy.Tools.Util
+namespace BlueRocket.CORE.Tools.Util
 {
     public class myClipBoard
     {

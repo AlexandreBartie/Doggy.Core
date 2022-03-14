@@ -1,13 +1,13 @@
-﻿using Dooggy.Factory;
-using Dooggy.Factory.Console;
-using Dooggy.Factory.Data;
-using Dooggy.Lib.Generic;
-using Dooggy.Lib.Vars;
+﻿using BlueRocket.CORE.Factory;
+using BlueRocket.CORE.Factory.Console;
+using BlueRocket.CORE.Factory.Data;
+using BlueRocket.CORE.Lib.Generic;
+using BlueRocket.CORE.Lib.Vars;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Dooggy.Factory.Console
+namespace BlueRocket.CORE.Factory.Console
 {
 
     public class TestCode
@@ -334,6 +334,10 @@ public class TestCommandAction
                     case eTipoTestCommand.eCommandNote:
                         break;
 
+                    case eTipoTestCommand.eCommandDB:
+                        ActionCommandDB(prmCommand: Sintaxe.target);
+                        break;
+
                     case eTipoTestCommand.eCommandTag:
                         break;
 
@@ -434,6 +438,7 @@ public class TestCommandAction
         private void ActionAddDataFlow() => Dados.AddDataFlow(prmTag: target);
         private void ActionSetDataFlow(string prmArg, string prmInstrucao) => Pool.SetDataFlow(prmArg, prmInstrucao);
 
+        private void ActionCommandDB(string prmCommand) => Script.CommandDB(prmCommand);
         private void ActionScriptSave() => Script.Save(prmOptions: Sintaxe.options);
         private void ActionScriptBreak() => Script.Break(Sintaxe.options);
 

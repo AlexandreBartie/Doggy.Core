@@ -1,9 +1,9 @@
-﻿using Dooggy;
-using Dooggy.Factory.Console;
-using Dooggy.Factory.Data;
-using Dooggy.Factory.Robot;
-using Dooggy.Lib.Generic;
-using Dooggy.Lib.Parse;
+﻿using BlueRocket.CORE;
+using BlueRocket.CORE.Factory.Console;
+using BlueRocket.CORE.Factory.Data;
+using BlueRocket.CORE.Factory.Robot;
+using BlueRocket.CORE.Lib.Generic;
+using BlueRocket.CORE.Lib.Parse;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace Dooggy.Factory
+namespace BlueRocket.CORE.Factory
 {
     public class TestFactory
     {

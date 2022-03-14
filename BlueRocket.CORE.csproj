@@ -4,25 +4,29 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
-    <ApplicationIcon>MyDooggy.ico</ApplicationIcon>
+    <ApplicationIcon>Rocket.ico</ApplicationIcon>
     <StartupObject></StartupObject>
     <Authors>Alexandre Bartie</Authors>
-    <Product>DOOGGY FRAMEWORK</Product>
-    <AssemblyName>Dooggy</AssemblyName>
-    <RootNamespace>Dooggy</RootNamespace>
+    <Product>BlueRocket.CORE FRAMEWORK</Product>
+    <AssemblyName>BlueRocket.CORE</AssemblyName>
+    <RootNamespace>BlueRocket.CORE</RootNamespace>
     <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
-    <Version>1.1.4</Version>
+    <Version>0.0.6</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageProjectUrl></PackageProjectUrl>
-    <PackageIcon>MyDooggy.jpg</PackageIcon>
+    <PackageIcon>Rocket.png</PackageIcon>
     <PackageIconUrl />
-    <RepositoryUrl>https://github.com/AlexandreBartie/Dooggy</RepositoryUrl>
+    <RepositoryUrl>https://github.com/AlexandreBartie/BlueRocket.CORE</RepositoryUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Rocket.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeCoverage" Version="17.0.0" />
@@ -38,9 +42,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="MyDooggy.jpg">
+    <None Update="Rocket.png">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath>\</PackagePath>
     </None>
   </ItemGroup>
 

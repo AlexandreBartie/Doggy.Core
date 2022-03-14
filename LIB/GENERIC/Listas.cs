@@ -4,10 +4,10 @@ using System.Diagnostics;
 using System.Text;
 using Microsoft.VisualBasic.FileIO;
 using System.Linq;
-using Dooggy.Lib.Parse;
-using Dooggy.Lib.Vars;
+using BlueRocket.CORE.Lib.Parse;
+using BlueRocket.CORE.Lib.Vars;
 
-namespace Dooggy.Lib.Generic
+namespace BlueRocket.CORE.Lib.Generic
 {
     public class xLista : List<string>
     {

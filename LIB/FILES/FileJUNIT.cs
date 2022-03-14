@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
-using Dooggy.Lib.Parse;
-using Dooggy;
-using Dooggy.Lib.Generic;
+using BlueRocket.CORE.Lib.Parse;
+using BlueRocket.CORE;
+using BlueRocket.CORE.Lib.Generic;
 
-namespace Dooggy.Lib.Files
+namespace BlueRocket.CORE.Lib.Files
 {
     public class FileJUNIT : FileTXT
     {

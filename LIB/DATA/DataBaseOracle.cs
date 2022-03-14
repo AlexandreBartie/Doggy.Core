@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Dooggy.Lib.Data
+namespace BlueRocket.CORE.Lib.Data
 {
 
     public class DataBaseConnectOracle

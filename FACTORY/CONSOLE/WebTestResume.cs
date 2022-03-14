@@ -1,12 +1,12 @@
-﻿using Dooggy.Factory.Data;
-using Dooggy.Lib.Data;
-using Dooggy.Lib.Generic;
-using Dooggy.Lib.Vars;
+﻿using BlueRocket.CORE.Factory.Data;
+using BlueRocket.CORE.Lib.Data;
+using BlueRocket.CORE.Lib.Generic;
+using BlueRocket.CORE.Lib.Vars;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Dooggy.Factory.Data
+namespace BlueRocket.CORE.Factory.Data
 {
 
     public class TestDataTag : myDominio

@@ -1,13 +1,14 @@
-﻿using Dooggy.Factory.Data;
-using Dooggy;
+﻿using BlueRocket.CORE.Factory.Data;
+using BlueRocket.CORE;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
-using Dooggy.Lib.Vars;
-using Dooggy.Lib.Generic;
+using BlueRocket.CORE.Lib.Vars;
+using BlueRocket.CORE.Lib.Generic;
+using BlueRocket.CORE.Lib.Data;
 
-namespace Dooggy.Factory.Console
+namespace BlueRocket.CORE.Factory.Console
 {
     public class TestScripts : List<TestScript>
     {
@@ -142,8 +143,8 @@ namespace Dooggy.Factory.Console
         public void SetCode(string prmCode) => Result.SetCode(prmCode);
         public void Play(string prmCode, string prmArquivoOUT) => Code.Play(prmCode, prmArquivoOUT);
 
-        public void AddLogItem(TestTraceMsg prmMsg) => Result.AddLogItem(prmTipo: prmMsg.tipo, prmTexto: prmMsg.texto);
-        public void AddLogSQL(TestTraceMsg prmMsg) => Result.AddLogSQL(prmSQL: prmMsg.texto, prmTimeElapsed: prmMsg.time_elapsed);
+        public void AddLogItem(TestTraceMsg prmMsg) => Result.AddLogItem(prmTipo: prmMsg.tipo, prmTrace: prmMsg.texto);
+        public void AddLogSQL(TestTraceMsg prmMsg) => Result.AddLogSQL(prmTrace: prmMsg.texto, prmSQL: prmMsg.sql, prmTimeElapsed: prmMsg.time_elapsed);
     }
 
     public class TestScritpBreak : TestScriptSave
@@ -183,7 +184,6 @@ namespace Dooggy.Factory.Console
 
         public TestResult Result;
 
-
         public eTipoFileFormat tipo;
 
         public string encoding;
@@ -193,6 +193,8 @@ namespace Dooggy.Factory.Console
 
         private TestConfigPath Path => Console.Config.Path;
         private TestConsoleOutput Output => Console.Output;
+
+        public bool CommandDB(string prmCommand) => Console.Bases.ExecuteNoSQL(prmCommand, prmTimeOut: Console.Config.Connect.timeoutSQL);
 
         public void Save(string prmOptions)
         { 

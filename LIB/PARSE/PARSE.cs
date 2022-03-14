@@ -1,10 +1,10 @@
-﻿using Dooggy;
-using Dooggy.Lib.Generic;
+﻿using BlueRocket.CORE;
+using BlueRocket.CORE.Lib.Generic;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Dooggy.Lib.Parse
+namespace BlueRocket.CORE.Lib.Parse
 {
     public class xParseCSV : xMemo
     {

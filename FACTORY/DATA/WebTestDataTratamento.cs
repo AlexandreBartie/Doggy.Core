@@ -1,12 +1,12 @@
-﻿using Dooggy.Factory.Console;
-using Dooggy.Lib.Generic;
-using Dooggy.Lib.Parse;
-using Dooggy.Lib.Vars;
+﻿using BlueRocket.CORE.Factory.Console;
+using BlueRocket.CORE.Lib.Generic;
+using BlueRocket.CORE.Lib.Parse;
+using BlueRocket.CORE.Lib.Vars;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Dooggy.Factory.Data
+namespace BlueRocket.CORE.Factory.Data
 {
     public class TestDataTratamento : TestDataFormat
     {

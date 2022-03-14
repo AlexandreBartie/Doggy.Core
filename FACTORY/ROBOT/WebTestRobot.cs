@@ -4,15 +4,15 @@ using System.Drawing;
 using System.Diagnostics;
 using OpenQA.Selenium;
 using System.Collections.ObjectModel;
-using Dooggy.Lib.Parse;
-using Dooggy.Lib.Files;
-using Dooggy;
-using Dooggy.Factory.Data;
-using Dooggy.Factory;
+using BlueRocket.CORE.Lib.Parse;
+using BlueRocket.CORE.Lib.Files;
+using BlueRocket.CORE;
+using BlueRocket.CORE.Factory.Data;
+using BlueRocket.CORE.Factory;
 using OpenQA.Selenium.Chrome;
-using Dooggy.Lib.Generic;
+using BlueRocket.CORE.Lib.Generic;
 
-namespace Dooggy.Factory.Robot
+namespace BlueRocket.CORE.Factory.Robot
 {
     public enum eTipoElemento : int
     {

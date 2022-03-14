@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DOOGGY", "DOOGGY.csproj", "{488F7112-6C43-4177-AB1F-FF3F69F841A0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlueRocket.CORE", "BlueRocket.CORE.csproj", "{488F7112-6C43-4177-AB1F-FF3F69F841A0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DOOGGY-QA", "..\DOOGGY-QA\DOOGGY-QA.csproj", "{CA5D4472-FF5A-4C5B-89F8-D0997835E52B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlueRocket.CORE.QA", "..\CORE-QA\BlueRocket.CORE.QA.csproj", "{59F95408-E817-425E-A2A1-8345A73445FC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{488F7112-6C43-4177-AB1F-FF3F69F841A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{488F7112-6C43-4177-AB1F-FF3F69F841A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{488F7112-6C43-4177-AB1F-FF3F69F841A0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CA5D4472-FF5A-4C5B-89F8-D0997835E52B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CA5D4472-FF5A-4C5B-89F8-D0997835E52B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CA5D4472-FF5A-4C5B-89F8-D0997835E52B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CA5D4472-FF5A-4C5B-89F8-D0997835E52B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59F95408-E817-425E-A2A1-8345A73445FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59F95408-E817-425E-A2A1-8345A73445FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59F95408-E817-425E-A2A1-8345A73445FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59F95408-E817-425E-A2A1-8345A73445FC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

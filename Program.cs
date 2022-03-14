@@ -1,11 +1,11 @@
-using Dooggy.Factory;
-using Dooggy.Factory.Robot;
-using Dooggy.POC.AutomacaoTestes;
+using BlueRocket.CORE.Factory;
+using BlueRocket.CORE.Factory.Robot;
+using BlueRocket.CORE.POC.AutomacaoTestes;
 using System;
 using System.Data.SqlClient;
 using System.Windows.Forms;
 
-namespace Dooggy
+namespace BlueRocket.CORE
 {
     static class Program
     {

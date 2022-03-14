@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Forms;
 using System.Text;
-using Dooggy.Factory.Robot;
-using Dooggy.Factory;
+using BlueRocket.CORE.Factory.Robot;
+using BlueRocket.CORE.Factory;
 
-namespace Dooggy.POC.AutomacaoTestes
+namespace BlueRocket.CORE.POC.AutomacaoTestes
 {
     public class POC_AutomacaoTestesScripts : TestRobotProject
     {

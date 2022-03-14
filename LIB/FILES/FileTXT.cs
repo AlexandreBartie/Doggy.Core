@@ -3,9 +3,9 @@ using System.Diagnostics;
 using System.Windows.Forms;
 using System.Text;
 using System.IO;
-using Dooggy.Lib.Vars;
+using BlueRocket.CORE.Lib.Vars;
 
-namespace Dooggy.Lib.Files
+namespace BlueRocket.CORE.Lib.Files
 {
     public class FileTXT
     {

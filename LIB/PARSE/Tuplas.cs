@@ -1,10 +1,10 @@
-﻿using Dooggy.Lib.Generic;
-using Dooggy.Lib.Vars;
+﻿using BlueRocket.CORE.Lib.Generic;
+using BlueRocket.CORE.Lib.Vars;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Dooggy.Lib.Parse
+namespace BlueRocket.CORE.Lib.Parse
 {
     public class myTupla
     {

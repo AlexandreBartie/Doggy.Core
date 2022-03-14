@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using Dooggy.Factory.Robot;
+using BlueRocket.CORE.Factory.Robot;
 using OpenQA.Selenium;
 
-namespace Dooggy.WebTestes
+namespace BlueRocket.CORE.WebTestes
 {
     public class FindElementTeste : TestRobotScript
     {

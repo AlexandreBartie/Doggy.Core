@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Text.Json;
 using System.Diagnostics;
-using Dooggy;
-using Dooggy.Lib.Generic;
+using BlueRocket.CORE;
+using BlueRocket.CORE.Lib.Generic;
 
-namespace Dooggy.Lib.Parse
+namespace BlueRocket.CORE.Lib.Parse
 {
     public class myJSON
     {

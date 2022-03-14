@@ -1,15 +1,15 @@
-﻿using Dooggy;
-using Dooggy.Factory;
-using Dooggy.Factory.Data;
-using Dooggy.Lib.Data;
-using Dooggy.Lib.Generic;
-using Dooggy.Lib.Parse;
-using Dooggy.Lib.Vars;
+﻿using BlueRocket.CORE;
+using BlueRocket.CORE.Factory;
+using BlueRocket.CORE.Factory.Data;
+using BlueRocket.CORE.Lib.Data;
+using BlueRocket.CORE.Lib.Generic;
+using BlueRocket.CORE.Lib.Parse;
+using BlueRocket.CORE.Lib.Vars;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Dooggy.Factory.Data
+namespace BlueRocket.CORE.Factory.Data
 {
     public class TestDataView : TestDataViewSQL
     {
@@ -79,7 +79,7 @@ namespace Dooggy.Factory.Data
             get
             {
                 if (_cursor == null)
-                    _cursor = new DataCursorConnection(GetSQL(), GetMaskMerged(), DataBase);
+                    _cursor = DataBase.GetCursor(prmSQL: GetSQL(), prmMask: GetMaskMerged()); // new DataCursorConnection(GetSQL(), GetMaskMerged(), DataBase);
 
                 return (_cursor);
             }

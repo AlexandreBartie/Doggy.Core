@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Dooggy.Lib.Data
+namespace BlueRocket.CORE.Lib.Data
 {
     public class DataBaseConnectVirtual
     {
@@ -17,22 +17,38 @@ namespace Dooggy.Lib.Data
         public OracleConnection GetConnection => conexao;
 
         public void Open() => conexao.Open();
+
         public void Close() => conexao.Close();
+
+        public bool Execute(string prmNoSQL, int prmTimeOut)
+        {
+            DataCommandVirtual Command = new DataCommandVirtual(prmNoSQL, this, prmTimeOut);
+
+            return Command.GetNoResults();
+        }
+
     }
 
     public class DataCommandVirtual
     {
 
-        private OracleCommand query;
+        private OracleCommand command;
 
         public DataCommandVirtual(string prmSQL, DataBaseConnectVirtual prmConnect, int prmTimeOut)
         {
-            query = new OracleCommand(prmSQL, prmConnect.GetConnection);
+            command = new OracleCommand(prmSQL, prmConnect.GetConnection);
 
-            query.CommandTimeout = prmTimeOut;
+            command.CommandTimeout = prmTimeOut;
         }
 
-        public DataReaderVirtual GetReader() => new DataReaderVirtual(query);
+        public bool GetNoResults()
+        {
+            int result = command.ExecuteNonQuery();
+
+            return result == -1;
+        }
+
+        public DataReaderVirtual GetReader() => new DataReaderVirtual(command);
 
     }
 
@@ -41,13 +57,13 @@ namespace Dooggy.Lib.Data
 
         private OracleDataReader reader;
 
-        private OracleCommand query;
+        private OracleCommand command;
 
-        public DataReaderVirtual(OracleCommand prmQuery)
+        public DataReaderVirtual(OracleCommand prmCommand)
         {
-            query = prmQuery;
+            command = prmCommand;
 
-            reader = query.ExecuteReader();
+            reader = command.ExecuteReader();
         }
 
         public bool IsDBNull(int prmIndice) => reader.IsDBNull(prmIndice);

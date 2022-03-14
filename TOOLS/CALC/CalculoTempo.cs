@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
-namespace Dooggy.Tools.Calc
+namespace BlueRocket.CORE.Tools.Calc
 {
     public class Cronometro
     {

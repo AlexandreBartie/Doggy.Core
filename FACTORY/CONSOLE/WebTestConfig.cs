@@ -1,16 +1,16 @@
-﻿using Dooggy.Factory.Data;
-using Dooggy.Lib.Data;
-using Dooggy.Lib.Files;
-using Dooggy;
+﻿using BlueRocket.CORE.Factory.Data;
+using BlueRocket.CORE.Lib.Data;
+using BlueRocket.CORE.Lib.Files;
+using BlueRocket.CORE;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Dooggy.Lib.Generic;
-using Dooggy.Lib.Vars;
-using Dooggy.Tools.Calc;
+using BlueRocket.CORE.Lib.Generic;
+using BlueRocket.CORE.Lib.Vars;
+using BlueRocket.CORE.Tools.Calc;
 using System.Globalization;
 
-namespace Dooggy.Factory.Console
+namespace BlueRocket.CORE.Factory.Console
 {
     public class TestConsoleConfig
     {
@@ -23,7 +23,7 @@ namespace Dooggy.Factory.Console
 
         public TestConfigCSV CSV;
         public TestConfigPath Path;
-        public TestConfigTimeout Timeout;
+        public TestConfigConnect Connect;
 
         public TestConfigMain Main;
 
@@ -52,7 +52,7 @@ namespace Dooggy.Factory.Console
 
             Path = new TestConfigPath(this);
 
-            Timeout = new TestConfigTimeout(this);
+            Connect = new TestConfigConnect(this);
 
             Main = new TestConfigMain(this);
 
@@ -85,7 +85,7 @@ namespace Dooggy.Factory.Console
 
             if (Console.IsDbOK)
             {
-                status.Add(Timeout.log); status.Add(CSV.log); status.Add(Path.log);
+                status.Add(Connect.log); status.Add(CSV.log); status.Add(Path.log);
 
             }
 
@@ -96,25 +96,40 @@ namespace Dooggy.Factory.Console
         }
 
     }
-    public class TestConfigTimeout
+    public class TestConfigConnect
     {
 
         private TestConsoleConfig Config;
 
-        public int connect_timeout = 30;
-        public int command_timeout = 20;
+        private xLinhas SetupDB;
 
-        public TestConfigTimeout(TestConsoleConfig prmConfig)
+        public int timeoutDB = 30;
+        public int timeoutSQL = 20;
+
+        public TestConfigConnect(TestConsoleConfig prmConfig)
         {
-            Config = prmConfig;
+            Config = prmConfig; SetupDB = new xLinhas();
         }
 
-        public void SetConnectTimeOut(int prmSegundos) => connect_timeout = prmSegundos;
-        public void SetCommandTimeOut(int prmSegundos) => command_timeout = prmSegundos;
+        public void SetSetup(string prmCommand) => SetupDB.Add(prmCommand);
 
-        private string txtconnectTimeout() => String.Format("-connectDB: {0}", connect_timeout);
-        private string txtcommandTimeout() => String.Format("-commandSQL: {0}", command_timeout);
-        public string log => String.Format(">timeout: {0}, {1}", txtconnectTimeout(), txtcommandTimeout());
+        public void SetTimeOutDB(int prmSegundos) => timeoutDB = prmSegundos;
+        public void SetTimeOutSQL(int prmSegundos) => timeoutSQL = prmSegundos;
+
+        public string GetSetupDB()
+        {
+            xLinhas commands = new xLinhas();
+
+            foreach (string linha in SetupDB)
+                commands.Add(string.Format(">db: {0}",linha));
+
+            return commands.memo;
+        }
+
+        private string txtSetup => String.Format("-setup: {0}", SetupDB.Export(" | "));
+        private string txtTimeOutDB => String.Format("-timeoutDB: {0}", timeoutDB);
+        private string txtTimeOutSQL => String.Format("-timeoutSQL: {0}", timeoutSQL);
+        public string log => String.Format(">connect: {0}, {1}, {2}", txtSetup, txtTimeOutDB, txtTimeOutSQL);
 
     }
 
@@ -371,7 +386,8 @@ namespace Dooggy.Factory.Console
 
         private FileTXT File;
 
-        private string pathCFG;
+        public string nome_CFG;
+        public string path_CFG;
 
         private string var_pathCFG = "#(PathArquivoCFG)";
 
@@ -419,7 +435,7 @@ namespace Dooggy.Factory.Console
             {
 
                 if (prmMain)
-                    pathCFG = File.path;
+                { path_CFG = File.path; nome_CFG = File.nome;  }
 
                 if (Parse(prmBloco: File.txt()))
                 { Trace.LogConfig.LoadConfig(prmFile: File); return true; }
@@ -466,10 +482,10 @@ namespace Dooggy.Factory.Console
             tag = Bloco.GetBloco(linha, prmDelimitadorInicial: prefixo_parametro, prmDelimitadorFinal: delimitador).Trim().ToLower();
             valor = Bloco.GetBlocoDepois(linha, delimitador, prmTRIM: true);
 
-            sigla = Bloco.GetBloco(tag, prmDelimitadorInicial: "[", prmDelimitadorFinal: "]").Trim().ToLower();
+            sigla = BlocoParametro.GetParametro(tag).ToLower();
 
             if (sigla != "")
-                tag = Bloco.GetBlocoAntes(tag, prmDelimitador: "[",prmTRIM: true).ToLower();
+                tag = BlocoParametro.GetPrefixo(tag).ToLower();
 
             switch (grupo)
             {
@@ -480,8 +496,8 @@ namespace Dooggy.Factory.Console
                 case "dbase":
                     SetGroupDBase(tag, sigla, valor); break;
 
-                case "timeout":
-                    SetGroupTimeout(tag, valor); break;
+                case "connect":
+                    SetGroupConnect(tag, valor); break;
 
                 case "csv":
                     SetGroupCSV(tag, valor); break;
@@ -498,7 +514,7 @@ namespace Dooggy.Factory.Console
         private void SetGroupPath(string prmTag, string prmValor)
         {
 
-            string path = myString.GetSubstituir(prmValor, var_pathCFG, pathCFG);
+            string path = myString.GetSubstituir(prmValor, var_pathCFG, path_CFG);
             
             switch (prmTag)
             {
@@ -529,15 +545,18 @@ namespace Dooggy.Factory.Console
                     Trace.LogConfig.FailFindParameter(prmSigla, prmValor); break;
             }
         }
-        private void SetGroupTimeout(string prmTag, string prmValor)
+        private void SetGroupConnect(string prmTag, string prmValor)
         {
             switch (prmTag)
             {
-                case "connectdb":
-                    Config.Timeout.SetConnectTimeOut(myInt.GetNumero(prmValor)); break;
+                case "setup":
+                    Config.Connect.SetSetup(prmValor); break;
 
-                case "commandsql":
-                    Config.Timeout.SetCommandTimeOut(myInt.GetNumero(prmValor)); break;
+                case "timeoutdb":
+                    Config.Connect.SetTimeOutDB(myInt.GetNumero(prmValor)); break;
+
+                case "timeoutsql":
+                    Config.Connect.SetTimeOutSQL(myInt.GetNumero(prmValor)); break;
 
                 default:
                     Trace.LogConfig.FailFindParameter(prmTag, prmValor); break;

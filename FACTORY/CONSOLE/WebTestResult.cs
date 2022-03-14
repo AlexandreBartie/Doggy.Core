@@ -1,12 +1,12 @@
-﻿using Dooggy;
-using Dooggy.Factory;
-using Dooggy.Lib.Generic;
-using Dooggy.Lib.Vars;
+﻿using BlueRocket.CORE;
+using BlueRocket.CORE.Factory;
+using BlueRocket.CORE.Lib.Generic;
+using BlueRocket.CORE.Lib.Vars;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Dooggy.Factory.Console
+namespace BlueRocket.CORE.Factory.Console
 {
     public class TestResult
     {
@@ -59,8 +59,8 @@ namespace Dooggy.Factory.Console
         public void LogStart(string prmArquivoOUT) { Log.Start(); name_OUT = prmArquivoOUT; IsDataSaved = false; }
         public void LogStop() => Log.Stop();
 
-        public void AddLogItem(string prmTipo, string prmTexto) => Log.AddItem(prmTipo, prmTexto);
-        public void AddLogSQL(string prmSQL, long prmTimeElapsed) => Log.AddSQL(prmSQL, prmTimeElapsed);
+        public void AddLogItem(string prmTipo, string prmTrace) => Log.AddItem(prmTipo, prmTrace);
+        public void AddLogSQL(string prmTrace, string prmSQL, long prmTimeElapsed) => Log.AddSQL(prmTrace, prmSQL, prmTimeElapsed);
         public void SetSave(string prmCode) { _codeZero = prmCode; SetCode(_codeZero); }
         public void SetCode(string prmCode) => _code = prmCode;
         public void SetData(string prmData) { _data = prmData; IsDataSaved = true; }
@@ -93,24 +93,24 @@ namespace Dooggy.Factory.Console
         }
 
         public void Start() { Clear(); ativo = true; }
-        public void AddItem(string prmTipo, string prmTexto)
+        public void AddItem(string prmTipo, string prmTrace)
         {
             if (ativo)
             {
 
-                TestItemLog item = new TestItemLog(prmTipo, prmTexto);
+                TestItemLog item = new TestItemLog(prmTipo, prmTrace);
 
                 Main.Add(item);
 
             }
 
         }
-        public void AddSQL(string prmSQL, long prmTimeElapsed)
+        public void AddSQL(string prmTrace, string prmSQL, long prmTimeElapsed)
         {
             if (ativo)
             {
 
-                TestItemLog item = new TestItemLog(prmSQL, prmTimeElapsed);
+                TestItemLog item = new TestItemLog(prmTrace, prmSQL, prmTimeElapsed);
 
                 SQL.Add(item);
 
@@ -124,15 +124,17 @@ namespace Dooggy.Factory.Console
     public class TestResultMain : TestResultBase
     {
 
-        public TestResultBase Err => GetErr();
+        public TestResultBase Err => GetFiltro(prmTipo: "ERRO");
 
-        private TestResultBase GetErr()
+        public TestResultBase Filtro(string prmTipo) => GetFiltro(prmTipo);
+
+        private TestResultBase GetFiltro(string prmTipo)
         {
 
             TestResultBase result = new TestResultBase();
 
             foreach (TestItemLog item in this)
-                if (item.IsErr)
+                if (item.IsEqual(prmTipo))
                     result.Add(item);
 
             return (result);
@@ -150,7 +152,7 @@ namespace Dooggy.Factory.Console
             xMemo log = new xMemo();
 
             foreach (TestItemLog item in this)
-                log.Add(item.time);
+                log.Add(item.key);
 
             return (log.memo_ext);
         }

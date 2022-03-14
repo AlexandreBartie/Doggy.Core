@@ -1,9 +1,9 @@
-﻿using Dooggy.Factory.Robot;
+﻿using BlueRocket.CORE.Factory.Robot;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Dooggy.BookRoom
+namespace BlueRocket.CORE.BookRoom
 {
 
     public class BookRoomTeste : TestRobotScript

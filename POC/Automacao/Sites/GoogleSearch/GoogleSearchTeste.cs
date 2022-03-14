@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
-using Dooggy.Factory.Robot;
-using Dooggy.Lib.Files;
-using Dooggy;
+using BlueRocket.CORE.Factory.Robot;
+using BlueRocket.CORE.Lib.Files;
+using BlueRocket.CORE;
 
-namespace Dooggy.GoogleSearch
+namespace BlueRocket.CORE.GoogleSearch
 {
     public class GoogleSearchTextoTeste : TestRobotScript
     {

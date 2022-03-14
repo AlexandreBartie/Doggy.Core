@@ -1,10 +1,10 @@
-﻿using Dooggy.Lib.Generic;
-using Dooggy.Lib.Vars;
+﻿using BlueRocket.CORE.Lib.Generic;
+using BlueRocket.CORE.Lib.Vars;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Dooggy.FACTORY.UNIT
+namespace BlueRocket.CORE.FACTORY.UNIT
 {
     public static class TestUnityLog
     {

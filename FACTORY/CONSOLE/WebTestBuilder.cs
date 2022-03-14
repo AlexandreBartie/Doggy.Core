@@ -1,13 +1,13 @@
-﻿using Dooggy.Factory;
-using Dooggy.Factory.Console;
-using Dooggy;
+﻿using BlueRocket.CORE.Factory;
+using BlueRocket.CORE.Factory.Console;
+using BlueRocket.CORE;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Dooggy.Lib.Generic;
-using Dooggy.Lib.Vars;
+using BlueRocket.CORE.Lib.Generic;
+using BlueRocket.CORE.Lib.Vars;
 
-namespace Dooggy.Factory.Console
+namespace BlueRocket.CORE.Factory.Console
 {
 
     public enum eTipoTestCommand : int
@@ -16,6 +16,7 @@ namespace Dooggy.Factory.Console
 
         eCommandNote = 10,
         eCommandInclude = 11,
+        eCommandDB = 12,
 
         eCommandTag = 21,
         eCommandVar = 22,
@@ -55,6 +56,8 @@ namespace Dooggy.Factory.Console
         public void Compile(string prmCode)
         {
             Result.SetCode(prmCode);
+
+            Merge(prmCode: Console.Config.Connect.GetSetupDB());
 
             Merge(prmCode);
 
@@ -267,17 +270,24 @@ namespace Dooggy.Factory.Console
                     tipo = eTipoTestCommand.eCommandNote;
                     break;
 
+                case "db":
+                case "setup":
+                    tipo = eTipoTestCommand.eCommandDB;
+                    args = "null";
+                    break;
+
                 case "tag":
                 case "tags":
                     tipo = eTipoTestCommand.eCommandTag;
                     args = "null";
                     break;
 
-                case "var":
-                    tipo = eTipoTestCommand.eCommandVar;
-                    args = "sql";
-                    break;
+                //case "var":
+                //    tipo = eTipoTestCommand.eCommandVar;
+                //    args = "sql";
+                //    break;
 
+                case "var":
                 case "loc":
                 case "local":
                     tipo = eTipoTestCommand.eCommandLoc;
@@ -340,6 +350,9 @@ namespace Dooggy.Factory.Console
 
                 case eTipoTestCommand.eCommandNote:
                     return "note";
+
+                case eTipoTestCommand.eCommandDB:
+                    return "dbase";
 
                 case eTipoTestCommand.eCommandTag:
                     return "tag";

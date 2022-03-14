@@ -1,12 +1,12 @@
-﻿using Dooggy.Factory.Console;
-using Dooggy.Factory.Data;
-using Dooggy.Factory.Robot;
+﻿using BlueRocket.CORE.Factory.Console;
+using BlueRocket.CORE.Factory.Data;
+using BlueRocket.CORE.Factory.Robot;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 
-namespace Dooggy.Factory
+namespace BlueRocket.CORE.Factory
 {
 
     public class TestDataProject : TestFactory

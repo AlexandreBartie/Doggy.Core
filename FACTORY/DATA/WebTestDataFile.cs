@@ -1,12 +1,12 @@
-﻿using Dooggy;
-using Dooggy.Factory;
-using Dooggy.Lib.Files;
-using Dooggy.Lib.Vars;
+﻿using BlueRocket.CORE;
+using BlueRocket.CORE.Factory;
+using BlueRocket.CORE.Lib.Files;
+using BlueRocket.CORE.Lib.Vars;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Dooggy.Factory.Data
+namespace BlueRocket.CORE.Factory.Data
 {
     public class TestDataFile
     {

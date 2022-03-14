@@ -3,14 +3,15 @@ using System.Data;
 using System.Collections.Generic;
 using System;
 using System.IO;
-using Dooggy.Factory.Data;
-using Dooggy;
-using Dooggy.Lib.Parse;
-using Dooggy.Factory;
-using Dooggy.Lib.Generic;
-using Dooggy.Tools.Calc;
+using BlueRocket.CORE.Factory.Data;
+using BlueRocket.CORE;
+using BlueRocket.CORE.Lib.Parse;
+using BlueRocket.CORE.Factory;
+using BlueRocket.CORE.Lib.Generic;
+using BlueRocket.CORE.Tools.Calc;
+using BlueRocket.CORE.Lib.Data;
 
-namespace Dooggy.Lib.Data
+namespace BlueRocket.CORE.Lib.Data
 {
 
     public class DataCursorConnection : DataCursorDados
@@ -40,12 +41,12 @@ namespace Dooggy.Lib.Data
         private void SetQuery()
         {
 
-            if (GetRequest(sql, prmTimeOut: DataBase.Pool.Connect.command_timeout))
+            if (GetRequest(sql, prmTimeOut: DataBase.Pool.Connect.timeoutSQL))
             {
-                Trace.OnSqlExecutado(DataBase.tag, sql, TemDados, TimeCursor.Elapsed.milliseconds);
+                Trace.OnSqlExecutado(DataBase.tag, sql, TimeCursor.Elapsed.milliseconds, TemDados);
             }
             else
-                Trace.LogData.FailSQLConnection(DataBase.tag, sql, Erro);
+                Trace.OnSqlError(DataBase.tag, sql, Erro);
         }
 
         private string GetTratarSQL(string prmSQL) => Bloco.GetBlocoTroca(prmSQL, prmDelimitadorInicial: "<##>", prmDelimitadorFinal: "<##>", prmDelimitadorNovo: "'");
@@ -171,16 +172,9 @@ namespace Dooggy.Lib.Data
     public class DataCursorReader : DataCursorBase
     {
 
-        internal Cronometro TimeCursor;
-
-        private DataCommandVirtual query;
+        public DataReaderVirtual reader;
 
         public bool TemDados;
-
-        public DataCursorReader()
-        {
-            TimeCursor = new Cronometro();
-        }
 
         public bool GetRequest(string prmSQL, int prmTimeOut)
         {
@@ -189,11 +183,11 @@ namespace Dooggy.Lib.Data
 
             try
             {
-                query = new DataCommandVirtual(prmSQL, DataBase.Conexao, prmTimeOut);
+                command = new DataCommandVirtual(prmSQL, DataBase.Conexao, prmTimeOut);
 
                 TimeCursor.Start();
 
-                reader = query.GetReader();
+                reader = command.GetReader();
 
                 TemDados = Next();
             }
@@ -219,12 +213,54 @@ namespace Dooggy.Lib.Data
 
     }
 
-    public class DataCursorBase
+    public class DataCursorCommand : DataCursorBase
+    {
+
+        public bool Execute(string prmSQL, int prmTimeOut)
+        {
+
+            Erro = null;
+
+            try
+            {
+                command = new DataCommandVirtual(prmSQL, DataBase.Conexao, prmTimeOut);
+
+                TimeCursor.Start();
+
+                command.GetNoResults();
+
+            }
+            catch (Exception e)
+            { Erro = e; }
+
+            finally
+            {
+                TimeCursor.Stop();
+            }
+
+            return (IsOK);
+        }
+
+    }
+
+    public class DataCursorBase : DataCursorError
     {
 
         public DataBaseConnection DataBase;
 
-        public DataReaderVirtual reader;
+        public DataCommandVirtual command;
+
+        internal Cronometro TimeCursor;
+
+        public DataCursorBase()
+        {
+            TimeCursor = new Cronometro();
+        }
+
+    }
+
+    public class DataCursorError
+    {
 
         public Exception Erro;
 
@@ -269,6 +305,8 @@ namespace Dooggy.Lib.Data
 
         public string GetStatus() { if (status == "") Connect(); return status; }
 
+        public DataCursorConnection GetCursor(string prmSQL, myTuplas prmMask) => new DataCursorConnection(prmSQL, prmMask, this);
+
         public bool Connect()
         {
 
@@ -300,6 +338,19 @@ namespace Dooggy.Lib.Data
 
             return (false);
         }
+        public bool ExecuteNoSQL(string prmNoSQL, int prmTimeOut)
+        {
+
+            if (Conexao.Execute(prmNoSQL, prmTimeOut))
+            {
+                Trace.LogData.DBSetup(tag, prmNoSQL); return true;
+            }
+
+            Trace.LogData.FailDBSetup(tag, prmNoSQL); 
+
+            return false;
+        }
+
         public void Close()
         {
             try
@@ -345,6 +396,8 @@ namespace Dooggy.Lib.Data
 
             return IsConnected;
         }
+
+        public bool ExecuteNoSQL(string prmNoSQL, int prmTimeOut) => Corrente.ExecuteNoSQL(prmNoSQL, prmTimeOut);
 
         private bool GetIsOK()
         {

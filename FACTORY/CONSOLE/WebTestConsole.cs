@@ -1,15 +1,15 @@
-﻿using Dooggy.Factory.Data;
-using Dooggy.Lib.Data;
-using Dooggy.Lib.Files;
-using Dooggy;
-using Dooggy.Lib.Parse;
+﻿using BlueRocket.CORE.Factory.Data;
+using BlueRocket.CORE.Lib.Data;
+using BlueRocket.CORE.Lib.Files;
+using BlueRocket.CORE;
+using BlueRocket.CORE.Lib.Parse;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
-using Dooggy.Lib.Vars;
+using BlueRocket.CORE.Lib.Vars;
 
-namespace Dooggy.Factory.Console
+namespace BlueRocket.CORE.Factory.Console
 {
     public class TestConsole
     {
@@ -27,6 +27,8 @@ namespace Dooggy.Factory.Console
         public TestDataPool Pool => Factory.Pool;
         public TestTrace Trace => Factory.Trace;
         public TestDataSource Dados => Pool.Dados;
+
+        public DataBasesConnection Bases => Pool.Bases;
 
         public TestConfigPath Path => Config.Path;
 

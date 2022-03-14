@@ -1,9 +1,9 @@
-﻿using Dooggy.Lib.Vars;
+﻿using BlueRocket.CORE.Lib.Vars;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Dooggy.Lib.Generic
+namespace BlueRocket.CORE.Lib.Generic
 {
     public class myDominio
     {

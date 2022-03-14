@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
 
-namespace Dooggy.Lib.Vars
+namespace BlueRocket.CORE.Lib.Vars
 {
     public static class myControl
     {
