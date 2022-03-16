@@ -1,5 +1,4 @@
-using BlueRocket.CORE.Factory;
-using BlueRocket.CORE.Factory.Robot;
+using BlueRocket.CORE;
 using BlueRocket.CORE.POC.AutomacaoTestes;
 using System;
 using System.Data.SqlClient;

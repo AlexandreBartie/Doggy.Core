@@ -1,10 +1,8 @@
-﻿using BlueRocket.CORE.FACTORY.UNIT;
-using BlueRocket.CORE.Lib.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 
-namespace BlueRocket.CORE.FACTORY.UNIT
+namespace BlueRocket.CORE
 {
 
     public class UTC

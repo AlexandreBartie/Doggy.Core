@@ -1,12 +1,9 @@
-﻿using BlueRocket.CORE;
-using BlueRocket.CORE.Factory;
-using BlueRocket.CORE.Lib.Generic;
-using BlueRocket.CORE.Lib.Vars;
+﻿using BlueRocket.LIBRARY;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BlueRocket.CORE.Factory.Console
+namespace BlueRocket.CORE
 {
     public class TestResult
     {
@@ -98,7 +95,7 @@ namespace BlueRocket.CORE.Factory.Console
             if (ativo)
             {
 
-                TestItemLog item = new TestItemLog(prmTipo, prmTrace);
+                TraceMSG item = new TraceMSG(prmTipo, prmTrace);
 
                 Main.Add(item);
 
@@ -110,7 +107,7 @@ namespace BlueRocket.CORE.Factory.Console
             if (ativo)
             {
 
-                TestItemLog item = new TestItemLog(prmTrace, prmSQL, prmTimeElapsed);
+                TraceMSG item = new TraceMSG(prmTrace, prmSQL, prmTimeElapsed);
 
                 SQL.Add(item);
 
@@ -133,7 +130,7 @@ namespace BlueRocket.CORE.Factory.Console
 
             TestResultBase result = new TestResultBase();
 
-            foreach (TestItemLog item in this)
+            foreach (TraceMSG item in this)
                 if (item.IsEqual(prmTipo))
                     result.Add(item);
 
@@ -151,14 +148,14 @@ namespace BlueRocket.CORE.Factory.Console
 
             xMemo log = new xMemo();
 
-            foreach (TestItemLog item in this)
+            foreach (TraceMSG item in this)
                 log.Add(item.key);
 
             return (log.memo_ext);
         }
     }
 
-    public class TestResultBase : List<TestItemLog>
+    public class TestResultBase : List<TraceMSG>
     {
         public string txt => GetTXT();
         public bool IsFull => (this.Count > 0);
@@ -168,7 +165,7 @@ namespace BlueRocket.CORE.Factory.Console
 
             xMemo log = new xMemo();
 
-            foreach (TestItemLog item in this)
+            foreach (TraceMSG item in this)
                 log.Add(item.msg);
 
             return (log.memo_ext);

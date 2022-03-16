@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
-using BlueRocket.CORE.Factory.Robot;
-using BlueRocket.CORE.Lib.Files;
 using BlueRocket.CORE;
 
 namespace BlueRocket.CORE.GoogleSearch

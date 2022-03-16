@@ -1,13 +1,9 @@
-﻿using BlueRocket.CORE.Factory;
-using BlueRocket.CORE.Factory.Console;
-using BlueRocket.CORE.Factory.Data;
-using BlueRocket.CORE.Lib.Generic;
-using BlueRocket.CORE.Lib.Vars;
+﻿using BlueRocket.LIBRARY;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BlueRocket.CORE.Factory.Console
+namespace BlueRocket.CORE
 {
 
     public class TestCode

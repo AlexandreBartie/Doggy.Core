@@ -1,20 +1,16 @@
-﻿using BlueRocket.CORE;
-using BlueRocket.CORE.Factory;
-using BlueRocket.CORE.Factory.Data;
-using BlueRocket.CORE.Lib.Data;
-using BlueRocket.CORE.Lib.Generic;
-using BlueRocket.CORE.Lib.Parse;
-using BlueRocket.CORE.Lib.Vars;
+﻿using BlueRocket.LIBRARY;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BlueRocket.CORE.Factory.Data
+namespace BlueRocket.CORE
 {
     public class TestDataView : TestDataViewSQL
     {
 
-        public DataBaseConnection DataBase;
+        public TestDataPool Pool;
+        
+        public DataBase DataBase;
 
         private string key;
 
@@ -23,13 +19,14 @@ namespace BlueRocket.CORE.Factory.Data
 
         public TestDataFlows Flows;
 
-        public TestDataPool Pool { get => DataBase.Pool; }
         public TestDataTratamento Tratamento { get => Pool.Tratamento; }
 
         public TestTrace Trace { get => Pool.Trace; }
 
-        public TestDataView(string prmTag, DataBaseConnection prmDataBase)
+        public TestDataView(string prmTag, DataBase prmDataBase, TestDataPool prmPool)
         {
+            Pool = prmPool;
+            
             DataBase = prmDataBase;
 
             Cleanup();
@@ -68,13 +65,13 @@ namespace BlueRocket.CORE.Factory.Data
 
         private TestDataTratamento Tratamento { get => View.Pool.Tratamento; }
 
-        public DataBaseConnection DataBase { get => View.DataBase; }
+        public DataBase DataBase { get => View.DataBase; }
 
         // internal
 
-        private DataCursorConnection _cursor;
+        private DataCursor _cursor;
 
-        public DataCursorConnection Cursor
+        public DataCursor Cursor
         {
             get
             {
@@ -289,7 +286,7 @@ namespace BlueRocket.CORE.Factory.Data
 
         }
 
-        public string Criar(string prmTag, string prmMask, DataBaseConnection prmDataBase)
+        public string Criar(string prmTag, string prmMask, DataBase prmDataBase)
         {
 
             if (Find(prmTag))
@@ -299,7 +296,7 @@ namespace BlueRocket.CORE.Factory.Data
             else
             {
 
-                Corrente = new TestDataView(prmTag, prmDataBase);
+                Corrente = new TestDataView(prmTag, prmDataBase, Pool);
 
                 Add(Corrente);
 

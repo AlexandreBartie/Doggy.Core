@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using BlueRocket.CORE.Factory.Robot;
+using BlueRocket.CORE;
 using OpenQA.Selenium;
 
 namespace BlueRocket.CORE.WebTestes

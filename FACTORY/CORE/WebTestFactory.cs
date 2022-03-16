@@ -1,9 +1,4 @@
-﻿using BlueRocket.CORE;
-using BlueRocket.CORE.Factory.Console;
-using BlueRocket.CORE.Factory.Data;
-using BlueRocket.CORE.Factory.Robot;
-using BlueRocket.CORE.Lib.Generic;
-using BlueRocket.CORE.Lib.Parse;
+﻿using BlueRocket.LIBRARY;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,7 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace BlueRocket.CORE.Factory
+namespace BlueRocket.CORE
 {
     public class TestFactory
     {
@@ -31,6 +26,11 @@ namespace BlueRocket.CORE.Factory
         public TestFactory()
         {
 
+            Trace = new TestTrace();
+
+            Trace.LogExecutado += TraceLogExecutado;
+            Trace.SqlExecutado += TraceSqlExecutado;
+
             Pool = new TestDataPool(this);
 
             Console = new TestConsole(this);
@@ -39,10 +39,6 @@ namespace BlueRocket.CORE.Factory
 
             Parameters = new TestParameters();
 
-            Trace = new TestTrace();
-
-            Trace.LogExecutado += TraceLogExecutado;
-            Trace.SqlExecutado += TraceSqlExecutado;
         }
 
         public void TraceLogExecutado() => Console.AddLogItem();

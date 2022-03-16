@@ -1,10 +1,9 @@
-﻿using BlueRocket.CORE.Lib.Generic;
-using BlueRocket.CORE.Lib.Vars;
+﻿using BlueRocket.LIBRARY;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BlueRocket.CORE.FACTORY.UNIT
+namespace BlueRocket.CORE
 {
     public static class TestUnityLog
     {

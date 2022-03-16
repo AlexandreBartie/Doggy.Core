@@ -1,19 +1,11 @@
-﻿using BlueRocket.CORE;
-using BlueRocket.CORE.Factory;
-using BlueRocket.CORE.Factory.Console;
-using BlueRocket.CORE.Lib.Data;
-using BlueRocket.CORE.Lib.Files;
-using BlueRocket.CORE.Lib.Generic;
-using BlueRocket.CORE.Lib.Parse;
-using BlueRocket.CORE.Lib.Vars;
-using BlueRocket.CORE.Tools.Calc;
+﻿using BlueRocket.LIBRARY;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
 
-namespace BlueRocket.CORE.Factory.Data
+namespace BlueRocket.CORE
 {
 
     public enum eTipoFileFormat : int
@@ -38,10 +30,8 @@ namespace BlueRocket.CORE.Factory.Data
         public TestConsole Console => Factory.Console;
         public TestTrace Trace => Factory.Trace;
 
-        private bool bloqueado = false;
-
-        public DataBasesConnection Bases => (Resume.Bases);
-        public TestDataConnect Connect => (Resume.Connect);
+        public DataBases Bases => (Connect.Bases);
+        public DataConnect Connect => (Resume.Connect);
         public TestDataSource Dados => (Resume.Dados);
         public TestDataGlobal Global => (Resume.Global);
 
@@ -50,13 +40,9 @@ namespace BlueRocket.CORE.Factory.Data
         public TestDataRaws Raws => (Local.Raws);
         public TestDataVars Vars => (Local.Vars);
 
-        public DataTypesField DataTypes => (Bases.DataTypes);
-
-        public DataBaseConnection DataBaseCorrente => (Bases.Corrente);
+        public DataBase DataBaseCorrente => (Bases.Corrente);
         public TestDataView DataViewCorrente => (Views.Corrente);
 
-        public bool IsDbOK => (Bases.IsOK);
-        public bool IsDbBlocked => bloqueado;
         public bool IsHaveData => Raws.IsHaveData || Views.IsHaveData;
         private int next_view => Views.Count + 1;
 
@@ -77,7 +63,7 @@ namespace BlueRocket.CORE.Factory.Data
 
         public bool DoConnect() => Bases.DoConnect();
 
-        public bool AddDataBase(string prmTag, string prmConexao) => Bases.Criar(prmTag, prmConexao, this);
+        public bool AddDataBase(string prmTag, string prmConexao) => Bases.Criar(prmTag, prmConexao);
 
         public string AddGlobalVAR(string prmVar) => Global.Vars.Criar(prmVar);
         public void SetGlobalVAR(string prmArg, string prmInstrucao) => Global.Vars.SetArgumento(prmArg, prmInstrucao);
@@ -100,8 +86,6 @@ namespace BlueRocket.CORE.Factory.Data
 
         public void Cleanup() => Local.Cleanup();
 
-        public void SetDBStatus(bool prmBloqueado) => bloqueado = prmBloqueado;
-
         public bool IsSQLDataException(string prmTexto) => Tratamento.IsSQLDataException(prmTexto);
         public string GetTextoTratado(string prmTexto) => Tratamento.GetTextoTratado(prmTexto);
         public string GetNextKeyDataView() => string.Format("view#{0}", next_view);
@@ -117,9 +101,7 @@ namespace BlueRocket.CORE.Factory.Data
     {
         private TestDataPool Pool;
 
-        public TestDataConnect Connect;
-
-        public DataBasesConnection Bases;
+        public DataConnect Connect;
 
         public TestDataSource Dados;
 
@@ -129,9 +111,7 @@ namespace BlueRocket.CORE.Factory.Data
         {
             Pool = prmPool; 
 
-            Bases = new DataBasesConnection(new DataTypesField());
-
-            Connect = new TestDataConnect(prmPool);
+            Connect = new DataConnect(Pool.Trace);
 
             Dados = new TestDataSource(prmPool);
 

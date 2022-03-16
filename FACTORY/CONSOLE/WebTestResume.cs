@@ -1,12 +1,9 @@
-﻿using BlueRocket.CORE.Factory.Data;
-using BlueRocket.CORE.Lib.Data;
-using BlueRocket.CORE.Lib.Generic;
-using BlueRocket.CORE.Lib.Vars;
+﻿using BlueRocket.LIBRARY;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BlueRocket.CORE.Factory.Data
+namespace BlueRocket.CORE
 {
 
     public class TestDataTag : myDominio
@@ -36,7 +33,7 @@ namespace BlueRocket.CORE.Factory.Data
     public class TestDataVar
     {
 
-        //private DataBaseConnection DataBase;
+        //private DataBase DataBase;
 
         public string tag;
 
@@ -44,7 +41,7 @@ namespace BlueRocket.CORE.Factory.Data
 
         public string sql;
 
-        public TestDataVar(string prmTag, string prmValor)//', DataBaseConnection prmDataBase)
+        public TestDataVar(string prmTag, string prmValor)//', DataBase prmDataBase)
         {
             //DataBase = prmDataBase;
 
@@ -69,7 +66,7 @@ namespace BlueRocket.CORE.Factory.Data
         //    Pool = prmPool;
         //}
 
-        public string Criar(string prmVar)//, DataBaseConnection prmDataBase)
+        public string Criar(string prmVar)//, DataBase prmDataBase)
         {
 
             //

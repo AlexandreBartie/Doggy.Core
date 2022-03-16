@@ -1,16 +1,10 @@
-﻿using BlueRocket.CORE.Factory.Data;
-using BlueRocket.CORE.Lib.Data;
-using BlueRocket.CORE.Lib.Files;
-using BlueRocket.CORE;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using BlueRocket.CORE.Lib.Generic;
-using BlueRocket.CORE.Lib.Vars;
-using BlueRocket.CORE.Tools.Calc;
 using System.Globalization;
+using BlueRocket.LIBRARY;
 
-namespace BlueRocket.CORE.Factory.Console
+namespace BlueRocket.CORE
 {
     public class TestConsoleConfig
     {
@@ -23,18 +17,17 @@ namespace BlueRocket.CORE.Factory.Console
 
         public TestConfigCSV CSV;
         public TestConfigPath Path;
-        public TestConfigConnect Connect;
+        public TestConfigDB DB;
 
         public TestConfigMain Main;
 
         public TestConfigValidation Validation;
 
-
         public TestDataPool Pool => Console.Pool;
-
         public TestDataGlobal Global => Console.Pool.Global;
 
-        private DataBasesConnection Bases => Pool.Bases;
+        private DataBases Bases => Pool.Bases;
+        public DataConnect Connect => Pool.Connect;
 
         public string status() => GetStatus();
 
@@ -52,7 +45,7 @@ namespace BlueRocket.CORE.Factory.Console
 
             Path = new TestConfigPath(this);
 
-            Connect = new TestConfigConnect(this);
+            DB = new TestConfigDB(this);
 
             Main = new TestConfigMain(this);
 
@@ -85,7 +78,7 @@ namespace BlueRocket.CORE.Factory.Console
 
             if (Console.IsDbOK)
             {
-                status.Add(Connect.log); status.Add(CSV.log); status.Add(Path.log);
+                status.Add(DB.log); status.Add(CSV.log); status.Add(Path.log);
 
             }
 
@@ -96,25 +89,27 @@ namespace BlueRocket.CORE.Factory.Console
         }
 
     }
-    public class TestConfigConnect
+    public class TestConfigDB
     {
 
         private TestConsoleConfig Config;
 
+        private DataConnect Connect => Config.Connect;
+
         private xLinhas SetupDB;
 
-        public int timeoutDB = 30;
-        public int timeoutSQL = 20;
+        public int timeoutDB => Connect.timeoutDB;
+        public int timeoutSQL => Connect.timeoutSQL;
 
-        public TestConfigConnect(TestConsoleConfig prmConfig)
+        public TestConfigDB(TestConsoleConfig prmConfig)
         {
             Config = prmConfig; SetupDB = new xLinhas();
         }
 
         public void SetSetup(string prmCommand) => SetupDB.Add(prmCommand);
 
-        public void SetTimeOutDB(int prmSegundos) => timeoutDB = prmSegundos;
-        public void SetTimeOutSQL(int prmSegundos) => timeoutSQL = prmSegundos;
+        public void SetTimeOutDB(int prmSegundos) => Connect.timeoutDB = prmSegundos;
+        public void SetTimeOutSQL(int prmSegundos) => Connect.timeoutSQL = prmSegundos;
 
         public string GetSetupDB()
         {
@@ -130,54 +125,48 @@ namespace BlueRocket.CORE.Factory.Console
         private string txtTimeOutDB => String.Format("-timeoutDB: {0}", timeoutDB);
         private string txtTimeOutSQL => String.Format("-timeoutSQL: {0}", timeoutSQL);
         public string log => String.Format(">connect: {0}, {1}, {2}", txtSetup, txtTimeOutDB, txtTimeOutSQL);
-
     }
 
     public class TestConfigCSV
     {
         private TestConsoleConfig Config;
 
-        public DateTime anchor;
+        private DataFormat Format => Config.Connect.Format;
 
         public string formatRegion;
 
         public string formatToday;
 
-        public string formatDateDefault;
-
         private string formatSaveDefault;
 
-        public CultureInfo Culture;
+        public CultureInfo Culture => Format.Culture;
+        public DateTime dateAnchor => Format.dateAnchor;
+        public string maskDateDefault => Format.maskDateDefault;
+
 
         public TestConfigCSV(TestConsoleConfig prmConfig)
         {
             Config = prmConfig;
-
-            anchor = DateTime.Now;
-
-            formatDateDefault = "DD/MM/AAAA";
-
-            GetCulture();
         }
         public void SetToday(string prmFormat)
         {
             formatToday = prmFormat;
 
-            anchor = myDate.Calc(prmDate: anchor, prmSintaxe: prmFormat);
+            Format.dateAnchor = myDate.Calc(prmDate: dateAnchor, prmSintaxe: prmFormat);
         }
         public void SetToday(DateTime prmDate)
         {
-            anchor = prmDate;
+            Format.dateAnchor = prmDate;
         }
         public void SetFormatDate(string prmFormat)
         {
-            formatDateDefault = prmFormat;
+            Format.maskDateDefault = prmFormat;
         }
 
         public void SetRegion() => SetRegion(prmRegion: "");
         public void SetRegion(string prmRegion)
         {
-            formatRegion = prmRegion; GetCulture();
+            formatRegion = prmRegion; Format.SetCulture(prmRegion);
         }
         public void SetFormatSave(string prmFormat)
         {
@@ -200,22 +189,11 @@ namespace BlueRocket.CORE.Factory.Console
 
         private string txt_region => String.Format("-region: {0}", formatRegion);
         private string txt_today => String.Format("-today: {0}", formatToday);
-        private string txt_date => String.Format("-date: {0}", formatDateDefault);
+        private string txt_date => String.Format("-date: {0}", maskDateDefault);
         private string txt_save => String.Format("-save: {0}", formatSaveDefault);
 
         public string log => String.Format(">csv: {0}, {1}, {2}, {3}", txt_region, txt_today, txt_date, txt_save);
 
-        private void GetCulture()
-        {
-            CultureInfo ret = CultureInfo.InvariantCulture;
-            try
-            { ret = new CultureInfo(formatRegion); }
-
-            catch (Exception e)
-            { }
-
-            Culture = ret;
-        }
     }
 
     public class TestConfigValidation
@@ -230,9 +208,9 @@ namespace BlueRocket.CORE.Factory.Console
             Config = prmConfig;
         }
 
-        public string log => GetTest(prmDate: CSV.anchor, prmNumber: 1234.5);
+        public string log => GetTest(prmDate: CSV.dateAnchor, prmNumber: 1234.5);
 
-        private string txt_date(DateTime prmDate) => String.Format("-date: {0}", myCSV.DateToCSV(prmDate, CSV.formatDateDefault));
+        private string txt_date(DateTime prmDate) => String.Format("-date: {0}", myCSV.DateToCSV(prmDate, CSV.maskDateDefault));
         private string txt_double(Double prmDouble) => String.Format("-double: {0}", myCSV.DoubleToCSV(prmDouble, CSV.Culture));
 
         private string GetTest(DateTime prmDate, Double prmNumber) => String.Format(">test: {0}, {1}", txt_date(prmDate), txt_double(prmNumber));
@@ -380,14 +358,13 @@ namespace BlueRocket.CORE.Factory.Console
         private TestConsole Console => Config.Console;
 
         private TestTrace Trace => Console.Trace;
-        private TestDataConnect Connect => Console.Pool.Connect;
+        private DataConnect Connect => Console.Pool.Connect;
 
         public bool IsOK;
 
         private FileTXT File;
 
-        public string nome_CFG;
-        public string path_CFG;
+        public FileTXT FileCFG;
 
         private string var_pathCFG = "#(PathArquivoCFG)";
 
@@ -435,7 +412,7 @@ namespace BlueRocket.CORE.Factory.Console
             {
 
                 if (prmMain)
-                { path_CFG = File.path; nome_CFG = File.nome;  }
+                { FileCFG = File;  }
 
                 if (Parse(prmBloco: File.txt()))
                 { Trace.LogConfig.LoadConfig(prmFile: File); return true; }
@@ -513,8 +490,10 @@ namespace BlueRocket.CORE.Factory.Console
 
         private void SetGroupPath(string prmTag, string prmValor)
         {
+            string path = prmValor;
 
-            string path = myString.GetSubstituir(prmValor, var_pathCFG, path_CFG);
+            if (FileCFG != null)
+                path = myString.GetSubstituir(path, var_pathCFG, FileCFG.path);
             
             switch (prmTag)
             {
@@ -539,7 +518,7 @@ namespace BlueRocket.CORE.Factory.Console
             switch (prmTag)
             {
                 case "db":
-                    Connect.Oracle.AddJSON(prmSigla, prmValor); break;
+                    Connect.Assist.Oracle.AddJSON(prmSigla, prmValor); break;
 
                 default:
                     Trace.LogConfig.FailFindParameter(prmSigla, prmValor); break;
@@ -550,13 +529,13 @@ namespace BlueRocket.CORE.Factory.Console
             switch (prmTag)
             {
                 case "setup":
-                    Config.Connect.SetSetup(prmValor); break;
+                    Config.DB.SetSetup(prmValor); break;
 
                 case "timeoutdb":
-                    Config.Connect.SetTimeOutDB(myInt.GetNumero(prmValor)); break;
+                    Config.DB.SetTimeOutDB(myInt.GetNumero(prmValor)); break;
 
                 case "timeoutsql":
-                    Config.Connect.SetTimeOutSQL(myInt.GetNumero(prmValor)); break;
+                    Config.DB.SetTimeOutSQL(myInt.GetNumero(prmValor)); break;
 
                 default:
                     Trace.LogConfig.FailFindParameter(prmTag, prmValor); break;

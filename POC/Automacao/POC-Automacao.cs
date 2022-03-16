@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Forms;
 using System.Text;
-using BlueRocket.CORE.Factory.Robot;
-using BlueRocket.CORE.Factory;
+using BlueRocket.CORE;
 
 namespace BlueRocket.CORE.POC.AutomacaoTestes
 {

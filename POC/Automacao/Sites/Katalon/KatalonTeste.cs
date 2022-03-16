@@ -1,4 +1,4 @@
-﻿using BlueRocket.CORE.Factory.Robot;
+﻿using BlueRocket.CORE;
 using System.Diagnostics;
 
 namespace BlueRocket.CORE.Katalon

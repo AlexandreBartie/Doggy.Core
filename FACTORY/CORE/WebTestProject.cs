@@ -1,17 +1,15 @@
-﻿using BlueRocket.CORE.Factory.Console;
-using BlueRocket.CORE.Factory.Data;
-using BlueRocket.CORE.Factory.Robot;
+﻿using BlueRocket.LIBRARY;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 
-namespace BlueRocket.CORE.Factory
+namespace BlueRocket.CORE
 {
 
     public class TestDataProject : TestFactory
     {
-        public TestDataConnect Connect { get => Pool.Connect; }
+        public DataConnect Connect { get => Pool.Connect; }
 
         
     }

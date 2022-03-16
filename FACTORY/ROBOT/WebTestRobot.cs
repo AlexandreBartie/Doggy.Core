@@ -4,15 +4,10 @@ using System.Drawing;
 using System.Diagnostics;
 using OpenQA.Selenium;
 using System.Collections.ObjectModel;
-using BlueRocket.CORE.Lib.Parse;
-using BlueRocket.CORE.Lib.Files;
-using BlueRocket.CORE;
-using BlueRocket.CORE.Factory.Data;
-using BlueRocket.CORE.Factory;
 using OpenQA.Selenium.Chrome;
-using BlueRocket.CORE.Lib.Generic;
+using BlueRocket.LIBRARY;
 
-namespace BlueRocket.CORE.Factory.Robot
+namespace BlueRocket.CORE
 {
     public enum eTipoElemento : int
     {
@@ -98,7 +93,7 @@ namespace BlueRocket.CORE.Factory.Robot
         public TestRobotProject Projeto { get => Motor.Suite.Projeto; }
         public TestTrace Trace { get => Projeto.Trace; }
 
-        public TestTraceErro Erro { get => Trace.Erro; }
+        public TraceErro Erro { get => Trace.Erro; }
 
         public IWebDriver driver { get => Motor.driver; }
 

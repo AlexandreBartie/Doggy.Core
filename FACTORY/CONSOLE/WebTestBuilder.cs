@@ -1,13 +1,9 @@
-﻿using BlueRocket.CORE.Factory;
-using BlueRocket.CORE.Factory.Console;
-using BlueRocket.CORE;
+﻿using BlueRocket.LIBRARY;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using BlueRocket.CORE.Lib.Generic;
-using BlueRocket.CORE.Lib.Vars;
 
-namespace BlueRocket.CORE.Factory.Console
+namespace BlueRocket.CORE
 {
 
     public enum eTipoTestCommand : int
@@ -57,7 +53,7 @@ namespace BlueRocket.CORE.Factory.Console
         {
             Result.SetCode(prmCode);
 
-            Merge(prmCode: Console.Config.Connect.GetSetupDB());
+            Merge(prmCode: Console.Config.DB.GetSetupDB());
 
             Merge(prmCode);
 

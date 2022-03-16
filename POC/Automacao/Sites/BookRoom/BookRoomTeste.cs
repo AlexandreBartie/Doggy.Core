@@ -1,9 +1,8 @@
-﻿using BlueRocket.CORE.Factory.Robot;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BlueRocket.CORE.BookRoom
+namespace BlueRocket.CORE
 {
 
     public class BookRoomTeste : TestRobotScript

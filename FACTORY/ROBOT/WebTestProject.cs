@@ -6,10 +6,8 @@ using System;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using System.Text;
-using BlueRocket.CORE.Factory.Data;
-using BlueRocket.CORE.Factory;
 
-namespace BlueRocket.CORE.Factory.Robot
+namespace BlueRocket.CORE
 {
     public enum eTipoDriver : int
     {

@@ -1,14 +1,10 @@
-﻿using BlueRocket.CORE.Factory.Data;
-using BlueRocket.CORE;
+﻿using BlueRocket.LIBRARY;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
-using BlueRocket.CORE.Lib.Vars;
-using BlueRocket.CORE.Lib.Generic;
-using BlueRocket.CORE.Lib.Data;
 
-namespace BlueRocket.CORE.Factory.Console
+namespace BlueRocket.CORE
 {
     public class TestScripts : List<TestScript>
     {
@@ -143,8 +139,8 @@ namespace BlueRocket.CORE.Factory.Console
         public void SetCode(string prmCode) => Result.SetCode(prmCode);
         public void Play(string prmCode, string prmArquivoOUT) => Code.Play(prmCode, prmArquivoOUT);
 
-        public void AddLogItem(TestTraceMsg prmMsg) => Result.AddLogItem(prmTipo: prmMsg.tipo, prmTrace: prmMsg.texto);
-        public void AddLogSQL(TestTraceMsg prmMsg) => Result.AddLogSQL(prmTrace: prmMsg.texto, prmSQL: prmMsg.sql, prmTimeElapsed: prmMsg.time_elapsed);
+        public void AddLogItem(TraceMSG prmMsg) => Result.AddLogItem(prmTipo: prmMsg.tipo, prmTrace: prmMsg.texto);
+        public void AddLogSQL(TraceMSG prmMsg) => Result.AddLogSQL(prmTrace: prmMsg.texto, prmSQL: prmMsg.sql, prmTimeElapsed: prmMsg.time_elapsed);
     }
 
     public class TestScritpBreak : TestScriptSave
@@ -194,7 +190,7 @@ namespace BlueRocket.CORE.Factory.Console
         private TestConfigPath Path => Console.Config.Path;
         private TestConsoleOutput Output => Console.Output;
 
-        public bool CommandDB(string prmCommand) => Console.Bases.ExecuteNoSQL(prmCommand, prmTimeOut: Console.Config.Connect.timeoutSQL);
+        public bool CommandDB(string prmCommand) => Console.Bases.ExecuteNoSQL(prmCommand, prmTimeOut: Console.Config.DB.timeoutSQL);
 
         public void Save(string prmOptions)
         { 

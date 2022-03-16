@@ -1,18 +1,17 @@
-﻿using BlueRocket.CORE.Factory.Console;
-using BlueRocket.CORE.Lib.Generic;
-using BlueRocket.CORE.Lib.Parse;
-using BlueRocket.CORE.Lib.Vars;
+﻿using BlueRocket.LIBRARY;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BlueRocket.CORE.Factory.Data
+namespace BlueRocket.CORE
 {
-    public class TestDataTratamento : TestDataFormat
+    public class TestDataTratamento : TestDataException
     {
         private TestDataVars Vars => Pool.Vars;
         private TestDataRaws Raws => (Pool.Raws);
         private TestDataViews Views => (Pool.Views);
+
+        private DateTime anchor => Pool.Connect.Format.dateAnchor;
 
         private string varDataFlow = "#(flow)";
 
@@ -168,9 +167,9 @@ namespace BlueRocket.CORE.Factory.Data
 
         public TestConfigCSV CSV => Pool.Console.Config.CSV;
 
-        public DateTime anchor => CSV.anchor;
+        public DateTime anchor => CSV.dateAnchor;
 
-        public string formatDateDefault => CSV.formatDateDefault;
+        public string formatDateDefault => CSV.maskDateDefault;
 
         public string GetDateAnchor() => GetDateAnchor(formatDateDefault);
         public string GetDateAnchor(string prmFormat) => GetDateFormat(anchor, prmFormat);
@@ -189,8 +188,6 @@ namespace BlueRocket.CORE.Factory.Data
         }
         public string GetDoubleFormat(double prmNumber) => GetDoubleFormat(prmNumber, prmFormat: "");
         public string GetDoubleFormat(double prmNumber, string prmFormat) => CSV.DoubleToCSV(prmNumber, prmFormat);
-
-
 
     }
     public class TestDataException

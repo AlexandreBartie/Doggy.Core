@@ -42,6 +42,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\LIBRARY\BlueRocket.LIBRARY.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="Rocket.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>

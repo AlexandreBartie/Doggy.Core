@@ -1,15 +1,10 @@
-﻿using BlueRocket.CORE.Factory.Data;
-using BlueRocket.CORE.Lib.Data;
-using BlueRocket.CORE.Lib.Files;
-using BlueRocket.CORE;
-using BlueRocket.CORE.Lib.Parse;
+﻿using BlueRocket.LIBRARY;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
-using BlueRocket.CORE.Lib.Vars;
 
-namespace BlueRocket.CORE.Factory.Console
+namespace BlueRocket.CORE
 {
     public class TestConsole
     {
@@ -28,7 +23,8 @@ namespace BlueRocket.CORE.Factory.Console
         public TestTrace Trace => Factory.Trace;
         public TestDataSource Dados => Pool.Dados;
 
-        public DataBasesConnection Bases => Pool.Bases;
+        public DataConnect Connect => Pool.Connect;
+        public DataBases Bases => Pool.Bases;
 
         public TestConfigPath Path => Config.Path;
 
@@ -36,7 +32,7 @@ namespace BlueRocket.CORE.Factory.Console
         public TestScript Script { get => Scripts.Corrente; }
 
         public bool IsOK => Config.IsOK;
-        public bool IsDbOK => Pool.IsDbOK;
+        public bool IsDbOK => Connect.IsDbOK;
         private bool IsScript => (Script != null);
 
         public string code_result { get { if (IsScript) return Result.code; return ""; } }
@@ -66,7 +62,7 @@ namespace BlueRocket.CORE.Factory.Console
 
         public void SetAnchor(DateTime prmAncora) => Config.CSV.SetToday(prmAncora);
 
-        public void SetDBStatus(bool prmBloqueado) => Pool.SetDBStatus(prmBloqueado);
+        public void SetDBStatus(bool prmBloqueado) => Config.Connect.SetDBStatus(prmBloqueado);
 
         public void AddLogItem() => Scripts.AddLogItem();
         public void AddLogSQL() => Scripts.AddLogSQL();
