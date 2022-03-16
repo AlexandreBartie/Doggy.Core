@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using BlueRocket.LIBRARY;
 
-namespace BlueRocket.CORE
+namespace BlueRocket.KERNEL
 {
 
   //  public delegate void NotifyLOG();

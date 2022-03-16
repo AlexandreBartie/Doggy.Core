@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
 
-namespace BlueRocket.CORE
+namespace BlueRocket.KERNEL
 {
     public class TestScripts : List<TestScript>
     {

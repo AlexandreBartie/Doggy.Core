@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
-namespace BlueRocket.CORE
+namespace BlueRocket.KERNEL
 {
     public class TestConsole
     {

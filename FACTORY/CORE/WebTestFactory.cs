@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace BlueRocket.CORE
+namespace BlueRocket.KERNEL
 {
     public class TestFactory
     {

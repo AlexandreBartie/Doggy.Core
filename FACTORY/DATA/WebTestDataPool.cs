@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 
-namespace BlueRocket.CORE
+namespace BlueRocket.KERNEL
 {
 
     public enum eTipoFileFormat : int

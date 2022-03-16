@@ -1,7 +1,7 @@
-﻿using BlueRocket.CORE;
+﻿using BlueRocket.KERNEL;
 using System.Diagnostics;
 
-namespace BlueRocket.CORE.Katalon
+namespace BlueRocket.KERNEL.Katalon
 {
     public class KatalonTeste : TestRobotScript
     {

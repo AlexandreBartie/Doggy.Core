@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace BlueRocket.CORE
+namespace BlueRocket.KERNEL
 {
 
     public class BookRoomTeste : TestRobotScript

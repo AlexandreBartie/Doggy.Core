@@ -1,10 +1,10 @@
-using BlueRocket.CORE;
-using BlueRocket.CORE.POC.AutomacaoTestes;
+using BlueRocket.KERNEL;
+using BlueRocket.KERNEL.POC.AutomacaoTestes;
 using System;
 using System.Data.SqlClient;
 using System.Windows.Forms;
 
-namespace BlueRocket.CORE
+namespace BlueRocket.KERNEL
 {
     static class Program
     {

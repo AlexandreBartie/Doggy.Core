@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 
-namespace BlueRocket.CORE
+namespace BlueRocket.KERNEL
 {
 
     public class TestDataProject : TestFactory

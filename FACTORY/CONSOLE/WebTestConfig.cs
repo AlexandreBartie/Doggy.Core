@@ -4,7 +4,7 @@ using System.Text;
 using System.Globalization;
 using BlueRocket.LIBRARY;
 
-namespace BlueRocket.CORE
+namespace BlueRocket.KERNEL
 {
     public class TestConsoleConfig
     {

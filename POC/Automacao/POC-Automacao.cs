@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Forms;
 using System.Text;
-using BlueRocket.CORE;
+using BlueRocket.KERNEL;
 
-namespace BlueRocket.CORE.POC.AutomacaoTestes
+namespace BlueRocket.KERNEL.POC.AutomacaoTestes
 {
     public class POC_AutomacaoTestesScripts : TestRobotProject
     {

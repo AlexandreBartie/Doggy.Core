@@ -7,7 +7,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using System.Text;
 
-namespace BlueRocket.CORE
+namespace BlueRocket.KERNEL
 {
     public enum eTipoDriver : int
     {

@@ -7,7 +7,7 @@ using System.Collections.ObjectModel;
 using OpenQA.Selenium.Chrome;
 using BlueRocket.LIBRARY;
 
-namespace BlueRocket.CORE
+namespace BlueRocket.KERNEL
 {
     public enum eTipoElemento : int
     {

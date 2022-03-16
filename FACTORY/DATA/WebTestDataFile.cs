@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BlueRocket.CORE
+namespace BlueRocket.KERNEL
 {
     public class TestDataFile
     {

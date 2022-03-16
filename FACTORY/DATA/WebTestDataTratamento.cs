@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BlueRocket.CORE
+namespace BlueRocket.KERNEL
 {
     public class TestDataTratamento : TestDataException
     {
@@ -11,7 +11,7 @@ namespace BlueRocket.CORE
         private TestDataRaws Raws => (Pool.Raws);
         private TestDataViews Views => (Pool.Views);
 
-        private DateTime anchor => Pool.Connect.Format.dateAnchor;
+        private DateTime dateAnchor => Pool.Connect.Format.dateAnchor;
 
         private string varDataFlow = "#(flow)";
 
@@ -151,15 +151,15 @@ namespace BlueRocket.CORE
         }
         private string GetDataDinamica(string prmParametro)
         {
-            return myDate.View(prmDate: anchor, prmSintaxe: prmParametro);
+            return myDate.View(prmDate: dateAnchor, prmSintaxe: prmParametro);
         }
         private string GetDataEstatica(string prmParametro)
         {
-            return myDate.Static(prmDate: anchor, prmFormato: prmParametro);
+            return myDate.Static(prmDate: dateAnchor, prmFormato: prmParametro);
         }
         private string GetNumberRandom(string prmParametro)
         {
-            return myFormat.RandomToString(prmDate: anchor, prmParametro);
+            return myFormat.RandomToString(prmDate: dateAnchor, prmParametro);
         }
     }
     public class TestDataFormat : TestDataException

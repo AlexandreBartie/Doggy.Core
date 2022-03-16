@@ -1,17 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Library</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon>Rocket.ico</ApplicationIcon>
     <StartupObject></StartupObject>
     <Authors>Alexandre Bartie</Authors>
     <Product>BlueRocket.CORE FRAMEWORK</Product>
-    <AssemblyName>BlueRocket.CORE</AssemblyName>
-    <RootNamespace>BlueRocket.CORE</RootNamespace>
+    <AssemblyName>BlueRocket.KERNEL</AssemblyName>
+    <RootNamespace>BlueRocket.KERNEL</RootNamespace>
     <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
-    <Version>0.0.6</Version>
+    <Version>1.0.7</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageProjectUrl></PackageProjectUrl>
     <PackageIcon>Rocket.png</PackageIcon>
@@ -29,6 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="BlueRocket.LIBRARY" Version="1.0.0" />
     <PackageReference Include="Microsoft.CodeCoverage" Version="17.0.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="2.2.8" />
     <PackageReference Include="MSTest.TestFramework" Version="2.2.8" />
@@ -39,10 +40,6 @@
     <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
     <PackageReference Include="System.Linq" Version="4.3.0" />
     <PackageReference Include="System.Linq.Expressions" Version="4.3.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\LIBRARY\BlueRocket.LIBRARY.csproj" />
   </ItemGroup>
 
   <ItemGroup>
