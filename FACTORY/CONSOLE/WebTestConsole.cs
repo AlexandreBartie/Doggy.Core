@@ -65,7 +65,7 @@ namespace BlueRocket.KERNEL
         public void SetDBStatus(bool prmBloqueado) => Config.Connect.SetDBStatus(prmBloqueado);
 
         public void AddLogItem() => Scripts.AddLogItem();
-        public void AddLogSQL() => Scripts.AddLogSQL();
+        public void AddLogSQL(string prmError) => Scripts.AddLogSQL(prmError);
         
         public void Load() => Load(prmPlay: false);
         public void Load(bool prmPlay) => Input.Load(prmPlay);

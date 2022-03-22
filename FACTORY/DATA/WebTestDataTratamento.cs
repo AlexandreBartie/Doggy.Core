@@ -41,7 +41,7 @@ namespace BlueRocket.KERNEL
 
             return data_view;
 
-        }
+        }   
         public string GetSQLTratado(string prmSql, TestDataHeader prmHeader)
         {
             string sql = myString.GetSubstituir(prmSql, varDataFlow, varDataFull);

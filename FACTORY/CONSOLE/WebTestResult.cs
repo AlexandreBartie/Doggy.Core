@@ -57,7 +57,7 @@ namespace BlueRocket.KERNEL
         public void LogStop() => Log.Stop();
 
         public void AddLogItem(string prmTipo, string prmTrace) => Log.AddItem(prmTipo, prmTrace);
-        public void AddLogSQL(string prmTrace, string prmSQL, long prmTimeElapsed) => Log.AddSQL(prmTrace, prmSQL, prmTimeElapsed);
+        public void AddLogSQL(string prmTrace, string prmSQL, long prmTimeElapsed, string prmError) => Log.AddSQL(prmTrace, prmSQL, prmTimeElapsed, prmError);
         public void SetSave(string prmCode) { _codeZero = prmCode; SetCode(_codeZero); }
         public void SetCode(string prmCode) => _code = prmCode;
         public void SetData(string prmData) { _data = prmData; IsDataSaved = true; }
@@ -102,12 +102,12 @@ namespace BlueRocket.KERNEL
             }
 
         }
-        public void AddSQL(string prmTrace, string prmSQL, long prmTimeElapsed)
+        public void AddSQL(string prmTrace, string prmSQL, long prmTimeElapsed, string prmError)
         {
             if (ativo)
             {
 
-                TraceMSG item = new TraceMSG(prmTrace, prmSQL, prmTimeElapsed);
+                TraceMSG item = new TraceMSG(prmTrace, prmSQL, prmTimeElapsed, prmError);
 
                 SQL.Add(item);
 
@@ -141,23 +141,24 @@ namespace BlueRocket.KERNEL
 
     public class TestResultSQL : TestResultBase
     {
-        public string log => GetLog();
-
-        private string GetLog()
+        public string log => GetLOG();
+        private string GetLOG()
         {
 
             xMemo log = new xMemo();
 
             foreach (TraceMSG item in this)
-                log.Add(item.key);
+                log.Add(String.Format("[{0,4}] {1}", item.title, item.sql));
 
-            return (log.memo_ext);
+            return (log.memo);
         }
+
     }
 
     public class TestResultBase : List<TraceMSG>
     {
         public string txt => GetTXT();
+
         public bool IsFull => (this.Count > 0);
 
         private string GetTXT()
@@ -166,10 +167,12 @@ namespace BlueRocket.KERNEL
             xMemo log = new xMemo();
 
             foreach (TraceMSG item in this)
-                log.Add(item.msg);
+                log.Add(item.txt);
 
-            return (log.memo_ext);
+            return (log.memo);
         }
+
+
 
     }
 }

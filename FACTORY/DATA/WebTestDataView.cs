@@ -64,10 +64,11 @@ namespace BlueRocket.KERNEL
         public string tag;
 
         private TestDataTratamento Tratamento { get => View.Pool.Tratamento; }
+        private TestTrace Trace => View.Trace;
 
         public DataBase DataBase { get => View.DataBase; }
 
-        // internal
+        private bool IsVazio => (_cursor == null);
 
         private DataCursor _cursor;
 
@@ -75,9 +76,12 @@ namespace BlueRocket.KERNEL
         {
             get
             {
-                if (_cursor == null)
-                    _cursor = DataBase.GetCursor(prmSQL: GetSQL(), prmMask: GetMaskMerged()); // new DataCursorConnection(GetSQL(), GetMaskMerged(), DataBase);
+                if (IsVazio)
+                {
+                    _cursor = DataBase.GetCursor(prmSQL: GetSQL(), prmMask: GetMaskMerged());
 
+                    CheckResultDataCursor();
+                }
                 return (_cursor);
             }
         }
@@ -110,13 +114,13 @@ namespace BlueRocket.KERNEL
 
         public string csv() => csv(prmSeparador: ",");
         public string csv(string prmSeparador) => GetCSV(prmSeparador);
-        public string json() => Cursor.GetJSON();
+        public string json() => GetJSON();
 
         private string GetCSV(string prmSeparador)
         {
             if (TemSQL || TemStructure)
             {
-                string memo = Cursor.GetCSV(prmSeparador);
+                string memo = Cursor.csv(prmSeparador);
 
                 if (memo != "")
                     return memo;
@@ -125,6 +129,45 @@ namespace BlueRocket.KERNEL
             }
             return Tratamento.GetNoCommand();
         }
+
+        private string GetJSON()
+        {
+            if (TemSQL || TemStructure)
+            {
+                string memo = Cursor.json();
+
+                if (memo != "")
+                    return memo;
+                else
+                    return Tratamento.GetZeroItens();
+            }
+            return Tratamento.GetNoCommand();
+        }
+        private void CheckResultDataCursor()
+        {
+            
+            if (Cursor.TemDados)
+            {
+                CheckQtdeInterface(Header.qtdeColumns, Cursor.qtdeColumns);
+
+                CheckFindFieldToMaskFormat();
+            }
+        }
+
+        private void CheckQtdeInterface(int prmHeaderColumns, int prmSQLColumns)
+        {
+            if (prmHeaderColumns != prmSQLColumns)
+                Trace.LogData.FailSQLFailInterface(prmHeaderColumns, prmSQLColumns);
+        }
+
+        private void CheckFindFieldToMaskFormat()
+        {
+            if (Cursor.TemMask)
+                foreach (myTupla tupla in Cursor.GetMask())
+                    if (!Cursor.IsFind(prmColumn: tupla.name))
+                        Trace.LogData.FailSQLFormatFindField(prmCampo: tupla.name, prmFormat: tupla.value);
+        }
+
     }
     public class TestDataFlowSQL : TestDataMask
     {
@@ -224,7 +267,7 @@ namespace BlueRocket.KERNEL
                     Trace.LogConsole.FailCheckVariable(tupla);
         }
 
-        public myTuplas GetMaskMerged()
+        internal myTuplas GetMaskMerged()
         {
             myTuplas mask = new myTuplas();
 
@@ -318,10 +361,12 @@ namespace BlueRocket.KERNEL
                     Corrente.SetName(prmInstrucao);
                     break;
 
+                case "table":
                 case "tables":
                     Corrente.SetTables(prmInstrucao);
                     break;
 
+                case "link":
                 case "links":
                     Corrente.SetLinks(prmInstrucao);
                     break;
@@ -389,7 +434,6 @@ namespace BlueRocket.KERNEL
         }
         private bool Find(string prmTag)
         {
-
             foreach (TestDataView view in this)
 
                 if (myString.IsEqual(view.tag, prmTag))
@@ -400,9 +444,7 @@ namespace BlueRocket.KERNEL
                     return (true);
 
                 }
-
             return (false);
-
         }
 
     }
@@ -414,6 +456,8 @@ namespace BlueRocket.KERNEL
         public TestDataFlow Corrente;
 
         public TestTrace Trace { get => Pool.Trace; }
+
+        public bool IsFull => (Count != 0);
 
         public TestDataFlows(TestDataPool prmPool)
         {
@@ -479,23 +523,24 @@ namespace BlueRocket.KERNEL
 
         public string output(eTipoFileFormat prmTipo)
         {
-
-            switch (prmTipo)
+            if (IsFull)
             {
+                switch (prmTipo)
+                {
 
-                case eTipoFileFormat.txt:
-                    return txt();
+                    case eTipoFileFormat.txt:
+                        return txt();
 
-                case eTipoFileFormat.csv:
-                    return csv();
+                    case eTipoFileFormat.csv:
+                        return csv();
 
-                case eTipoFileFormat.json:
-                    return json();
+                    case eTipoFileFormat.json:
+                        return json();
 
+                }
+                return json();
             }
-
-            return json();
-
+            return null;
         }
 
         private string txt() => txt(prmSeparador: ",", prmColunaExtra: true);
@@ -504,7 +549,7 @@ namespace BlueRocket.KERNEL
 
             string header = ""; string tag_view = ""; int cont = 0;
 
-            string corpo = ""; string linha; string coluna_extra = "";
+            string linha; string coluna_extra = ""; xLinhas corpo = new xLinhas();
 
             if (prmColunaExtra)
                 coluna_extra = prmSeparador;
@@ -525,55 +570,48 @@ namespace BlueRocket.KERNEL
 
                     header = Flow.header_txt;
 
-                    corpo += header + Environment.NewLine;
+                    corpo.Add(header);
 
                     //Trace.LogFile.DataFileFormatTXT(header);
 
                 }
-
+                
                 //
                 // Montar o Corpo do arquivo TXT ...
                 //
 
                 linha = Flow.csv(prmSeparador);
 
-                if (linha != "")
-                    corpo += coluna_extra + linha;
-
-                corpo += Environment.NewLine;
+                if (linha == "")
+                    corpo.Add("");
+                else
+                    corpo.Add(coluna_extra + linha);
 
                 //Trace.LogFile.DataFileFormatTXT(linha);
 
             }
 
-            return (corpo);
+            return (corpo.memo);
 
         }
         private string csv()
         {
-
-            string csv = "";
+            xLinhas corpo = new xLinhas();
 
             foreach (TestDataFlow Flow in this)
-                csv += Flow.csv() + Environment.NewLine;
+                corpo.Add(Flow.csv());
 
-
-            return (csv);
-
+            return (corpo.memo);
         }
         private string json()
         {
 
-            string json = ""; string separador = "";
+            xLinhas corpo = new xLinhas();
 
             foreach (TestDataFlow Flow in this)
-            {
+                corpo.Add(Flow.json());
 
-                json += separador + Flow.json(); separador = ", ";
-
-            }
-
-            return (json);
+            return (corpo.txt);
 
         }
 
@@ -581,13 +619,13 @@ namespace BlueRocket.KERNEL
     public class TestDataRaws
     {
 
-        private xMemo Itens;
+        private xLinhas Itens;
 
         public TestDataPool Pool;
 
         private TestTrace Trace { get => Pool.Trace; }
 
-        private string output { get => Itens.memo_ext ; }
+        private string output { get => Itens.memo ; }
 
         public bool IsON = true;
         public bool IsHaveData => IsON && Itens.IsFull;
@@ -597,7 +635,7 @@ namespace BlueRocket.KERNEL
 
             Pool = prmPool;
 
-            Itens = new xMemo();
+            Itens = new xLinhas();
 
         }
         public void SetOptions(string prmOptions)
@@ -632,31 +670,20 @@ namespace BlueRocket.KERNEL
 
         private string Merge(string prmDados)
         {
+            xLinhas Dados = new xLinhas(prmDados);
 
-            int cont = 0;
-
-            xLista Dados = new xLista(prmDados, prmSeparador: Environment.NewLine);
-
-            foreach (string dado in Dados)
-            {
-
-                cont++;
-
-                if (Dados.qtde > cont)
-                    AtualizaLinha(cont, prmLinhaNova: dado);
-
-            }
+            for (int cont = 1; cont <= Dados.qtde; cont++)
+                AtualizaLinha(cont, prmText: Dados.Get(cont));
 
             return (output);
-
         }
 
-        private void AtualizaLinha(int prmIndice, string prmLinhaNova)
+        private void AtualizaLinha(int prmIndice, string prmText)
         {
 
             string texto = Itens.Get(prmIndice);
 
-            Itens.Add(prmIndice, prmTexto: GetLinhaTratada(prmLinhaNova, prmLinhaAtual: texto));
+            Itens.Add(prmIndice, prmTexto: GetLinhaTratada(prmLinhaNova: prmText, prmLinhaAtual: texto));
 
         }
 
@@ -695,6 +722,7 @@ namespace BlueRocket.KERNEL
         public string name;
         public myArgs Tables;
 
+        public int qtdeColumns => Box.Main.qtde;
         public string columns => Box.Main.columns;
         public string columns_sql => Box.Main.columns_sql;
         public string txt => name + "," + columns;

@@ -283,11 +283,7 @@ namespace BlueRocket.KERNEL
             return (tipo == eTipoTestCommand.eCommandRaw || tipo == eTipoTestCommand.eCommandView || tipo == eTipoTestCommand.eCommandFlow);
         }
         private bool GetTipoSave() => Sintaxe.tipo == eTipoTestCommand.eCommandSave;
-        //{
-        //    eTipoTestCommand tipo = Sintaxe.tipo;
 
-        //    return (tipo == eTipoTestCommand.savetxt || tipo == eTipoTestCommand.savecsv || tipo == eTipoTestCommand.savejson);
-        //}
     }
 public class TestCommandAction
     {

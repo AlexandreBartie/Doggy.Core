@@ -474,7 +474,7 @@ namespace BlueRocket.KERNEL
         public void Setup(string prmLista, string prmSintaxe)
         {
 
-            lista.Parse(prmLista, ";");
+            lista.Parse(prmLista, ");");
 
             filtro = prmSintaxe;
 

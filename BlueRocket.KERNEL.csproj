@@ -11,13 +11,15 @@
     <AssemblyName>BlueRocket.KERNEL</AssemblyName>
     <RootNamespace>BlueRocket.KERNEL</RootNamespace>
     <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
-    <Version>1.0.7</Version>
+    <Version>1.0.7.1</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageProjectUrl></PackageProjectUrl>
     <PackageIcon>Rocket.png</PackageIcon>
     <PackageIconUrl />
     <RepositoryUrl>https://github.com/AlexandreBartie/BlueRocket.CORE</RepositoryUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <AssemblyVersion></AssemblyVersion>
+    <FileVersion></FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -29,13 +31,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="BlueRocket.LIBRARY" Version="1.0.0" />
-    <PackageReference Include="Microsoft.CodeCoverage" Version="17.0.0" />
-    <PackageReference Include="MSTest.TestAdapter" Version="2.2.8" />
-    <PackageReference Include="MSTest.TestFramework" Version="2.2.8" />
+    <PackageReference Include="BlueRocket.LIBRARY" Version="1.0.7.2" />
+    <PackageReference Include="Microsoft.CodeCoverage" Version="17.1.0" />
     <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="3.21.50" />
     <PackageReference Include="Selenium.Support" Version="4.1.0" />
-    <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="97.0.4692.7100" />
+    <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="99.0.4844.5100" />
     <PackageReference Include="Selenium.WebDriver.MicrosoftDriver" Version="17.17134.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
     <PackageReference Include="System.Linq" Version="4.3.0" />

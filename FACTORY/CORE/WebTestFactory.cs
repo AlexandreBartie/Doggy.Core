@@ -1,4 +1,5 @@
-﻿using BlueRocket.LIBRARY;
+﻿using BlueRocket.KERNEL;
+using BlueRocket.LIBRARY;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -43,7 +44,7 @@ namespace BlueRocket.KERNEL
 
         public void TraceLogExecutado() => Console.AddLogItem();
 
-        public void TraceSqlExecutado() => Console.AddLogSQL();
+        public void TraceSqlExecutado(string prmError) => Console.AddLogSQL(prmError);
 
         public void EXE(string prmArquivoCFG, bool prmPlay, string prmAppName, string prmAppVersion)
         {

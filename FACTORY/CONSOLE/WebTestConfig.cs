@@ -415,9 +415,9 @@ namespace BlueRocket.KERNEL
                 { FileCFG = File;  }
 
                 if (Parse(prmBloco: File.txt()))
-                { Trace.LogConfig.LoadConfig(prmFile: File); return true; }
+                { Trace.LogConfig.LoadCFG(prmFile: File); return true; }
                 else
-                { Trace.LogConfig.FailLoadConfig(prmFile: File, Config.status()); return (false); }
+                { Trace.LogConfig.FailLoadCFG(prmFile: File, Config.status()); return (false); }
 
             }
 
@@ -483,7 +483,7 @@ namespace BlueRocket.KERNEL
                     SetGroupGlobal(tag, valor); break;
 
                 default:
-                    Trace.LogConfig.FailFindGroup(grupo); break;
+                    Trace.LogConfig.FailFindGroupCFG(grupo); break;
             }
 
         }
@@ -510,7 +510,7 @@ namespace BlueRocket.KERNEL
                     Config.Path.SetLOG(path); break;
 
                 default:
-                    Trace.LogConfig.FailFindParameter(prmTag, path); break;
+                    Trace.LogConfig.FailFindParameterCFG(prmTag, path); break;
             }
         }
         private void SetGroupDBase(string prmTag, string prmSigla, string prmValor)
@@ -521,7 +521,7 @@ namespace BlueRocket.KERNEL
                     Connect.Assist.Oracle.AddJSON(prmSigla, prmValor); break;
 
                 default:
-                    Trace.LogConfig.FailFindParameter(prmSigla, prmValor); break;
+                    Trace.LogConfig.FailFindParameterCFG(prmSigla, prmValor); break;
             }
         }
         private void SetGroupConnect(string prmTag, string prmValor)
@@ -538,7 +538,7 @@ namespace BlueRocket.KERNEL
                     Config.DB.SetTimeOutSQL(myInt.GetNumero(prmValor)); break;
 
                 default:
-                    Trace.LogConfig.FailFindParameter(prmTag, prmValor); break;
+                    Trace.LogConfig.FailFindParameterCFG(prmTag, prmValor); break;
             }
         }
         private void SetGroupCSV(string prmTag, string prmValor)
@@ -558,7 +558,7 @@ namespace BlueRocket.KERNEL
                     Config.CSV.SetFormatSave(prmValor); break;
 
                 default:
-                    Trace.LogConfig.FailFindParameter(prmTag, prmValor); break;
+                    Trace.LogConfig.FailFindParameterCFG(prmTag, prmValor); break;
             }
         }
         private void SetGroupGlobal(string prmTag, string prmValor)
@@ -569,7 +569,7 @@ namespace BlueRocket.KERNEL
                     Config.Main.SetTag(prmValor); break;
 
                 default:
-                    Trace.LogConfig.FailFindParameter(prmTag, prmValor); break;
+                    Trace.LogConfig.FailFindParameterCFG(prmTag, prmValor); break;
             }
         }
         private bool IsGroup() => (Prefixo.IsPrefixo(linha, prefixo_grupo, delimitador));

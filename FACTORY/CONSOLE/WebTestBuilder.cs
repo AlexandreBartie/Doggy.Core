@@ -293,19 +293,19 @@ namespace BlueRocket.KERNEL
                 case "raw":
                 case "data":
                     tipo = eTipoTestCommand.eCommandRaw;
-                    args = "header;null;*";
+                    args = "header,null,*";
                     break;
 
                 case "view":
                 case "dataview":
                     tipo = eTipoTestCommand.eCommandView;
-                    args = "name;tables;links;input;output;alias,mask";
+                    args = "name,table,tables,link,links,input,output,alias,mask";
                     break;
 
                 case "item":
                 case "dataflow":
                     tipo = eTipoTestCommand.eCommandFlow;
-                    args = "enter;check;sql;filter;order;mask;index";
+                    args = "enter,check,sql,filter,order,mask,index";
                     break;
 
                 case "save":
@@ -465,7 +465,7 @@ namespace BlueRocket.KERNEL
         private bool GetOK()
         {
             if (lista != null)
-                return lista.IsContem(key);
+                return lista.IsEqual(key);
             
             return false;
         }

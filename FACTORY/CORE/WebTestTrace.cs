@@ -7,9 +7,6 @@ using BlueRocket.LIBRARY;
 namespace BlueRocket.KERNEL
 {
 
-  //  public delegate void NotifyLOG();
-   // public delegate void NotifySQL();
-
     public class TestTrace : TraceLog
     {
 
@@ -59,20 +56,20 @@ namespace BlueRocket.KERNEL
     }
     public class TestTraceLogConfig : TraceTipo
     {
-        public void LoadConfig(FileTXT prmFile) => msgSet(String.Format("Arquivo CFG carregado ... -file: {0} -path: {1}", prmFile.nome, prmFile.path));
+        public void LoadCFG(FileTXT prmFile) => msgCFG(String.Format("Arquivo CFG carregado ... -file: {0} -path: {1}", prmFile.nome, prmFile.path));
 
-        public void FailLoadConfig(FileTXT prmFile, string prmStatus) => msgSet(String.Format("Parâmetros incompletos no arquivo CFG ... -status: {2} -file: {0} -path: {1}", prmFile.nome, prmFile.path, prmStatus));
+        public void FailLoadCFG(FileTXT prmFile, string prmStatus) => msgErro(String.Format("Parâmetros incompletos no arquivo CFG ... -status: {2} -file: {0} -path: {1}", prmFile.nome, prmFile.path, prmStatus));
 
-        public void FailFindGroup(string prmGroup) => msgErro(String.Format("Grupo do arquivo CFG não encontrado ... -grp: {0}", prmGroup));
+        public void FailFindGroupCFG(string prmGroup) => msgErro(String.Format("Grupo do arquivo CFG não encontrado ... -grp: {0}", prmGroup));
 
-        public void FailFindParameter(string prmParameter, string prmValor) => msgErro(String.Format("Parâmetro do arquivo CFG não encontrado ... -item: {0} -valor: {1}", prmParameter, prmValor));
+        public void FailFindParameterCFG(string prmParameter, string prmValor) => msgErro(String.Format("Parâmetro do arquivo CFG não encontrado ... -item: {0} -valor: {1}", prmParameter, prmValor));
 
 
     }
     public class TestTraceLogConsole : TestTraceLogConsole_Fail
     {
 
-        public void SetScript(string prmScript) => msgSet(String.Format("Script Selecionado ... -ini: {0}", prmScript));
+        public void SetScript(string prmScript) => msgDef(String.Format("Script Selecionado ... -ini: {0}", prmScript));
 
         public void PlayCommand(string prmTipo, string prmKeyWord, string prmTarget) => msgPlay(String.Format("Running {0,10} ... -key: {1} -target: {2}", prmTipo, prmKeyWord, prmTarget));
 
@@ -80,7 +77,7 @@ namespace BlueRocket.KERNEL
 
         public void WriteKeyWordArg(string prmArg, string prmParametros) => msgCode(String.Format("  -{0}: {1}", prmArg, prmParametros));
 
-        public void SetValueVariable(string prmVariable, string prmValue) => msgSet(String.Format("Variável modificada ... -var: {0} = {1}", prmVariable, prmValue));
+        public void SetValueVariable(string prmVariable, string prmValue) => msgDef(String.Format("Variável modificada ... -var: {0} = {1}", prmVariable, prmValue));
 
     }
     public class TestTraceLogConsole_Fail : TraceTipo

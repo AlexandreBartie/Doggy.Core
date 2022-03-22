@@ -34,10 +34,10 @@ namespace BlueRocket.KERNEL
             if (TemCorrente)
                 Corrente.AddLogItem(Trace.Msg);
         }
-        public void AddLogSQL()
+        public void AddLogSQL(string prmError)
         {
             if (TemCorrente)
-                Corrente.AddLogSQL(Trace.Msg);
+                Corrente.AddLogSQL(Trace.Msg, prmError);
         }
 
         public string GetLog()
@@ -90,7 +90,7 @@ namespace BlueRocket.KERNEL
             foreach (TestScript Script in this)
                 memo.Add(Script.key);
 
-            return (memo.memo_ext);
+            return (memo.memo);
 
         }
 
@@ -139,8 +139,8 @@ namespace BlueRocket.KERNEL
         public void SetCode(string prmCode) => Result.SetCode(prmCode);
         public void Play(string prmCode, string prmArquivoOUT) => Code.Play(prmCode, prmArquivoOUT);
 
-        public void AddLogItem(TraceMSG prmMsg) => Result.AddLogItem(prmTipo: prmMsg.tipo, prmTrace: prmMsg.texto);
-        public void AddLogSQL(TraceMSG prmMsg) => Result.AddLogSQL(prmTrace: prmMsg.texto, prmSQL: prmMsg.sql, prmTimeElapsed: prmMsg.time_elapsed);
+        public void AddLogItem(TraceMSG prmMsg) => Result.AddLogItem(prmTipo: prmMsg.tipo, prmTrace: prmMsg.msg);
+        public void AddLogSQL(TraceMSG prmMsg, string prmError) => Result.AddLogSQL(prmTrace: prmMsg.msg, prmSQL: prmMsg.sql, prmTimeElapsed: prmMsg.time_elapsed, prmError);
     }
 
     public class TestScritpBreak : TestScriptSave
@@ -281,8 +281,8 @@ namespace BlueRocket.KERNEL
         }
         private void SetTag(string prmTag, string prmValue, string prmCommand)
         {
-            if (MainTags.FindIt(prmTag))
-                if (MainTags.Find(prmTag).IsContem(prmValue))
+            if (MainTags.IsFind(prmTag))
+                if (MainTags.FindKey(prmTag).IsFind(prmValue))
                     SetValue(prmTag, prmValue);
                 else
                     Trace.LogConsole.FailFindTagElement(prmTag, prmValue);
