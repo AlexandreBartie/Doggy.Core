@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
-using BlueRocket.KERNEL;
+using Dooggy.CORE;
 
-namespace BlueRocket.KERNEL.GoogleSearch
+namespace Dooggy.CORE.GoogleSearch
 {
     public class GoogleSearchTextoTeste : TestRobotScript
     {

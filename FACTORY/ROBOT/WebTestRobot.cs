@@ -5,9 +5,9 @@ using System.Diagnostics;
 using OpenQA.Selenium;
 using System.Collections.ObjectModel;
 using OpenQA.Selenium.Chrome;
-using BlueRocket.LIBRARY;
+using Dooggy.LIBRARY;
 
-namespace BlueRocket.KERNEL
+namespace Dooggy.CORE
 {
     public enum eTipoElemento : int
     {

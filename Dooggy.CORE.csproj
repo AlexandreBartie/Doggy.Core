@@ -4,19 +4,19 @@
     <OutputType>Library</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
-    <ApplicationIcon>Rocket.ico</ApplicationIcon>
+    <ApplicationIcon>Dooggy.ico</ApplicationIcon>
     <StartupObject></StartupObject>
     <Authors>Alexandre Bartie</Authors>
-    <Product>BlueRocket.CORE FRAMEWORK</Product>
-    <AssemblyName>BlueRocket.KERNEL</AssemblyName>
-    <RootNamespace>BlueRocket.KERNEL</RootNamespace>
+    <Product>Dooggy.CORE FRAMEWORK</Product>
+    <AssemblyName>Dooggy.CORE</AssemblyName>
+    <RootNamespace>Dooggy.CORE</RootNamespace>
     <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
-    <Version>1.0.7.1</Version>
+    <Version>1.0.7.2</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageProjectUrl></PackageProjectUrl>
-    <PackageIcon>Rocket.png</PackageIcon>
+    <PackageIcon>Dooggy.jpg</PackageIcon>
     <PackageIconUrl />
-    <RepositoryUrl>https://github.com/AlexandreBartie/BlueRocket.CORE</RepositoryUrl>
+    <RepositoryUrl>https://github.com/AlexandreBartie/Dooggy.CORE</RepositoryUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <AssemblyVersion></AssemblyVersion>
     <FileVersion></FileVersion>
@@ -27,23 +27,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="Rocket.ico" />
+    <Content Include="Dooggy.ico" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="BlueRocket.LIBRARY" Version="1.0.7.2" />
+    <PackageReference Include="Dooggy.LIBRARY" Version="1.0.7.3" />
     <PackageReference Include="Microsoft.CodeCoverage" Version="17.1.0" />
     <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="3.21.50" />
     <PackageReference Include="Selenium.Support" Version="4.1.0" />
     <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="99.0.4844.5100" />
     <PackageReference Include="Selenium.WebDriver.MicrosoftDriver" Version="17.17134.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
-    <PackageReference Include="System.Linq" Version="4.3.0" />
-    <PackageReference Include="System.Linq.Expressions" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Rocket.png">
+    <None Update="Dooggy.jpg">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>

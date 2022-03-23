@@ -2,9 +2,9 @@
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Text;
-using BlueRocket.LIBRARY;
+using Dooggy.LIBRARY;
 
-namespace BlueRocket.KERNEL
+namespace Dooggy.CORE
 {
 
     public class TestTrace : TraceLog

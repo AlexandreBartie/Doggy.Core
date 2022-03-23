@@ -1,10 +1,10 @@
-﻿using BlueRocket.LIBRARY;
+﻿using Dooggy.LIBRARY;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
-namespace BlueRocket.KERNEL
+namespace Dooggy.CORE
 {
     public class TestConsole
     {

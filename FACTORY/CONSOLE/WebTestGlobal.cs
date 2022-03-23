@@ -1,13 +1,19 @@
-﻿using BlueRocket.LIBRARY;
+﻿using Dooggy.LIBRARY;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BlueRocket.KERNEL
+namespace Dooggy.CORE
 {
 
     public class TestDataTag : myDominio
     {
+
+        public string name;
+
+        public xLista Opcoes => lista;
+
+        public bool TemOpcoes => (Opcoes != null);
 
         public TestDataTag(string prmKey, string prmLista) : base(prmKey, prmLista)
         { }

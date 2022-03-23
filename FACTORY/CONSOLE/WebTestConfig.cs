@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Globalization;
-using BlueRocket.LIBRARY;
+using Dooggy.LIBRARY;
 
-namespace BlueRocket.KERNEL
+namespace Dooggy.CORE
 {
     public class TestConsoleConfig
     {

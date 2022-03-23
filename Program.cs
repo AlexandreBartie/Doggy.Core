@@ -1,10 +1,10 @@
-using BlueRocket.KERNEL;
-using BlueRocket.KERNEL.POC.AutomacaoTestes;
+using Dooggy.CORE;
+using Dooggy.CORE.POC.AutomacaoTestes;
 using System;
 using System.Data.SqlClient;
 using System.Windows.Forms;
 
-namespace BlueRocket.KERNEL
+namespace Dooggy.CORE
 {
     static class Program
     {

@@ -1,7 +1,7 @@
-﻿using BlueRocket.KERNEL;
+﻿using Dooggy.CORE;
 using System.Diagnostics;
 
-namespace BlueRocket.KERNEL.Katalon
+namespace Dooggy.CORE.Katalon
 {
     public class KatalonTeste : TestRobotScript
     {
