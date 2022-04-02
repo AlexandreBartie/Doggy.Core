@@ -338,7 +338,7 @@ namespace Dooggy.CORE
 
         private TestConsoleConfig Config;
 
-        private TestDataTags Tags => Config.Pool.Global.Tags;
+        private DataTags Tags => Config.Pool.Global.Tags;
 
         
         public TestConfigMain(TestConsoleConfig prmConfig)
@@ -454,15 +454,15 @@ namespace Dooggy.CORE
         public void SetParameter()
         {
 
-            string tag; string valor; string sigla;
+            string tag; string valor; string sigla; 
       
             tag = Bloco.GetBloco(linha, prmDelimitadorInicial: prefixo_parametro, prmDelimitadorFinal: delimitador).Trim().ToLower();
             valor = Bloco.GetBlocoDepois(linha, delimitador, prmTRIM: true);
 
-            sigla = BlocoParametro.GetParametro(tag).ToLower();
+            sigla = new BlocoColchetes().GetParametro(tag).ToLower();
 
             if (sigla != "")
-                tag = BlocoParametro.GetPrefixo(tag).ToLower();
+                tag = new BlocoColchetes().GetPrefixo(tag).ToLower();
 
             switch (grupo)
             {
@@ -572,8 +572,8 @@ namespace Dooggy.CORE
                     Trace.LogConfig.FailFindParameterCFG(prmTag, prmValor); break;
             }
         }
-        private bool IsGroup() => (Prefixo.IsPrefixo(linha, prefixo_grupo, delimitador));
-        private void SetGroup() => grupo = (Prefixo.GetPrefixo(linha, prefixo_grupo, delimitador).Trim().ToLower());
+        private bool IsGroup() => (BlocoPrefixo.IsPrefixo(linha, prefixo_grupo, delimitador));
+        private void SetGroup() => grupo = (BlocoPrefixo.GetPrefixo(linha, prefixo_grupo, delimitador).Trim().ToLower());
 
     }
 

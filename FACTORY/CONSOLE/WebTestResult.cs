@@ -142,6 +142,8 @@ namespace Dooggy.CORE
     public class TestResultSQL : TestResultBase
     {
         public string log => GetLOG();
+        public double timeSeconds => GetTime();
+        public string timeSecondsTXT => myFormat.DoubleToString(timeSeconds, "##0.000");
         private string GetLOG()
         {
 
@@ -151,6 +153,16 @@ namespace Dooggy.CORE
                 log.Add(String.Format("[{0,4}] {1}", item.title, item.sql));
 
             return (log.memo);
+        }
+
+        private double GetTime()
+        {
+            double time = 0;
+
+            foreach (TraceMSG item in this)
+                time += item.time_seconds;
+
+            return time;
         }
 
     }

@@ -399,7 +399,7 @@ namespace Dooggy.CORE
             foreach (TestDataView View in this)
             {
 
-                if (myString.IsEmpty(prmTags) || lista.IsEqual(View.tag))
+                if (myString.IsEmpty(prmTags) || lista.IsFind(View.tag))
                 {
                     
                     filtro.AddItens(View.Flows);

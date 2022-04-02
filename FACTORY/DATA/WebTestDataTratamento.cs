@@ -7,7 +7,7 @@ namespace Dooggy.CORE
 {
     public class TestDataTratamento : TestDataException
     {
-        private TestDataVars Vars => Pool.Vars;
+        private DataVars Vars => Pool.Vars;
         private TestDataRaws Raws => (Pool.Raws);
         private TestDataViews Views => (Pool.Views);
 

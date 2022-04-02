@@ -6,75 +6,29 @@ using System.Text;
 namespace Dooggy.CORE
 {
 
-    public class TestDataTag : myDominio
+    public class DataVar
     {
-
-        public string name;
-
-        public xLista Opcoes => lista;
-
-        public bool TemOpcoes => (Opcoes != null);
-
-        public TestDataTag(string prmKey, string prmLista) : base(prmKey, prmLista)
-        { }
-
-    }
-
-    public class TestDataTags : myDominios
-    {
-
-        private string key_start = "[";
-        private string key_finish = "]";
-        public new void AddItem(string prmTag)
-        {
-            string key = Bloco.GetBloco(prmTag, key_start, key_finish);
-            string lista = Bloco.GetBlocoDepois(prmTag, key_finish,prmTRIM: true);
-
-            if (myString.IsFull(key) && myString.IsFull(lista))
-                AddItem(key, lista);
-        }
-    
-    }
-
-    public class TestDataVar
-    {
-
-        //private DataBase DataBase;
-
         public string tag;
 
         public string valor;
 
         public string sql;
 
-        public TestDataVar(string prmTag, string prmValor)//', DataBase prmDataBase)
+        public DataVar(string prmTag, string prmValor)
         {
-            //DataBase = prmDataBase;
-
             tag = prmTag;
 
             valor = prmValor;
         }
-
     }
 
-    public class TestDataVars : List<TestDataVar>
+    public class DataVars : List<DataVar>
     {
 
-       // public TestDataPool Pool;
+        public DataVar Corrente;
 
-        public TestDataVar Corrente;
-
-       // private TestTrace Trace { get => Pool.Trace; }
-
-        //public TestDataVars(TestDataPool prmPool)
-        //{
-        //    Pool = prmPool;
-        //}
-
-        public string Criar(string prmVar)//, DataBase prmDataBase)
+        public string Criar(string prmVar)
         {
-
             //
             // Identidica TAG e VALOR da variável 
             //
@@ -88,15 +42,12 @@ namespace Dooggy.CORE
 
             if (!Find(tag, valor))
             {
-
-                Corrente = new TestDataVar(tag, valor);//, prmDataBase);
+                Corrente = new DataVar(tag, valor);
 
                 Add(Corrente);
-
             }
 
             return Corrente.tag;
-
         }
         public string GetValor(string prmTag)
         {
@@ -106,21 +57,17 @@ namespace Dooggy.CORE
         }
         public void SetArgumento(string prmArg, string prmInstrucao)
         {
-
             switch (prmArg)
             {
-
                 case "sql":
                     Corrente.sql = prmInstrucao;
                     break;
-
             }
-
         }
 
         public bool Find(string prmTag)
         {
-            foreach (TestDataVar var in this)
+            foreach (DataVar var in this)
 
                 if (myString.IsEqual(var.tag, prmTag))
                 {

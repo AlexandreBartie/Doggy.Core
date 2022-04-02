@@ -149,9 +149,9 @@ namespace Dooggy.CORE
 
         public bool IsNewParametro() => Argumento.IsNewParametro(linha);
 
-        private bool IsPrefixoNote() => (Prefixo.IsPrefixo(linha, prmPrefixo: keyword_note));
+        private bool IsPrefixoNote() => (BlocoPrefixo.IsPrefixo(linha, prmPrefixo: keyword_note));
 
-        private bool IsPrefixoTag() => (Prefixo.IsPrefixo(linha, prmPrefixo: tag_start, prmDelimitador: tag_finish));
+        private bool IsPrefixoTag() => (BlocoPrefixo.IsPrefixo(linha, prmPrefixo: tag_start, prmDelimitador: tag_finish));
 
         private bool IsNewKeyword()
         {
@@ -169,7 +169,7 @@ namespace Dooggy.CORE
         private bool  GetTagBlock()
         {
 
-            tag = Prefixo.GetPrefixo(linha, prmPrefixo: tag_start, prmDelimitador: tag_finish).ToUpper();
+            tag = BlocoPrefixo.GetPrefixo(linha, prmPrefixo: tag_start, prmDelimitador: tag_finish).ToUpper();
 
             return (tag != "");
 
@@ -182,21 +182,21 @@ namespace Dooggy.CORE
 
             keyword = keyword_note;
 
-            target = Prefixo.GetPrefixoRemove(linha, prmPrefixo: keyword_note, prmTRIM: true);
+            target = BlocoPrefixo.GetPrefixoRemove(linha, prmPrefixo: keyword_note, prmTRIM: true);
 
         }
 
         private void GetTargetCommand()
         {
 
-            target = Prefixo.GetPrefixoRemove(linha, prmPrefixo: keyword_start, prmDelimitador: keyword_finish, prmTRIM: true);
+            target = BlocoPrefixo.GetPrefixoRemove(linha, prmPrefixo: keyword_start, prmDelimitador: keyword_finish, prmTRIM: true);
 
         }
 
         private string GetKeywordCommand()
         {
 
-            return Prefixo.GetPrefixo(linha, prmPrefixo: keyword_start, prmDelimitador: keyword_finish).ToLower();
+            return BlocoPrefixo.GetPrefixo(linha, prmPrefixo: keyword_start, prmDelimitador: keyword_finish).ToLower();
 
         }
         private string GetOptionsCommand()
@@ -465,7 +465,7 @@ namespace Dooggy.CORE
         private bool GetOK()
         {
             if (lista != null)
-                return lista.IsEqual(key);
+                return lista.IsFind(key);
             
             return false;
         }

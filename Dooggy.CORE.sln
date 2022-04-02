@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dooggy.CORE", "Dooggy.CORE.csproj", "{488F7112-6C43-4177-AB1F-FF3F69F841A0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dooggy.CORE.QA", "..\TESTING\CORE-QA\Dooggy.CORE.QA.csproj", "{A0CBF7BC-E58A-4574-A541-2BF3433A7B64}"
+	ProjectSection(ProjectDependencies) = postProject
+		{488F7112-6C43-4177-AB1F-FF3F69F841A0} = {488F7112-6C43-4177-AB1F-FF3F69F841A0}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -100,7 +100,7 @@ namespace Dooggy.CORE
 
         private TestCode Code;
 
-        public TestScriptTags Tags;
+        public DataTags Tags;
 
         public TestTrace Trace => Dados.Trace;
 
@@ -116,11 +116,11 @@ namespace Dooggy.CORE
 
             Console = prmConsole;
 
+            Tags = new DataTags();
+
             Code = new TestCode(this);
 
             Result = new TestResult(this);
-
-            Tags = new TestScriptTags(this);
 
         }
 
@@ -214,101 +214,89 @@ namespace Dooggy.CORE
         }
 
     }
-    public class TestScriptTag
-    {
+    //public class TestScriptTag
+    //{
+    //    public string _name;
+    //    public string _valor;
 
-        public string _key;
-        public string _valor;
+    //    public string name => myString.GetLower(_name);
+    //    public string valor => myString.GetUpper(_valor);
 
-        public string key => myString.GetLower(_key);
-        public string valor => myString.GetUpper(_valor);
+    //    public bool IsEqual(string prmName) => myString.IsEqual(name, prmName);
 
-        public bool IsEqual(string prmKey) => myString.IsEqual(key, prmKey);
+    //    public string log => String.Format("[{0,10}] '{1}'", name, valor);
 
-        public string log => String.Format("[{0,10}] '{1}'", key, valor);
-
-        public TestScriptTag(string prmKey)
-        {
-            _key = prmKey;
-        }
+    //    public TestScriptTag(string prmKey)
+    //    {
+    //        _name = prmKey;
+    //    }
         
-        public TestScriptTag(string prmKey, string prmValor)
-        {
-            _key = prmKey; _valor = prmValor;
-        }
+    //    public TestScriptTag(string prmKey, string prmValor)
+    //    {
+    //        _name = prmKey; _valor = prmValor;
+    //    }
 
-        public bool SetValor(string prmValor) { _valor = prmValor; return true; }
-        public bool SetValor(string prmValor, string prmKey)
-        {
-            if (IsEqual(prmKey))
-                return SetValor(prmValor);
-            return false;
-        }
+    //    public void SetValor(string prmValor) => _valor = prmValor;
 
-    }
-    public class TestScriptTags : List<TestScriptTag>
-    {
+    //}
+    //public class TestScriptTags : List<TestScriptTag>
+    //{
 
-        private TestScript Script;
+    //    private TestScript Script;
 
-        private TestTrace Trace => Script.Trace;
+    //    private TestTrace Trace => Script.Trace;
 
-        private TestDataTags MainTags => Script.Global.Tags;
+    //    private DataTags MainTags => Script.Global.Tags;
 
-        private string delimitador = "=";
+    //    public string log => GetLOG();
 
-        public string log => GetLOG();
+    //    public TestScriptTags(TestScript prmScript)
+    //    {
+    //        Script = prmScript; Setup();
+    //    }
 
-        public TestScriptTags(TestScript prmScript)
-        {
-            Script = prmScript; Setup();
-        }
+    //    private void Setup()
+    //    {
+    //        foreach (var item in MainTags)
+    //            Add(new TestScriptTag(item.name, item.padrao));
+    //    }
 
-        private void Setup()
-        {
-            foreach (var item in MainTags)
-                Add(new TestScriptTag(item.key));
-        }
+    //    public void SetTag(string prmLinha)
+    //    {
+    //        myTupla tupla = new myTupla(prmLinha);
 
-        public void SetTag(string prmLinha)
-        {
-
-            string tag = myString.GetFirst(prmLinha, prmDelimitador: delimitador).Trim();
-            string valor = myString.GetLast(prmLinha, prmDelimitador: delimitador).Trim();
-
-            SetTag(prmTag: tag, prmValue: valor, prmCommand: prmLinha);
-
-        }
-        private void SetTag(string prmTag, string prmValue, string prmCommand)
-        {
-            if (MainTags.IsFind(prmTag))
-                if (MainTags.FindKey(prmTag).IsFind(prmValue))
-                    SetValue(prmTag, prmValue);
-                else
-                    Trace.LogConsole.FailFindTagElement(prmTag, prmValue);
-            else
-                Trace.LogConsole.FailFindTag(prmTag, prmCommand);
-        }
+    //        SetTag(prmTag: tupla.name, prmValue: tupla.value, prmCommand: prmLinha);
+    //    }
+    //    private void SetTag(string prmTag, string prmValue, string prmCommand)
+    //    {
+    //        if (MainTags.IsFind(prmTag))
+    //            if (MainTags.FindKey(prmTag).IsFind(prmValue))
+    //                SetValue(prmTag, prmValue);
+    //            else
+    //                Trace.LogConsole.FailFindTagElement(prmTag, prmValue);
+    //        else
+    //            Trace.LogConsole.FailFindTag(prmTag, prmCommand);
+    //    }
         
-        private void SetValue(string prmTag, string prmValue)
-        {
-            foreach (TestScriptTag Tag in this)
-                if (Tag.SetValor(prmValue, prmTag))
-                    return;
+    //    private void SetValue(string prmTag, string prmValue)
+    //    {
+    //        foreach (TestScriptTag Tag in this)
+    //            if (Tag.IsEqual(prmTag))
+    //                { Tag.SetValor(prmValue);  return; }             
+   
+    //        Trace.LogConsole.FailScriptTag(prmTag, prmValue);
+    //    }
+    //    private string GetLOG()
+    //    {
 
-            Trace.LogConsole.FailScriptTag(prmTag, prmValue);
-        }
-        private string GetLOG()
-        {
+    //        xMemo log = new xMemo();
 
-            xMemo log = new xMemo();
+    //        foreach (TestScriptTag Tag in this)
+    //            log.Add(Tag.log);
 
-            foreach (TestScriptTag Tag in this)
-                log.Add(Tag.log);
+    //        return log.memo;
 
-            return log.memo;
+    //    }
 
-        }
-
-    }
+    //}
 }

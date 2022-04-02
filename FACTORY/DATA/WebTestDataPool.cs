@@ -38,7 +38,7 @@ namespace Dooggy.CORE
         public TestDataViews Views => (Local.Views);
         public TestDataFlows Flows => (Local.Flows);
         public TestDataRaws Raws => (Local.Raws);
-        public TestDataVars Vars => (Local.Vars);
+        public DataVars Vars => (Local.Vars);
 
         public DataBase DataBaseCorrente => (Bases.Corrente);
         public TestDataView DataViewCorrente => (Views.Corrente);
@@ -128,9 +128,9 @@ namespace Dooggy.CORE
 
         private TestDataPool Pool;
 
-        public TestDataTags Tags;
+        public DataTags Tags;
 
-        public TestDataVars Vars;
+        public DataVars Vars;
 
         public TestDataGlobal(TestDataPool prmPool)
         {
@@ -139,9 +139,9 @@ namespace Dooggy.CORE
 
         public void Cleanup()
         {
-            Tags = new TestDataTags();
+            Tags = new DataTags();
 
-            Vars = new TestDataVars();
+            Vars = new DataVars();
         }
 
     }
@@ -150,7 +150,7 @@ namespace Dooggy.CORE
 
         private TestDataPool Pool;
 
-        public TestDataVars Vars;
+        public DataVars Vars;
         public TestDataRaws Raws;
         public TestDataViews Views;
 
@@ -164,7 +164,7 @@ namespace Dooggy.CORE
         public void Cleanup()
         {
 
-            Vars = new TestDataVars();// Pool);
+            Vars = new DataVars();// Pool);
             Raws = new TestDataRaws(Pool);
             Views = new TestDataViews(Pool);
 

@@ -31,13 +31,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dooggy.LIBRARY" Version="1.0.7.3" />
-    <PackageReference Include="Microsoft.CodeCoverage" Version="17.1.0" />
+    <PackageReference Include="Dooggy.LIBRARY" Version="1.0.7.8" />
     <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="3.21.50" />
     <PackageReference Include="Selenium.Support" Version="4.1.0" />
-    <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="99.0.4844.5100" />
     <PackageReference Include="Selenium.WebDriver.MicrosoftDriver" Version="17.17134.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LIBRARY\Dooggy.LIBRARY.csproj" />
   </ItemGroup>
 
   <ItemGroup>
