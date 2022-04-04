@@ -8,7 +8,7 @@ namespace Dooggy.CORE
     public class TestDataFile
     {
 
-        private TestDataSource Dados;
+        private DataSource Dados;
 
         private TestDataFileIO File;
 
@@ -16,7 +16,7 @@ namespace Dooggy.CORE
 
         private string extensao_padrao;
 
-        public TestDataFile(TestDataSource prmDados, string prmExtensao)
+        public TestDataFile(DataSource prmDados, string prmExtensao)
         {
 
             Dados = prmDados;

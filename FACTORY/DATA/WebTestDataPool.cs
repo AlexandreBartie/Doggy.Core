@@ -16,14 +16,14 @@ namespace Dooggy.CORE
           json = 3
     }
 
-    public class TestDataPool
+    public class DataPool
     {
 
         public TestFactory Factory;
 
-        public TestDataLocal Local;
+        public DataLocal Local;
 
-        private TestDataResume Resume;
+        private DataResume Resume;
 
         public TestDataTratamento Tratamento;
 
@@ -32,8 +32,8 @@ namespace Dooggy.CORE
 
         public DataBases Bases => (Connect.Bases);
         public DataConnect Connect => (Resume.Connect);
-        public TestDataSource Dados => (Resume.Dados);
-        public TestDataGlobal Global => (Resume.Global);
+        public DataSource Dados => (Resume.Dados);
+        public DataGlobal Global => (Resume.Global);
 
         public TestDataViews Views => (Local.Views);
         public TestDataFlows Flows => (Local.Flows);
@@ -46,14 +46,14 @@ namespace Dooggy.CORE
         public bool IsHaveData => Raws.IsHaveData || Views.IsHaveData;
         private int next_view => Views.Count + 1;
 
-        public TestDataPool(TestFactory prmFactory)
+        public DataPool(TestFactory prmFactory)
         {
 
             Factory = prmFactory;
 
-            Local = new TestDataLocal(this);
+            Local = new DataLocal(this);
 
-            Resume = new TestDataResume(this);
+            Resume = new DataResume(this);
 
             Tratamento = new TestDataTratamento(this);
 
@@ -97,25 +97,27 @@ namespace Dooggy.CORE
 
     }
 
-    public class TestDataResume
+    public class DataResume
     {
-        private TestDataPool Pool;
+        private DataPool Pool;
 
         public DataConnect Connect;
 
-        public TestDataSource Dados;
+        public DataSource Dados;
 
-        public TestDataGlobal Global;
+        public DataGlobal Global;
 
-        public TestDataResume(TestDataPool prmPool)
+        private TestTrace Trace => Pool.Trace;
+
+        public DataResume(DataPool prmPool)
         {
             Pool = prmPool; 
 
-            Connect = new DataConnect(Pool.Trace);
+            Connect = new DataConnect(Trace);
 
-            Dados = new TestDataSource(prmPool);
+            Dados = new DataSource(prmPool);
 
-            Global = new TestDataGlobal(prmPool);
+            Global = new DataGlobal(prmPool);
         }
 
         public void Cleanup()
@@ -123,32 +125,32 @@ namespace Dooggy.CORE
             Global.Cleanup();
         }
     }
-    public class TestDataGlobal
+    public class DataGlobal
     {
 
-        private TestDataPool Pool;
+        private DataPool Pool;
 
         public DataTags Tags;
 
         public DataVars Vars;
 
-        public TestDataGlobal(TestDataPool prmPool)
+        public DataGlobal(DataPool prmPool)
         {
             Pool = prmPool;  Cleanup();
         }
 
         public void Cleanup()
         {
-            Tags = new DataTags();
+            Tags = new DataTags(Pool);
 
-            Vars = new DataVars();
+            Vars = new DataVars(Pool);
         }
 
     }
-    public class TestDataLocal
+    public class DataLocal
     {
 
-        private TestDataPool Pool;
+        private DataPool Pool;
 
         public DataVars Vars;
         public TestDataRaws Raws;
@@ -156,26 +158,24 @@ namespace Dooggy.CORE
 
         public TestDataFlows Flows => (Views.Corrente.Flows);
 
-        public TestDataLocal(TestDataPool prmPool)
+        public DataLocal(DataPool prmPool)
         {
             Pool = prmPool; Cleanup();
         }
 
         public void Cleanup()
         {
-
-            Vars = new DataVars();// Pool);
+            Vars = new DataVars(Pool);
             Raws = new TestDataRaws(Pool);
             Views = new TestDataViews(Pool);
-
         }
 
 
     }
-    public class TestDataSource
+    public class DataSource
     {
 
-        public TestDataPool Pool;
+        public DataPool Pool;
 
         public TestDataFile FileINI;
         public TestDataFile FileLOG;
@@ -185,7 +185,7 @@ namespace Dooggy.CORE
 
         public bool IsHaveData => Pool.IsHaveData;
 
-        public TestDataSource(TestDataPool prmPool)
+        public DataSource(DataPool prmPool)
         {
 
             Pool = prmPool;

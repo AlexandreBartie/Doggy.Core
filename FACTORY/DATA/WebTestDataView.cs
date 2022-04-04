@@ -8,7 +8,7 @@ namespace Dooggy.CORE
     public class TestDataView : TestDataViewSQL
     {
 
-        public TestDataPool Pool;
+        public DataPool Pool;
         
         public DataBase DataBase;
 
@@ -23,7 +23,7 @@ namespace Dooggy.CORE
 
         public TestTrace Trace { get => Pool.Trace; }
 
-        public TestDataView(string prmTag, DataBase prmDataBase, TestDataPool prmPool)
+        public TestDataView(string prmTag, DataBase prmDataBase, DataPool prmPool)
         {
             Pool = prmPool;
             
@@ -314,7 +314,7 @@ namespace Dooggy.CORE
     public class TestDataViews : List<TestDataView>
     {
 
-        public TestDataPool Pool;
+        public DataPool Pool;
 
         public TestDataView Corrente;
 
@@ -322,7 +322,7 @@ namespace Dooggy.CORE
 
         public bool IsHaveData => (this.Count != 0);
 
-        public TestDataViews(TestDataPool prmPool)
+        public TestDataViews(DataPool prmPool)
         {
 
             Pool = prmPool;
@@ -423,7 +423,7 @@ namespace Dooggy.CORE
 
                 foreach (TestDataView View in this)
                 {
-                    if (myString.IsEqual(View.tag, tag))
+                    if (myString.IsMatch(View.tag, tag))
                     {
                         filtro.Add(View); cont++;
                     }
@@ -436,7 +436,7 @@ namespace Dooggy.CORE
         {
             foreach (TestDataView view in this)
 
-                if (myString.IsEqual(view.tag, prmTag))
+                if (myString.IsMatch(view.tag, prmTag))
                 {
 
                     Corrente = view;
@@ -451,7 +451,7 @@ namespace Dooggy.CORE
     public class TestDataFlows : List<TestDataFlow>
     {
 
-        private TestDataPool Pool;
+        private DataPool Pool;
 
         public TestDataFlow Corrente;
 
@@ -459,7 +459,7 @@ namespace Dooggy.CORE
 
         public bool IsFull => (Count != 0);
 
-        public TestDataFlows(TestDataPool prmPool)
+        public TestDataFlows(DataPool prmPool)
         {
 
             Pool = prmPool;
@@ -621,7 +621,7 @@ namespace Dooggy.CORE
 
         private xLinhas Itens;
 
-        public TestDataPool Pool;
+        public DataPool Pool;
 
         private TestTrace Trace { get => Pool.Trace; }
 
@@ -630,7 +630,7 @@ namespace Dooggy.CORE
         public bool IsON = true;
         public bool IsHaveData => IsON && Itens.IsFull;
 
-        public TestDataRaws(TestDataPool prmPool)
+        public TestDataRaws(DataPool prmPool)
         {
 
             Pool = prmPool;

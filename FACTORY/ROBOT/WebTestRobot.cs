@@ -696,7 +696,7 @@ namespace Dooggy.CORE
 
         public TestRobotProject Project { get => Robot.Projeto; }
         private TestTrace Trace { get => Robot.Trace; }
-        private TestDataPool Pool { get => Project.Pool; }
+        private DataPool Pool { get => Project.Pool; }
         public bool IsOK { get => JSON.IsOK; }
         public bool IsCurrent { get => JSON.IsCurrent; }
         public void Add(string prmFlow)

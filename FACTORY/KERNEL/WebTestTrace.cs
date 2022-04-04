@@ -91,9 +91,9 @@ namespace Dooggy.CORE
         public void FailEnterVariable(myTupla prmTupla) => msgErro(String.Format("DataEnter não encontrado em campos INPUT ... -enter: {0} = {1}", prmTupla.var_sql, prmTupla.value_sql));
         public void FailCheckVariable(myTupla prmTupla) => msgErro(String.Format("DataCheck não encontrado em campos OUTPUT... -check: {0} = {1}", prmTupla.var_sql, prmTupla.value_sql));
 
-        public void FailFindTag(string prmTag, string prmCommand) => msgErro(String.Format("Tag não encontrada ... -tag: {0} -cmd: {1}", prmTag, prmCommand));
-        public void FailFindTagElement(string prmTag, string prmValue) => msgErro(String.Format("Elemento Tag não encontrada ... -tag: {0} -value: {1}", prmTag, prmValue));
-        public void FailScriptTag(string prmTag, string prmValue) => msgErro(String.Format("Script TAG não atualizada ... -tag: {0} -value: {1}", prmTag, prmValue));
+        public void FailFindTagName(string prmTag) => msgErro(String.Format("Tag não definida ... -tag: {0}", prmTag));
+        public void FailFindTagOption(string prmTag, string prmValue) => msgErro(String.Format("Opção Tag não definida ... -tag: {0} -value: {1}", prmTag, prmValue));
+        public void FailConfigTag(string prmCommand) => msgErro(String.Format("Config TAG falhou ... -command: {0}", prmCommand));
 
         public void FailFindVariable(string prmVariable, string prmCommand) => msgErro(String.Format("Variável não encontrada ... -var: {0} -cmd: {1}", prmVariable, prmCommand));
         public void FailFindFunction(string prmFunction, string prmCommand) => msgErro(String.Format("Função não encontrada ... -fnc: {0} -cmd: {1}", prmFunction, prmCommand));

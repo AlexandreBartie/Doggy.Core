@@ -131,7 +131,7 @@ namespace Dooggy.CORE
             TestResultBase result = new TestResultBase();
 
             foreach (TraceMSG item in this)
-                if (item.IsEqual(prmTipo))
+                if (item.IsMatch(prmTipo))
                     result.Add(item);
 
             return (result);

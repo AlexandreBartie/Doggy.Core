@@ -15,7 +15,7 @@ namespace Dooggy.CORE
 
         public TestTrace Trace => Console.Trace;
 
-        public TestDataPool Pool => Console.Pool;
+        public DataPool Pool => Console.Pool;
 
         private bool TemCorrente => (Corrente != null);
 
@@ -65,7 +65,7 @@ namespace Dooggy.CORE
 
             foreach (TestScript Script in this)
 
-                if (myString.IsEqual(Script.key, prmKey))
+                if (myString.IsMatch(Script.key, prmKey))
                 {
 
                     Corrente = Script;
@@ -95,18 +95,12 @@ namespace Dooggy.CORE
         }
 
     }
-    public class TestScript : TestScritpBreak
+    public class TestScript : TestScriptTags
     {
 
         private TestCode Code;
 
-        public DataTags Tags;
-
-        public TestTrace Trace => Dados.Trace;
-
-        public TestDataGlobal Global => Console.Pool.Global;
-
-        private TestDataSource Dados => Console.Dados;
+        public TestTrace Trace => Pool.Trace;
         private TestConsoleInput Input => Console.Input;
 
         public string key;
@@ -116,11 +110,11 @@ namespace Dooggy.CORE
 
             Console = prmConsole;
 
-            Tags = new DataTags();
-
             Code = new TestCode(this);
 
             Result = new TestResult(this);
+
+            SetupTags();
 
         }
 
@@ -135,7 +129,6 @@ namespace Dooggy.CORE
 
         }
 
-        public void SetTag(string prmLinha) => Tags.SetTag(prmLinha);
         public void SetCode(string prmCode) => Result.SetCode(prmCode);
         public void Play(string prmCode, string prmArquivoOUT) => Code.Play(prmCode, prmArquivoOUT);
 
@@ -143,6 +136,21 @@ namespace Dooggy.CORE
         public void AddLogSQL(TraceMSG prmMsg, string prmError) => Result.AddLogSQL(prmTrace: prmMsg.msg, prmSQL: prmMsg.sql, prmTimeElapsed: prmMsg.time_elapsed, prmError);
     }
 
+    public class TestScriptTags : TestScritpBreak
+    {
+
+        public DataTags Tags;
+
+        public DataPool Pool => Console.Pool;
+
+        public void SetupTags()
+        {
+            Tags = new DataTags(Pool); Tags.SetGlobal();
+        }
+
+        public void SetTag(string prmSintaxe) => Tags.SetTag(prmSintaxe);
+
+    }
     public class TestScritpBreak : TestScriptSave
     {
 
@@ -185,7 +193,7 @@ namespace Dooggy.CORE
         public string encoding;
         public string extensao;
 
-        private TestDataSource Dados => Console.Dados;
+        private DataSource Dados => Console.Dados;
 
         private TestConfigPath Path => Console.Config.Path;
         private TestConsoleOutput Output => Console.Output;
@@ -214,6 +222,8 @@ namespace Dooggy.CORE
         }
 
     }
+
+
     //public class TestScriptTag
     //{
     //    public string _name;
@@ -222,7 +232,7 @@ namespace Dooggy.CORE
     //    public string name => myString.GetLower(_name);
     //    public string valor => myString.GetUpper(_valor);
 
-    //    public bool IsEqual(string prmName) => myString.IsEqual(name, prmName);
+    //    public bool IsMatch(string prmName) => myString.IsMatch(name, prmName);
 
     //    public string log => String.Format("[{0,10}] '{1}'", name, valor);
 
@@ -261,31 +271,6 @@ namespace Dooggy.CORE
     //            Add(new TestScriptTag(item.name, item.padrao));
     //    }
 
-    //    public void SetTag(string prmLinha)
-    //    {
-    //        myTupla tupla = new myTupla(prmLinha);
-
-    //        SetTag(prmTag: tupla.name, prmValue: tupla.value, prmCommand: prmLinha);
-    //    }
-    //    private void SetTag(string prmTag, string prmValue, string prmCommand)
-    //    {
-    //        if (MainTags.IsFind(prmTag))
-    //            if (MainTags.FindKey(prmTag).IsFind(prmValue))
-    //                SetValue(prmTag, prmValue);
-    //            else
-    //                Trace.LogConsole.FailFindTagElement(prmTag, prmValue);
-    //        else
-    //            Trace.LogConsole.FailFindTag(prmTag, prmCommand);
-    //    }
-        
-    //    private void SetValue(string prmTag, string prmValue)
-    //    {
-    //        foreach (TestScriptTag Tag in this)
-    //            if (Tag.IsEqual(prmTag))
-    //                { Tag.SetValor(prmValue);  return; }             
-   
-    //        Trace.LogConsole.FailScriptTag(prmTag, prmValue);
-    //    }
     //    private string GetLOG()
     //    {
 

@@ -23,8 +23,8 @@ namespace Dooggy.CORE
 
         public TestConfigValidation Validation;
 
-        public TestDataPool Pool => Console.Pool;
-        public TestDataGlobal Global => Console.Pool.Global;
+        public DataPool Pool => Console.Pool;
+        public DataGlobal Global => Console.Pool.Global;
 
         private DataBases Bases => Pool.Bases;
         public DataConnect Connect => Pool.Connect;
@@ -346,7 +346,7 @@ namespace Dooggy.CORE
             Config = prmConfig;
         }
 
-        public void SetTag(string prmTag) => Tags.AddItem(prmTag);
+        public void AddTag(string prmSintaxe) => Tags.Add(prmSintaxe);
 
         //public string log => String.Format(">path: -ini: '{0}', -out: '{1}', -log: '{2}'", INI.path, OUT.path, LOG.path);
 
@@ -566,7 +566,7 @@ namespace Dooggy.CORE
             switch (prmTag)
             {
                 case "tag":
-                    Config.Main.SetTag(prmValor); break;
+                    Config.Main.AddTag(prmSintaxe: prmValor); break;
 
                 default:
                     Trace.LogConfig.FailFindParameterCFG(prmTag, prmValor); break;

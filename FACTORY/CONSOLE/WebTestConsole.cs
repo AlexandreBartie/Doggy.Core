@@ -19,9 +19,9 @@ namespace Dooggy.CORE
 
         public TestScripts Scripts;
 
-        public TestDataPool Pool => Factory.Pool;
+        public DataPool Pool => Factory.Pool;
         public TestTrace Trace => Factory.Trace;
-        public TestDataSource Dados => Pool.Dados;
+        public DataSource Dados => Pool.Dados;
 
         public DataConnect Connect => Pool.Connect;
         public DataBases Bases => Pool.Bases;
@@ -145,7 +145,7 @@ namespace Dooggy.CORE
         internal TestConfigPath Path => Console.Config.Path;
         internal TestScript Script => Console.Script;
         internal TestResult Result => Script.Result;
-        internal TestDataSource Dados => Console.Dados;
+        internal DataSource Dados => Console.Dados;
         internal TestTrace Trace => Console.Trace;
 
         internal string GetNameScriptOrigem()

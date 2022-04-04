@@ -26,7 +26,7 @@ namespace Dooggy.CORE
         private string fncDelimitadorInicial = "(";
         private string fncDelimitadorFinal = ")";
 
-        public TestDataTratamento(TestDataPool prmPool)
+        public TestDataTratamento(DataPool prmPool)
         {
             Pool = prmPool;
         }
@@ -193,7 +193,7 @@ namespace Dooggy.CORE
     public class TestDataException
     {
 
-        public TestDataPool Pool;
+        public DataPool Pool;
 
         private xLista Dominio;
 

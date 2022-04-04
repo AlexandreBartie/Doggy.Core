@@ -31,7 +31,7 @@ namespace Dooggy.CORE
 
         public TestTraceLogRobot Log { get => Projeto.Trace.LogRobot; }
 
-        public TestDataPool Pool => Projeto.Pool;
+        public DataPool Pool => Projeto.Pool;
 
         public void Setup(TestRobotProject prmProjeto)
         {

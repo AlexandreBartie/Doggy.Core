@@ -122,7 +122,7 @@ namespace Dooggy.CORE
         {
             foreach (TestBlock Block in this)
 
-                if (myString.IsEqual(Block.key, prmTag))
+                if (myString.IsMatch(Block.key, prmTag))
                 {
                     Corrente = Block;
 
@@ -257,7 +257,7 @@ namespace Dooggy.CORE
 
         public string keyword { get => Sintaxe.keyword; }
         public TestTrace Trace { get => Console.Trace; }
-        private TestDataSource Dados { get => Console.Dados; }
+        private DataSource Dados { get => Console.Dados; }
 
         public bool IsTipoData => GetTipoData();
         public bool IsTipoSave => GetTipoSave();
@@ -302,9 +302,9 @@ public class TestCommandAction
 
         private TestTrace Trace { get => Sintaxe.Trace; }
 
-        private TestDataSource Dados { get => Console.Dados; }
+        private DataSource Dados { get => Console.Dados; }
 
-        private TestDataPool Pool { get => Dados.Pool; }
+        private DataPool Pool { get => Dados.Pool; }
 
         private string target { get => Sintaxe.target; }
 

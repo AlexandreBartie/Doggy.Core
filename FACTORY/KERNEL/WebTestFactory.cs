@@ -11,9 +11,9 @@ namespace Dooggy.CORE
     public class TestFactory
     {
 
-        public TestDataPool Pool;
+        public DataPool Pool;
 
-        public TestDataSource Dados => Pool.Dados;
+        public DataSource Dados => Pool.Dados;
 
         public TestConsole Console;
 
@@ -31,7 +31,7 @@ namespace Dooggy.CORE
             Trace.LogExecutado += TraceLogExecutado;
             Trace.SqlExecutado += TraceSqlExecutado;
 
-            Pool = new TestDataPool(this);
+            Pool = new DataPool(this);
 
             Console = new TestConsole(this);
 
