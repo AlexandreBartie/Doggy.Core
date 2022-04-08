@@ -48,11 +48,17 @@ namespace Dooggy.CORE
 
             return false;
         }
-    }
 
+    }
+    public class DataTagOption : myTagOption
+    {
+        public DataTagOption(myTagOption prmOption) : base(prmOption.Tag, prmOption.value) { }
+        public DataTagOption(myTag prmTag, string prmValue) : base(prmTag, prmValue) { }
+
+    }
     public class DataTagOptions : myTagOptions
     {
-
+    
     }
     public class DataVar
     {

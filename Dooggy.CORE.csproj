@@ -7,11 +7,11 @@
     <ApplicationIcon>Dooggy.ico</ApplicationIcon>
     <StartupObject></StartupObject>
     <Authors>Alexandre Bartie</Authors>
-    <Product>Dooggy.CORE FRAMEWORK</Product>
+    <Product>Dooggy FRAMEWORK</Product>
     <AssemblyName>Dooggy.CORE</AssemblyName>
     <RootNamespace>Dooggy.CORE</RootNamespace>
     <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
-    <Version>1.0.7.2</Version>
+    <Version>1.0.7.3</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageProjectUrl></PackageProjectUrl>
     <PackageIcon>Dooggy.jpg</PackageIcon>
@@ -20,6 +20,7 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <AssemblyVersion></AssemblyVersion>
     <FileVersion></FileVersion>
+    <Description>Dooggy-CORE é um Framework de Automação de Testes WEB (baseado no Selenium Driver) que reduz a complexidade e manutenção dos scripts de testes, além de possuir uma extensão "key-driven-testing" que permite automação por pessoas não técnicas.</Description>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -31,15 +32,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dooggy.LIBRARY" Version="1.0.7.8" />
+    <PackageReference Include="Dooggy.LIBRARY" Version="1.0.7.9" />
     <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="3.21.50" />
     <PackageReference Include="Selenium.Support" Version="4.1.0" />
     <PackageReference Include="Selenium.WebDriver.MicrosoftDriver" Version="17.17134.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\LIBRARY\Dooggy.LIBRARY.csproj" />
   </ItemGroup>
 
   <ItemGroup>

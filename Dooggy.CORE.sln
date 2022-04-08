@@ -10,8 +10,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dooggy.CORE.QA", "..\TESTIN
 		{488F7112-6C43-4177-AB1F-FF3F69F841A0} = {488F7112-6C43-4177-AB1F-FF3F69F841A0}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dooggy.LIBRARY", "..\LIBRARY\Dooggy.LIBRARY.csproj", "{B6636927-16A3-4245-B5E7-D695384587F4}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,10 +24,6 @@ Global
 		{A0CBF7BC-E58A-4574-A541-2BF3433A7B64}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A0CBF7BC-E58A-4574-A541-2BF3433A7B64}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A0CBF7BC-E58A-4574-A541-2BF3433A7B64}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B6636927-16A3-4245-B5E7-D695384587F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B6636927-16A3-4245-B5E7-D695384587F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B6636927-16A3-4245-B5E7-D695384587F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B6636927-16A3-4245-B5E7-D695384587F4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

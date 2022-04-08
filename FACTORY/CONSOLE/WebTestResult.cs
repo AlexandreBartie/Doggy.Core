@@ -25,6 +25,9 @@ namespace Dooggy.CORE
         public string data { get => _data; }
 
         public bool IsError => Log.IsError;
+
+        public bool IsSlow => SQL.IsSlow;
+
         public bool IsData => (myString.IsFull(data));
 
         public bool IsDataSaved;
@@ -142,8 +145,20 @@ namespace Dooggy.CORE
     public class TestResultSQL : TestResultBase
     {
         public string log => GetLOG();
+
         public double timeSeconds => GetTime();
-        public string timeSecondsTXT => myFormat.DoubleToString(timeSeconds, "##0.000");
+        public double timeBigger => GetTime(prmBigger: true);
+        public double timeAverage => myDouble.GetAverage(timeSeconds, qtde);
+
+        public bool IsRunned => (timeSeconds != 0 && IsFull);
+
+        public bool IsSlow => (timeBigger > 3);
+
+        public string qtdTestsTXT => myString.Texting(qtde.ToString(), IsRunned);
+        public string timeSecondsTXT => myString.Texting(myFormat.MilisecondsToString(timeSeconds), IsRunned);
+        public string timeAverageTXT => myString.Texting(myFormat.MilisecondsToString(timeAverage), IsRunned);
+        public string timeBiggerTXT => myString.Texting(myFormat.MilisecondsToString(timeBigger), IsRunned);
+
         private string GetLOG()
         {
 
@@ -155,12 +170,16 @@ namespace Dooggy.CORE
             return (log.memo);
         }
 
-        private double GetTime()
+        private double GetTime() => GetTime(prmBigger: false);
+        private double GetTime(bool prmBigger)
         {
             double time = 0;
 
             foreach (TraceMSG item in this)
-                time += item.time_seconds;
+                if (prmBigger)
+                    time = myDouble.GetBigger(time, item.time_seconds);
+                else
+                    time += item.time_seconds;
 
             return time;
         }
@@ -171,7 +190,8 @@ namespace Dooggy.CORE
     {
         public string txt => GetTXT();
 
-        public bool IsFull => (this.Count > 0);
+        public int qtde => this.Count;
+        public bool IsFull => (qtde > 0);
 
         private string GetTXT()
         {
