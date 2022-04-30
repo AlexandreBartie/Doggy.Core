@@ -1,9 +1,9 @@
-﻿using Dooggy.LIBRARY;
+﻿using Katty;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Dooggy.CORE
+namespace Dooggy
 {
     public class TestDataTratamento : TestDataException
     {
@@ -159,7 +159,7 @@ namespace Dooggy.CORE
         }
         private string GetNumberRandom(string prmParametro)
         {
-            return myFormat.RandomToString(prmDate: dateAnchor, prmParametro);
+            return myRandom.Next(prmParametro);
         }
     }
     public class TestDataFormat : TestDataException

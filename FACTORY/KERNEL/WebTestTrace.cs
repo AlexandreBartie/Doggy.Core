@@ -2,9 +2,9 @@
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Text;
-using Dooggy.LIBRARY;
+using Katty;
 
-namespace Dooggy.CORE
+namespace Dooggy
 {
 
     public class TestTrace : TraceLog

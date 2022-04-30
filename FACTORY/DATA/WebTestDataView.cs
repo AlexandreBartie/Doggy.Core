@@ -1,9 +1,9 @@
-﻿using Dooggy.LIBRARY;
+﻿using Katty;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Dooggy.CORE
+namespace Dooggy
 {
     public class TestDataView : TestDataViewSQL
     {
@@ -78,7 +78,7 @@ namespace Dooggy.CORE
             {
                 if (IsVazio)
                 {
-                    _cursor = DataBase.GetCursor(prmSQL: GetSQL(), prmMask: GetMaskMerged());
+                    _cursor = DataBase.GetCursor(prmSQL: GetSQL(), prmMasks: GetMasksMerged());
 
                     CheckResultDataCursor();
                 }
@@ -91,7 +91,7 @@ namespace Dooggy.CORE
         public bool IsOK => Cursor.IsOK;
         public Exception Erro => Cursor.Erro;
 
-        public TestDataFlow(string prmTag, string prmSQL, string prmMask, TestDataView prmDataView)
+        public TestDataFlow(string prmTag, string prmSQL, string prmMasks, TestDataView prmDataView)
         {
             View = prmDataView;
 
@@ -101,7 +101,7 @@ namespace Dooggy.CORE
 
             SetSQL(prmSQL);
 
-            SetMask(prmMask);
+            SetMasks(prmMasks);
         }
 
         public bool Next() => Cursor.Next();
@@ -162,8 +162,8 @@ namespace Dooggy.CORE
 
         private void CheckFindFieldToMaskFormat()
         {
-            if (Cursor.TemMask)
-                foreach (myTupla tupla in Cursor.GetMask())
+            if (Cursor.HasMasks)
+                foreach (myTupla tupla in Cursor.Masks)
                     if (!Cursor.IsFind(prmColumn: tupla.name))
                         Trace.LogData.FailSQLFormatFindField(prmCampo: tupla.name, prmFormat: tupla.value);
         }
@@ -267,17 +267,17 @@ namespace Dooggy.CORE
                     Trace.LogConsole.FailCheckVariable(tupla);
         }
 
-        internal myTuplas GetMaskMerged()
+        internal myMasks GetMasksMerged()
         {
-            myTuplas mask = new myTuplas();
+            myMasks ret = new myMasks();
 
-            mask.Parse(View.Mask);
+            ret.Parse(View.Masks);
 
-            mask.Parse(Mask);
+            ret.Parse(Masks);
 
-            mask.Parse(Header.Mask);
+            ret.Parse(Header.Masks);
 
-            return mask;
+            return ret;
         }
 
     }
@@ -307,9 +307,9 @@ namespace Dooggy.CORE
 
     public class TestDataMask
     {
-        public myTuplas Mask = new myTuplas();
+        public myMasks Masks = new myMasks();
 
-        public void SetMask(string prmLista) => Mask.Parse(prmLista);
+        public void SetMasks(string prmLista) => Masks.Parse(prmLista);
     }
     public class TestDataViews : List<TestDataView>
     {
@@ -329,7 +329,7 @@ namespace Dooggy.CORE
 
         }
 
-        public string Criar(string prmTag, string prmMask, DataBase prmDataBase)
+        public string Criar(string prmTag, string prmMasks, DataBase prmDataBase)
         {
 
             if (Find(prmTag))
@@ -345,7 +345,7 @@ namespace Dooggy.CORE
 
             }
 
-            Corrente.SetMask(prmMask);
+            Corrente.SetMasks(prmMasks);
 
             return Corrente.tag;
 
@@ -372,7 +372,7 @@ namespace Dooggy.CORE
                     break;
                 
                 case "mask":
-                    Corrente.SetMask(prmInstrucao);
+                    Corrente.SetMasks(prmInstrucao);
                     break;
 
                 case "input":
@@ -513,7 +513,7 @@ namespace Dooggy.CORE
                     Corrente.SetOrder(prmInstrucao); break;
 
                 case "mask":
-                    Corrente.SetMask(prmInstrucao); break;
+                    Corrente.SetMasks(prmInstrucao); break;
 
                 case "index":
                     Corrente.SetIndex(prmInstrucao); break;
@@ -712,12 +712,12 @@ namespace Dooggy.CORE
 
     public class TestDataHeader
     {
-        internal myTuplasBox Box;
+        internal myBoxMasks Box;
 
-        public myTuplas Input;
-        public myTuplas Output;
+        public myMasks Input;
+        public myMasks Output;
 
-        public myTuplas Mask => new myTuplas(Box.mask);
+        public myMasks Masks => new myMasks(Box.masks);
 
         public string name;
         public myArgs Tables;
@@ -731,7 +731,7 @@ namespace Dooggy.CORE
 
         public TestDataHeader()
         {
-            Box = new myTuplasBox();
+            Box = new myBoxMasks();
 
             Input = Box.AddItem(prmKey: "input", prmGroup: "main");
             Output = Box.AddItem(prmKey: "output", prmGroup: "main");

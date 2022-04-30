@@ -1,12 +1,13 @@
-﻿using Dooggy.LIBRARY;
+﻿using Katty;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace Dooggy.CORE
+namespace Dooggy
 {
     public class TestFactory
     {
@@ -54,23 +55,28 @@ namespace Dooggy.CORE
         public bool Call(Object prmObjeto, string prmMetodo)
         {
 
-            bool vlOk = true;
+            bool vlOk = true; xLista lista; MethodInfo bloco;
 
-            xLista lista = new xLista();
-
-            lista.Parse(prmMetodo, prmSeparador: ",");
+            lista = new xLista(prmMetodo, prmSeparador: ",");
 
             foreach (string metodo in lista)
             {
                 try
                 {
-                    prmObjeto.GetType().GetMethod(metodo).Invoke(prmObjeto, null);
+                    bloco = prmObjeto.GetType().GetMethod(metodo);
+
+                    if (bloco != null)
+                    {
+                        Trace.LogRobot.msgPlay(prmTrace: String.Format("Bloco Automação acionado. -bloco: {0} -metodo: {1}", bloco.Name, metodo));
+
+                        bloco.Invoke(prmObjeto, null);
+                    }
                 }
 
-                catch
+                catch (Exception e)
                 {
 
-                    Trace.Geral.msgAviso(string.Format("Método [{0}.{1}] não encontrado. [ error: {2} ]", prmObjeto.GetType().Name, metodo, prmObjeto.GetType().FullName));
+                    Trace.Geral.msgAviso(string.Format("Método [{0}.{1}] fail. [ -class:{2} -error: {3} ]", prmObjeto.GetType().Name, metodo, prmObjeto.GetType().FullName, e.Message));
 
                     vlOk = false;
 
@@ -89,6 +95,12 @@ namespace Dooggy.CORE
         private TestFactory Factory;
 
         //
+        // Parâmetros da Automacao
+        //
+
+        //public string pathWebDriver;
+
+        //
         // Parâmetros da Massa de Testes
         //
         public bool onlyDATA;
@@ -101,9 +113,9 @@ namespace Dooggy.CORE
         //
         public int pauseAfterTestCase;
 
-        public int pauseAfterTestRobotScript;
+        public int pauseAfterRobotScript;
 
-        public int pauseAfterTestRobotSuite;
+        public int pauseAfterRobotSuite;
 
         public TestConfig(TestFactory prmFactory)
         {

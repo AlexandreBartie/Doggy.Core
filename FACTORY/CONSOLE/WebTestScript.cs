@@ -1,10 +1,10 @@
-﻿using Dooggy.LIBRARY;
+﻿using Katty;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
 
-namespace Dooggy.CORE
+namespace Dooggy
 {
     public class TestScripts : List<TestScript>
     {
@@ -198,7 +198,7 @@ namespace Dooggy.CORE
         private TestConfigPath Path => Console.Config.Path;
         private TestConsoleOutput Output => Console.Output;
 
-        public bool CommandDB(string prmCommand) => Console.Bases.ExecuteNoSQL(prmCommand, prmTimeOut: Console.Config.DB.timeoutSQL);
+        public bool CommandDB(string prmCommand) => Console.Bases.Execute(prmCommand, prmTimeOut: Console.Config.DB.timeoutSQL);
 
         public void Save(string prmOptions)
         { 
@@ -223,65 +223,4 @@ namespace Dooggy.CORE
 
     }
 
-
-    //public class TestScriptTag
-    //{
-    //    public string _name;
-    //    public string _valor;
-
-    //    public string name => myString.GetLower(_name);
-    //    public string valor => myString.GetUpper(_valor);
-
-    //    public bool IsMatch(string prmName) => myString.IsMatch(name, prmName);
-
-    //    public string log => String.Format("[{0,10}] '{1}'", name, valor);
-
-    //    public TestScriptTag(string prmKey)
-    //    {
-    //        _name = prmKey;
-    //    }
-        
-    //    public TestScriptTag(string prmKey, string prmValor)
-    //    {
-    //        _name = prmKey; _valor = prmValor;
-    //    }
-
-    //    public void SetValor(string prmValor) => _valor = prmValor;
-
-    //}
-    //public class TestScriptTags : List<TestScriptTag>
-    //{
-
-    //    private TestScript Script;
-
-    //    private TestTrace Trace => Script.Trace;
-
-    //    private DataTags MainTags => Script.Global.Tags;
-
-    //    public string log => GetLOG();
-
-    //    public TestScriptTags(TestScript prmScript)
-    //    {
-    //        Script = prmScript; Setup();
-    //    }
-
-    //    private void Setup()
-    //    {
-    //        foreach (var item in MainTags)
-    //            Add(new TestScriptTag(item.name, item.padrao));
-    //    }
-
-    //    private string GetLOG()
-    //    {
-
-    //        xMemo log = new xMemo();
-
-    //        foreach (TestScriptTag Tag in this)
-    //            log.Add(Tag.log);
-
-    //        return log.memo;
-
-    //    }
-
-    //}
 }

@@ -6,34 +6,33 @@ using System;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using System.Text;
+using Katty;
 
-namespace Dooggy.CORE
+namespace Dooggy
 {
     public enum eTipoDriver : int
     {
         ChromeDriver = 0,
         EdgeDriver = 1
     }
-    public class TestRobotSuite
+    public class RobotSuite
     {
 
-        public TestRobotProject Projeto;
+        public RobotProject Projeto;
 
-        private QA_WebMotor Motor;
+        private WebMotor Motor;
 
-        public eTipoDriver tipoDriver;
-
-        public TestRobotScripts Scripts = new TestRobotScripts();
-
-        public string nome { get => this.GetType().Name; }
-
-        public TestConfig Config { get => Projeto.Config; }
-
-        public TestTraceLogRobot Log { get => Projeto.Trace.LogRobot; }
-
+        public string nome => this.GetType().Name;
+        
         public DataPool Pool => Projeto.Pool;
+        public TestConfig Config => Projeto.Config;
 
-        public void Setup(TestRobotProject prmProjeto)
+        public RobotScripts Scripts = new RobotScripts();
+
+        public TestTrace Trace => Projeto.Trace;
+        public TestTraceLogRobot Log => Trace.LogRobot;
+
+        public void Setup(RobotProject prmProjeto)
         {
             
             Projeto = prmProjeto;
@@ -42,26 +41,29 @@ namespace Dooggy.CORE
 
         }
 
-        public void AddScript(TestRobotScript prmScript)
+        public void AddScript(RobotScript prmScript)
         {
             Scripts.Add(prmScript);
         }
 
-        public void Executar(eTipoDriver prmTipoDriver)
+        public void Executar()
         {
 
-            tipoDriver = prmTipoDriver;
+            Motor = new WebMotor(this);
 
-            Motor = new QA_WebMotor(this);
-
-            Log.ActionTag(prmTag: "Suite", this.nome);
-
-            foreach (TestRobotScript Script in Scripts)
+            if (Motor.IsWorking)
             {
-                Script.Executar(Motor);
-            }
+                Log.ActionTag(prmTag: "Suite", this.nome);
 
-            Encerrar();
+                foreach (RobotScript Script in Scripts)
+                     Script.Executar(Motor);
+
+                Encerrar();
+            }
+            else
+                Trace.Erro.msgErro("Automação abortada: WebDriver não localizado ...");
+
+            Motor = null;
 
         }
 
@@ -71,7 +73,7 @@ namespace Dooggy.CORE
             if (!Config.onlyDATA)
             {
 
-                Projeto.Pause(Config.pauseAfterTestRobotSuite);
+                Projeto.Pause(Config.pauseAfterRobotSuite);
 
                 Motor.Encerrar();
             }
@@ -79,32 +81,32 @@ namespace Dooggy.CORE
         }
 
     }
-    public class TestRobotScript
+    public class RobotScript
     {
 
         public string nome;
 
-        public QA_WebMotor Motor;
+        public WebMotor Motor;
 
-        public QA_WebRobot Robot => Motor.Robot;
+        public WebRobot Robot => Motor.Robot;
 
-        public QA_MassaDados Massa => Robot.Massa;
+        public RobotData Massa => Robot.Massa;
 
-        public TestRobotSuite Suite => Motor.Suite;
+        public RobotSuite Suite => Motor.Suite;
+        public RobotProject Projeto => Robot.Projeto;
 
-        public TestRobotProject Projeto => Robot.Projeto;
-
-        public TestTraceLogRobot Trace => Suite.Log;
+        public TestTrace Trace => Suite.Trace;
+        public TestTraceLogRobot Log => Suite.Log;
 
         private void Metodo(string prmMetodo) => Projeto.Call(this, prmMetodo);
 
-        public void Executar(QA_WebMotor prmMotor)
+        public void Executar(WebMotor prmMotor)
         {
 
             this.nome = this.GetType().Name;
             this.Motor = prmMotor;
 
-            Trace.ActionTag(prmTag: "Script", this.nome);
+            Log.ActionTag(prmTag: "Script", this.nome);
 
             //Dados.Setup(this, Suite.Pool);
 
@@ -112,13 +114,9 @@ namespace Dooggy.CORE
             {
                 if (MetodoSETUP())
                 {
-
                     MetodoEXECUCAO();
-
                 }
-
                 Robot.Pause(prmSegundos: Projeto.Config.pauseAfterTestCase);
-
             }
 
         }
@@ -153,7 +151,7 @@ namespace Dooggy.CORE
                  while (Massa.IsCurrent)
                 {
 
-                    Trace.ActionTag(prmTag: "Teste", string.Format("#{0}", cont++));
+                    Log.ActionTag(prmTag: "Teste", string.Format("#{0}", cont++));
 
                     Metodo(prmMetodo: blockCode);
                     Motor.Refresh();
@@ -167,7 +165,116 @@ namespace Dooggy.CORE
         }
     }
 
-    public class TestRobotSuites : List<TestRobotSuite> { }
-    public class TestRobotScripts : List<TestRobotScript> { }
+    public class RobotSuites : List<RobotSuite> { }
+    public class RobotScripts : List<RobotScript> { }
+
+    public class RobotData
+    {
+        private WebRobot Robot;
+
+        public RobotSource Fonte;
+
+        public myJSON JSON = new myJSON();
+
+        public bool IsON;
+
+        public RobotData(WebRobot prmRobot)
+        {
+
+            Robot = prmRobot;
+
+            Fonte = new RobotSource(this);
+
+        }
+
+        public RobotProject Project { get => Robot.Projeto; }
+        private TestTrace Trace { get => Robot.Trace; }
+        private DataPool Pool { get => Project.Pool; }
+        public bool IsOK { get => JSON.IsOK; }
+        public bool IsCurrent { get => JSON.IsCurrent; }
+        public void Add(string prmFlow)
+        {
+            //if (IsSTATIC)
+            JSON.Add(prmFlow);
+            //else
+            //AddCombine(prmFlow, prmMestre: DefaultView.json());
+        }
+        public void Add(string prmFlow, string prmView)
+        {
+            AddCombine(prmFlow, prmMestre: Pool.json(prmView));
+        }
+        private void AddCombine(string prmFlow, string prmMestre)
+        {
+            JSON.Add(prmFlow, prmMestre);
+        }
+        public bool Save()
+        {
+            IsON = true;
+
+            if (!JSON.Save())
+            { Trace.Erro.msgErro("ERRO{JSON:Save} " + JSON.Flow); }
+
+            return (JSON.IsOK);
+
+        }
+        public bool Next()
+        {
+            return (JSON.Next());
+        }
+
+        public string GetValor(string prmKey, string prmPadrao)
+        {
+            return (JSON.GetValor(prmKey, prmPadrao));
+        }
+
+    }
+    public class RobotSource
+    {
+
+        private RobotData Massa;
+
+        private FileTXT _FileTXT;
+
+        private FileJUNIT _FileJUnit;
+
+        private TestConfig Config { get => Massa.Project.Config; }
+
+        public FileTXT FileTXT
+        {
+            get
+            {
+                if (_FileTXT is null)
+                    _FileTXT = new FileTXT();
+                return (_FileTXT);
+            }
+            set
+            {
+                _FileTXT = value;
+            }
+        }
+        public FileJUNIT FileJUnit
+        {
+            get
+            {
+                if (_FileJUnit is null)
+                {
+                    _FileJUnit = new FileJUNIT();
+                    _FileJUnit.SetEncoding(Config.EncodedDataJUNIT);
+                }
+                return (_FileJUnit);
+            }
+            set
+            {
+                _FileJUnit = value;
+            }
+        }
+        public RobotSource(RobotData prmMassa)
+        {
+
+            Massa = prmMassa;
+
+        }
+
+    }
 
 }

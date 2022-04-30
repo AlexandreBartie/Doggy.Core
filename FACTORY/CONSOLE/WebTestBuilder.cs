@@ -1,9 +1,9 @@
-﻿using Dooggy.LIBRARY;
+﻿using Katty;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Dooggy.CORE
+namespace Dooggy
 {
 
     public enum eTipoTestCommand : int
@@ -168,49 +168,37 @@ namespace Dooggy.CORE
 
         private bool  GetTagBlock()
         {
-
             tag = BlocoPrefixo.GetPrefixo(linha, prmPrefixo: tag_start, prmDelimitador: tag_finish).ToUpper();
 
             return (tag != "");
-
         }
         
         private void GetTargetNote()
         {
-
             key = keyword_note;
 
             keyword = keyword_note;
 
             target = BlocoPrefixo.GetPrefixoRemove(linha, prmPrefixo: keyword_note, prmTRIM: true);
-
         }
 
         private void GetTargetCommand()
         {
-
             target = BlocoPrefixo.GetPrefixoRemove(linha, prmPrefixo: keyword_start, prmDelimitador: keyword_finish, prmTRIM: true);
-
         }
 
         private string GetKeywordCommand()
         {
-
             return BlocoPrefixo.GetPrefixo(linha, prmPrefixo: keyword_start, prmDelimitador: keyword_finish).ToLower();
-
         }
         private string GetOptionsCommand()
         {
-
             return Bloco.GetBloco(keyword, prmDelimitadorInicial: option_start, prmDelimitadorFinal: option_finish);
-
         }
 
         private string GetBaseKeyCommand()
         {
-
             return Bloco.GetBlocoAntes(keyword, prmDelimitador: option_start, prmTRIM: true);
-
         }
 
         public TestSintaxe IClone() => (TestSintaxe)this.MemberwiseClone();

@@ -1,11 +1,11 @@
-﻿using Dooggy.LIBRARY;
+﻿using Katty;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
 
-namespace Dooggy.CORE
+namespace Dooggy
 {
 
     public enum eTipoFileFormat : int

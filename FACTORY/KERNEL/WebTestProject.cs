@@ -1,10 +1,10 @@
-﻿using Dooggy.LIBRARY;
+﻿using Katty;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 
-namespace Dooggy.CORE
+namespace Dooggy
 {
 
     public class TestDataProject : TestFactory
@@ -13,42 +13,47 @@ namespace Dooggy.CORE
 
         
     }
-    public class TestRobotProject : TestFactory
+    public class RobotProject : TestFactory
     {
 
         public string name;
 
-        public TestRobotSuites Suites = new TestRobotSuites();
+        public string pathWebDriver;
 
-        public void Start(eTipoDriver prmTipoDriver)
+        public eTipoDriver tipoDriver;
+
+        public RobotSuites Suites = new RobotSuites();
+
+        public void Start(eTipoDriver prmTipoDriver, string prmPathDriver)
         {
 
             Trace.LogRobot.ActionTag(prmTag: "Projeto", name);
 
+            tipoDriver = prmTipoDriver;
+
+            pathWebDriver = prmPathDriver;
+
             BuildSuites();
 
-            PlaySuites(prmTipoDriver);
+            PlaySuites();
 
         }
 
         private void BuildSuites()
         {
 
-            Call(this, Parameters.GetRobotFactoryBlockCode());
+            Call(this, prmMetodo: Parameters.GetRobotFactoryBlockCode());
 
         }
 
-        private void PlaySuites(eTipoDriver prmTipoDriver)
+        private void PlaySuites()
         {
-
-            foreach (TestRobotSuite Suite in Suites)
-                Suite.Executar(prmTipoDriver);
-
+            foreach (RobotSuite Suite in Suites)
+                Suite.Executar();
         }
 
-        public void AddSuite(TestRobotSuite prmSuite)
+        public void AddSuite(RobotSuite prmSuite)
         {
-
             prmSuite.Setup(this);
 
             Suites.Add(prmSuite);

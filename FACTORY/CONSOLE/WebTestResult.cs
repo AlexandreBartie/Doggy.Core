@@ -1,9 +1,9 @@
-﻿using Dooggy.LIBRARY;
+﻿using Katty;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Dooggy.CORE
+namespace Dooggy
 {
     public class TestResult
     {
@@ -30,7 +30,9 @@ namespace Dooggy.CORE
 
         public bool IsData => (myString.IsFull(data));
 
-        public bool IsDataSaved;
+        //private bool IsDataSaved;
+
+        public bool IsOutdated;
         public bool IsChanged => (myString.IsNoEqual(_code, _codeZero));
 
         public TestResultLog Log;
@@ -56,14 +58,14 @@ namespace Dooggy.CORE
 
         }
 
-        public void LogStart(string prmArquivoOUT) { Log.Start(); name_OUT = prmArquivoOUT; IsDataSaved = false; }
+        public void LogStart(string prmArquivoOUT) { Log.Start(); name_OUT = prmArquivoOUT; } // IsDataSaved = false; }
         public void LogStop() => Log.Stop();
 
         public void AddLogItem(string prmTipo, string prmTrace) => Log.AddItem(prmTipo, prmTrace);
         public void AddLogSQL(string prmTrace, string prmSQL, long prmTimeElapsed, string prmError) => Log.AddSQL(prmTrace, prmSQL, prmTimeElapsed, prmError);
-        public void SetSave(string prmCode) { _codeZero = prmCode; SetCode(_codeZero); }
-        public void SetCode(string prmCode) => _code = prmCode;
-        public void SetData(string prmData) { _data = prmData; IsDataSaved = true; }
+        public void SetSave(string prmCode) { _codeZero = prmCode; SetCode(_codeZero); IsOutdated = true;  }
+        public void SetCode(string prmCode) => _code = prmCode; 
+        public void SetData(string prmData) { _data = prmData; IsOutdated = false; } // IsDataSaved = true;
         public void UndoCode() => SetSave(prmCode: Script.Console.Input.GetCode(name_INI));
 
     }

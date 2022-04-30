@@ -2,55 +2,20 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
-using Dooggy.CORE;
+using Dooggy;
 
-namespace Dooggy.CORE.GoogleSearch
+namespace Dooggy.GoogleSearch
 {
-    public class GoogleSearchTextoTeste : TestRobotScript
+    public class GoogleSearchTextoTeste : RobotScript
     {
         public void DATA()
         {
 
-            //string arquivo = @"ArqDadosBaixaManualTesteNegativo.csv";
-
-            //if (false)
-            //{
-
-            //    if (Massa.Fonte.FileJUnit.Open(prmPath: @"C:\Users\alexa\OneDrive\Área de Trabalho\", prmName: arquivo))
-            //    {
-
-            //        if (true)
-            //        {
-            //            foreach (xTestCaseJUnit teste in Massa.Fonte.FileJUnit.TestCases)
-            //            {
-
-            //                Debug.WriteLine("===============================================");
-            //                Debug.WriteLine(teste.nome);
-            //                Debug.WriteLine("===============================================");
-            //                Debug.WriteLine(teste.Parametros.memo());
-            //                Debug.WriteLine(teste.Flows.memo());
-            //                Debug.WriteLine("===============================================");
-
-            //            }
-            //        }
-            //        else
-            //        {
-
-            //            foreach (xMemo Flow in Massa.Fonte.FileJUnit.JSON.Dados)
-            //            {
-
-            //                Debug.WriteLine(Flow.memo());
-
-            //                Debug.Assert(false);
-
-            //            }
-            //        }
-            //    }
-            //}
-
             Massa.Add(prmFlow: @"{'Nome':'Alexandre Bartie'}");
             Massa.Add(prmFlow: @"{'Nome':'Teste de Software'}");
             Massa.Add(prmFlow: @"{'Nome':'Albert Einstein'}");
+            Massa.Add(prmFlow: @"{'Nome':'G4MAERYT'}");
+            Massa.Add(prmFlow: @"{'Nome':'FOCAS'}");
 
             Massa.Save();
 
@@ -58,7 +23,7 @@ namespace Dooggy.CORE.GoogleSearch
         public void SETUP()
         {
 
-            //Robot.GoURL(prmUrl: "http://www.google.com.br");
+            Robot.GoURL(prmUrl: "http://www.google.com.br");
 
             Robot.Mapping("Nome", "name=q");
 
@@ -75,11 +40,19 @@ namespace Dooggy.CORE.GoogleSearch
 
             Robot.Submit();
 
+            Robot.Pause(2);
+
+        }
+        public void CLEANUP()
+        {
+
+
+
         }
 
     }
 
-    public class GoogleSearchImagemTeste : TestRobotScript
+    public class GoogleSearchImagemTeste : RobotScript
     {
 
         public void SETUP()
@@ -96,8 +69,21 @@ namespace Dooggy.CORE.GoogleSearch
 
             Robot.Input("Nome", "Alexandre Bartie");
 
+        }
+
+        public void CHECK()
+        {
+
             Robot.Submit();
 
         }
+        public void CLEANUP()
+        {
+
+
+
+        }
+
+
     }
 }

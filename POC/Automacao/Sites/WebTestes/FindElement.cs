@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using Dooggy.CORE;
+using Dooggy;
 using OpenQA.Selenium;
 
-namespace Dooggy.CORE.WebTestes
+namespace Dooggy.WebTestes
 {
-    public class FindElementTeste : TestRobotScript
+    public class FindElementTeste : RobotScript
     {
 
         public void SETUP()
@@ -19,7 +19,6 @@ namespace Dooggy.CORE.WebTestes
 
             while (true)
             {
-
                 //filtro = "//*[@name='gender'].contains(text(),'Female')]";
 
                 //filtro = "//*[contains(text(),'Female')]";
@@ -29,12 +28,9 @@ namespace Dooggy.CORE.WebTestes
                 try
                 {
                     IReadOnlyCollection<IWebElement> lista = Robot.GetElementsByXPath(filtro);
-
                 }
                 catch (Exception e)
-                {
-                    Robot.Erro.msgErro(e);
-                   }
+                { Trace.Erro.msgErro(e); }
             }
 
             //int cont = 0;

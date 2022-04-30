@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Globalization;
-using Dooggy.LIBRARY;
+using Katty;
 
-namespace Dooggy.CORE
+namespace Dooggy
 {
     public class TestConsoleConfig
     {
@@ -15,9 +15,11 @@ namespace Dooggy.CORE
 
         public TestConfigMode Mode;
 
-        public TestConfigCSV CSV;
-        public TestConfigPath Path;
         public TestConfigDB DB;
+        public TestConfigCSV CSV;
+        public TestConfigLog Log;
+        public TestConfigPath Path;
+
 
         public TestConfigMain Main;
 
@@ -42,6 +44,8 @@ namespace Dooggy.CORE
             Mode = new TestConfigMode(this);
 
             CSV = new TestConfigCSV(this);
+
+            Log = new TestConfigLog(this);
 
             Path = new TestConfigPath(this);
 
@@ -78,7 +82,7 @@ namespace Dooggy.CORE
 
             if (Console.IsDbOK)
             {
-                status.Add(DB.log); status.Add(CSV.log); status.Add(Path.log);
+                status.Add(DB.log); status.Add(Log.log); status.Add(CSV.log); status.Add(Path.log);
 
             }
 
@@ -195,7 +199,23 @@ namespace Dooggy.CORE
         public string log => String.Format(">csv: {0}, {1}, {2}, {3}", txt_region, txt_today, txt_date, txt_save);
 
     }
+    public class TestConfigLog
+    {
 
+        private TestConsoleConfig Config;
+
+        private TraceLog Trace => Config.Console.Trace;
+
+        public TestConfigLog(TestConsoleConfig prmConfig)
+        {
+            Config = prmConfig;
+        }
+
+        public void SetHidden(string prmList) => Trace.Msg.SetHidden(prmList);
+
+        public string log => String.Format(">log: -hidden: {0}", Trace.Msg.Hidden.txt);
+
+    }
     public class TestConfigValidation
     {
 
@@ -239,9 +259,9 @@ namespace Dooggy.CORE
         private TestTrace Trace => Config.Console.Trace;
 
         public Diretorio CFG;
+        public Diretorio LOG;
         public Diretorio INI;
         public Diretorio OUT;
-        public Diretorio LOG;
 
         public bool IsOK => CFG.IsFull && INI.IsFull && OUT.IsFull && LOG.IsFull;
 
@@ -250,9 +270,9 @@ namespace Dooggy.CORE
             Config = prmConfig;
 
             CFG = new Diretorio();
+            LOG = new Diretorio();
             INI = new Diretorio();
             OUT = new Diretorio();
-            LOG = new Diretorio();
 
         }
         public void SetCFG(string prmPath)
@@ -261,6 +281,14 @@ namespace Dooggy.CORE
             CFG.SetPath(prmPath);
 
             Trace.LogPath.SetPath(prmContexto: "ConfiguracaoGeral", prmPath);
+
+        }
+        public void SetLOG(string prmPath)
+        {
+
+            LOG.SetPath(prmPath);
+
+            Trace.LogPath.SetPath(prmContexto: "LogMassaTestes", prmPath);
 
         }
 
@@ -289,16 +317,7 @@ namespace Dooggy.CORE
             Trace.LogPath.SetSubPath(prmContexto: "... DestinoMassaTestes", prmSubPath);
 
         }
-        
-        public void SetLOG(string prmPath)
-        {
-
-            LOG.SetPath(prmPath);
-
-            Trace.LogPath.SetPath(prmContexto: "LogMassaTestes", prmPath);
-
-        }
-
+       
         public string GetExtensao(eTipoFileFormat prmTipo)
         {
             switch (prmTipo)
@@ -323,14 +342,14 @@ namespace Dooggy.CORE
             }
             return eTipoFileFormat.csv;
         }
+
+        public string GetPathLOG() => (LOG.path);
         public string GetPathINI() => (INI.path);
         public string GetPathOUT() => (OUT.path);
         public string GetPathOUT(string prmSubPath) => (OUT.GetPath(prmSubPath));
-        public string GetPathLOG() => (LOG.path);
-
         public string GetPathFullOUT(eTipoFileFormat prmTipo) => (GetPathOUT(prmSubPath: GetExtensao(prmTipo)));
 
-        public string log => String.Format(">path: -cfg: '{0}', -ini: '{1}', -out: '{2}', -log: '{3}'", CFG.path, INI.path, OUT.path, LOG.path);
+        public string log => String.Format(">path: -cfg: '{0}', -log: '{1}', -ini: '{2}', -out: '{3}'", CFG.path, LOG.path, INI.path, OUT.path);
 
     }
     public class TestConfigMain
@@ -459,7 +478,7 @@ namespace Dooggy.CORE
             tag = Bloco.GetBloco(linha, prmDelimitadorInicial: prefixo_parametro, prmDelimitadorFinal: delimitador).Trim().ToLower();
             valor = Bloco.GetBlocoDepois(linha, delimitador, prmTRIM: true);
 
-            sigla = new BlocoColchetes().GetParametro(tag).ToLower();
+            sigla = new BlocoColchetes().GetSpot(tag).ToLower();
 
             if (sigla != "")
                 tag = new BlocoColchetes().GetPrefixo(tag).ToLower();
@@ -479,8 +498,11 @@ namespace Dooggy.CORE
                 case "csv":
                     SetGroupCSV(tag, valor); break;
 
-                case "global":
-                    SetGroupGlobal(tag, valor); break;
+                case "trace":
+                    SetGroupTrace(tag, valor); break;
+
+                case "tags":
+                    SetGroupTags(tag, valor); break;
 
                 default:
                     Trace.LogConfig.FailFindGroupCFG(grupo); break;
@@ -561,7 +583,19 @@ namespace Dooggy.CORE
                     Trace.LogConfig.FailFindParameterCFG(prmTag, prmValor); break;
             }
         }
-        private void SetGroupGlobal(string prmTag, string prmValor)
+
+        private void SetGroupTrace(string prmTag, string prmValor)
+        {
+            switch (prmTag)
+            {
+                case "hidden":
+                    Config.Log.SetHidden(prmValor); break;
+
+                default:
+                    Trace.LogConfig.FailFindParameterCFG(prmTag, prmValor); break;
+            }
+        }
+        private void SetGroupTags(string prmTag, string prmValor)
         {
             switch (prmTag)
             {

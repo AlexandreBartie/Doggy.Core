@@ -1,19 +1,19 @@
-﻿using Dooggy.CORE;
+﻿using Dooggy;
 using System.Diagnostics;
 
-namespace Dooggy.CORE.Katalon
+namespace Dooggy.Katalon
 {
-    public class KatalonTeste : TestRobotScript
+    public class KatalonTeste : RobotScript
     {
         public void DATA()
         {
  
             Massa.Add(prmFlow: @"{ 'Nome': 'Alexandre', 'email': 'alexandre_bartie@hotmail.com' }");
-            Massa.Add(prmFlow: @"{ 'Nome': 'Daniel', 'Sobrenome': 'Campinho', 'email': 'alexandre.bartie@gmail.com' }");
-            Massa.Add(prmFlow: @"{ 'Nome': 'Luana', 'Sobrenome': 'Gonçalves', 'email': 'alexandre.bartie@gmail.com' }");
-            Massa.Add(prmFlow: @"{ 'Nome': 'Lisia', 'Sobrenome': 'Amantos', 'sexo': 'Mulher', 'email': 'lisia.amantos@gmail.com' }");
-            Massa.Add(prmFlow: @"{ 'Expectativa':'Salário + Desafio' }");
-            Massa.Add(prmFlow: @"{ 'Expectativa':'Liderança + Ambiente + Equipe' }");
+            Massa.Add(prmFlow: @"{ 'Nome': 'Daniel', 'Sobrenome': 'Campinho', 'sexo': 'Homem', 'email': 'redtheend087@gmail.com', 'senha': '123345' }");
+            //Massa.Add(prmFlow: @"{ 'Nome': 'Luana', 'Sobrenome': 'Gonçalves', 'email': 'alexandre.bartie@gmail.com' }");
+            //Massa.Add(prmFlow: @"{ 'Nome': 'Lisia', 'Sobrenome': 'Amantos', 'sexo': 'Mulher', 'email': 'lisia.amantos@gmail.com' }");
+            //Massa.Add(prmFlow: @"{ 'Expectativa':'Salário + Desafio' }");
+            //Massa.Add(prmFlow: @"{ 'Expectativa':'Liderança + Ambiente + Equipe' }");
 
             Massa.Save();
 
@@ -52,6 +52,8 @@ namespace Dooggy.CORE.Katalon
             Robot.Input("Expectativa", "Ambiente + Desafio");
             Robot.Input("Aprendizado", "Livros + Eventos + Blogs");
             Robot.Input("Observacao", "Maravilhoso ...");
+
+            Robot.Pause(2);
 
         }
         public void CHECK()

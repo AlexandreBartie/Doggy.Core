@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Dooggy.CORE
+namespace Dooggy
 {
 
-    public class BookRoomTeste : TestRobotScript
+    public class BookRoomTeste : RobotScript
     {
         private void Executar()
         {

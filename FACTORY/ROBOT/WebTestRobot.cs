@@ -5,9 +5,9 @@ using System.Diagnostics;
 using OpenQA.Selenium;
 using System.Collections.ObjectModel;
 using OpenQA.Selenium.Chrome;
-using Dooggy.LIBRARY;
+using Katty;
 
-namespace Dooggy.CORE
+namespace Dooggy
 {
     public enum eTipoElemento : int
     {
@@ -15,193 +15,179 @@ namespace Dooggy.CORE
         Opcao = 10,
         Botao = 20
     }
-    public class QA_WebMotor
+    public class WebMotor
     {
 
-        public TestRobotSuite Suite;
+        public RobotSuite Suite;
 
-        private QA_WebRobot _robot;
+        public WebRobot Robot;
 
-        private IWebDriver _driver;
+        public IWebDriver WebDriver;
+        public bool IsWorking => (WebDriver != null);
 
-        public QA_WebMotor(TestRobotSuite prmSuite)
-        { Suite = prmSuite; }
+        private TestTrace Trace => Suite.Trace;
 
+        public WebMotor(RobotSuite prmSuite)
+        { 
+            Suite = prmSuite;
 
-        public QA_WebRobot Robot
-        {
-            get
-            {
-                if (_robot == null)
-                { _robot = new QA_WebRobot(this); }
-                return _robot;
-            }
-        }
-        public IWebDriver driver
-        {
-            get
-            {
-                if (_driver == null)
-                {
+            Robot = new WebRobot(this);
 
-                    switch (Suite.tipoDriver)
-                    {
-
-                        case eTipoDriver.EdgeDriver:
-                            //_driver = new EdgeDriver();
-                            break;
-
-                        default:
-                            _driver = new ChromeDriver();
-                            break;
-
-                    }
-
-                }
-                return _driver;
-            }
+            WebDriver = GettWebDriver(prmPathDriver: Robot.Projeto.pathWebDriver);
         }
 
         public void Refresh() => Robot.Page.Refresh();
-
         public void Encerrar() => Robot.Quit();
 
+        private IWebDriver GettWebDriver(string prmPathDriver)
+        {
+            try
+            {
+                switch (Suite.Projeto.tipoDriver)
+                {
+                    case eTipoDriver.EdgeDriver:
+                        //_driver = new EdgeDriver();
+                        break;
+
+                    default:
+                        return new ChromeDriver(prmPathDriver);
+                }
+            }
+            catch (Exception e)
+            { Trace.Erro.msgErro(string.Format("Driver não localizado ... -path: {0} -error: {1}", prmPathDriver, e.Message)); }
+
+            return null;
+        }
+
     }
-    public class QA_WebRobot
+    public class WebRobot
     {
 
-        private QA_WebMotor Motor;
+        private WebMotor Motor;
 
-        public QA_MassaDados Massa;
+        public RobotData Massa;
 
-        public QA_WebPage Page;
+        public WebPage Page;
 
-        public QA_WebAction Action;
+        public WebAction Action;
 
-        public QA_WebRobot(QA_WebMotor prmMotor)
+        public IWebDriver WebDriver => Motor.WebDriver;
+
+        public RobotProject Projeto => Motor.Suite.Projeto;
+        public TestTrace Trace => Projeto.Trace;
+
+        public WebElemento Mapping(string prmKey, string prmTarget) => (Page.AddItem(prmKey, prmTarget));
+
+        public WebRobot(WebMotor prmMotor)
         {
 
             Motor = prmMotor;
 
-            Massa = new QA_MassaDados(this);
+            Massa = new RobotData(this);
 
-            Page = new QA_WebPage(this);
+            Page = new WebPage(this);
 
-            Action = new QA_WebAction(this);
+            Action = new WebAction(this);
 
         }
-        public TestRobotProject Projeto { get => Motor.Suite.Projeto; }
-        public TestTrace Trace { get => Projeto.Trace; }
-
-        public TraceErro Erro { get => Trace.Erro; }
-
-        public IWebDriver driver { get => Motor.driver; }
-
-        public QA_WebElemento Mapping(string prmKey, string prmTarget) => (Page.AddItem(prmKey, prmTarget));
 
         public void Input(string prmKey, string prmValor)
         {
-
             string valor = Massa.GetValor(prmKey, prmValor);
 
             Action.SetMap(prmKey, valor);
         }
-        public bool GoURL(string prmUrl)
+
+        public void Click(string prmKey)
         {
-            return (Action.GoURL(prmUrl));
+            Action.SetClick(prmKey);
         }
-        public void Submit()
-        { Page.Submit(); }
+
+        public bool GoURL(string prmUrl) => Action.GoURL(prmUrl);
+
+        public void Submit() => Page.Submit();
 
         public bool Refresh()
         {
             try
-            { driver.Navigate().Refresh(); return (true); }
-
-            catch
-            { Debug.Assert(false); }
+            { WebDriver.Navigate().Refresh(); return (true); }
+            
+            catch (Exception e)
+            { Trace.Erro.msgErro(e.Message); }
 
             return (false);
 
         }
-        public void Quit()
-        { driver.Quit(); }
+        public void Quit() => WebDriver.Quit();
 
-        public void Pause(int prmSegundos) { Projeto.Pause(prmSegundos); }
+        public void Pause(int prmSegundos) => Projeto.Pause(prmSegundos); 
 
         public IWebElement GetElementBy(By prmTupla)
         {
             try
-            {
-                return driver.FindElement(prmTupla);
-            }
+            { return WebDriver.FindElement(prmTupla); }
+            
             catch (Exception e)
-            {
-                Erro.msgErro(e);
-            }
+            { Trace.Erro.msgErro(e); }
+            
             return (null);
         }
         public IWebElement GetElementByName(string prmName)
         {
             try
-            {
-                return driver.FindElement(By.Name(prmName));
-            }
+            { return WebDriver.FindElement(By.Name(prmName)); }
+
             catch (Exception e)
-            {
-                Erro.msgErro(e);
-            }
+            { Trace.Erro.msgErro(e); }
+
             return (null);
         }
         public IWebElement GetElementByXPath(string prmXPath)
         {
             try
-            {
-                return driver.FindElement(By.XPath(prmXPath));
-            }
+            { return WebDriver.FindElement(By.XPath(prmXPath)); }
+            
             catch (Exception e)
-            {
-                Erro.msgErro(e);
-            }
+            { Trace.Erro.msgErro(e); }
+
             return (null);
+
         }
         public ReadOnlyCollection<IWebElement> GetElementsByXPath(string prmXPath)
         {
             try
-            {
-                return driver.FindElements(By.XPath(prmXPath));
-            }
+            { return WebDriver.FindElements(By.XPath(prmXPath)); }
+            
             catch (Exception e)
-            {
-                Erro.msgErro(e);
-            }
+            { Trace.Erro.msgErro(e); }
+
             return (null);
+
         }
 
     }
-    public class QA_WebPage
+    public class WebPage
     {
 
-        public QA_WebRobot Robot;
+        public WebRobot Robot;
 
-        public QA_WebMapping Mapa;
+        public WebMapping Mapa;
 
         private IWebElement LastControl;
+        private bool TemLastControl => !(LastControl == null);
 
-        public QA_WebPage(QA_WebRobot prmRobot)
+        public WebPage(WebRobot prmRobot)
         {
-
             Robot = prmRobot;
 
-            Mapa = new QA_WebMapping(this);
-
+            Mapa = new WebMapping(this);
         }
 
-        public QA_WebElemento Elemento { get => Mapa.Elemento; }
+        public WebElemento Elemento { get => Mapa.Elemento; }
 
         public TestTrace Trace { get => Robot.Trace; }
 
-        public QA_WebElemento AddItem(string prmKey, string prmTarget)
+        public WebElemento AddItem(string prmKey, string prmTarget)
         {
             return (Mapa.AddKey(prmKey, prmTarget));
         }
@@ -209,22 +195,17 @@ namespace Dooggy.CORE
         {
 
             if (Elemento.SetAction(prmValor))
-            {
-                LastControl = Elemento.control;
-                return (true);
-            }
+                { LastControl = Elemento.control; return (true); }
+
             return (false);
         }
+
         public bool Submit()
         {
             try
             {
-                if (TemLastControl())
-                {
-                    LastControl.Submit();
-
-                    return (true);
-                }
+                if (TemLastControl)
+                { LastControl.Submit(); return (true); }
             }
 
             catch (Exception e)
@@ -232,38 +213,34 @@ namespace Dooggy.CORE
 
             return (false);
         }
+        public void Refresh() => Mapa.Refresh();
 
-        public void Refresh()
-        {  Mapa.Refresh(); }
-
-        private bool TemLastControl()
-        { return !(LastControl == null); }
     }
-    public class QA_WebMapping
+    public class WebMapping
     {
         
-        private QA_WebPage Page;
+        private WebPage Page;
 
-        public List<QA_WebElemento> Elementos;
+        public List<WebElemento> Elementos;
 
-        public QA_WebMapping(QA_WebPage prmPage)
+        public WebMapping(WebPage prmPage)
         {
 
             Page = prmPage;
 
-            Elementos = new List<QA_WebElemento> { };
+            Elementos = new List<WebElemento> { };
 
         }
 
-        private QA_WebElemento _elemento;
+        private WebElemento _elemento;
 
-        public QA_WebElemento Elemento
+        public WebElemento Elemento
         { get => _elemento; }
 
-        public QA_WebElemento AddKey(string prmKey, string prmTarget)
+        public WebElemento AddKey(string prmKey, string prmTarget)
         {
 
-            QA_WebElemento elemento = new QA_WebElemento(Page, prmKey, prmTarget);
+            WebElemento elemento = new WebElemento(Page, prmKey, prmTarget);
 
             Elementos.Add(elemento);
 
@@ -274,7 +251,7 @@ namespace Dooggy.CORE
 
             _elemento = null;
 
-            foreach (QA_WebElemento item in Elementos)
+            foreach (WebElemento item in Elementos)
             {
                 if (item.key == prmKey.ToLower())
                 {
@@ -299,38 +276,39 @@ namespace Dooggy.CORE
 
             _elemento = null;
 
-            foreach (QA_WebElemento item in Elementos)
+            foreach (WebElemento item in Elementos)
                 item.Refresh();
         }
 
         public bool TemElemento()
         { return !(_elemento == null); }
     }
-    public class QA_WebElemento
+    public class WebElemento
     {
 
-        public QA_WebPage Page;
+        public WebPage Page;
 
         private string _key;
 
         private eTipoElemento _tipo = eTipoElemento.Input;
 
-        private QA_WebDominio Dominio;
+        private WebDominio Dominio;
 
-        private QA_WebTarget _target;
+        private WebTarget _target;
 
         public myTupla chave;
 
-        public string key { get => _key; }
+        public string key => _key;
 
-        public eTipoElemento tipo { get => _tipo; }
+        public eTipoElemento tipo => _tipo;
 
-        public IWebElement control { get => Target.control; }
+        public IWebElement control => Target.control;
 
+        public bool TemControl => (control != null);
 
         public string filltro;
 
-        public QA_WebElemento(QA_WebPage prmPage, string prmKey, string prmTarget)
+        public WebElemento(WebPage prmPage, string prmKey, string prmTarget)
         {
             Page = prmPage;
 
@@ -339,21 +317,21 @@ namespace Dooggy.CORE
 
             chave = new myTupla(prmTarget);
 
-            Dominio = new QA_WebDominio(this);
+            Dominio = new WebDominio(this);
 
         }
 
-        public QA_WebTarget Target
+        public WebTarget Target
         { get
             {
                 if (_target == null)
-                { _target = new QA_WebTarget(this); }
+                { _target = new WebTarget(this); }
                 return _target;
             }
         }
 
-        public QA_WebRobot Robot { get => Page.Robot; }
-        public TestRobotProject Projeto { get => Robot.Projeto; }
+        public WebRobot Robot { get => Page.Robot; }
+        public RobotProject Projeto { get => Robot.Projeto; }
         public TestTrace Trace { get => Robot.Trace; }
 
         public void SetDomain(string prmLista)
@@ -369,7 +347,7 @@ namespace Dooggy.CORE
 
             if (Dominio.IsFull())
             {
-                return (Dominio.SetAction(prmValor));
+                return (Dominio.SetAction(key, prmValor));
             }
             else
             {
@@ -423,8 +401,7 @@ namespace Dooggy.CORE
                 if (!prmFake )
                     Trace.LogRobot.ActionElement("Click", key);
 
-                return (true); 
-            
+                return (true);           
             }
 
             catch (Exception e)
@@ -451,22 +428,22 @@ namespace Dooggy.CORE
         }
 
     }
-    public class QA_WebDominio
+    public class WebDominio
     {
-        private QA_WebElemento Elemento;
+        private WebElemento Elemento;
+
+        public myTupla chave { get => Elemento.chave; }
+        public WebRobot Robot { get => Elemento.Robot; }
+        public RobotProject Projeto { get => Robot.Projeto; }
+        public TestTrace Trace { get => Robot.Trace; }
 
         private xLista lista = new xLista();
 
         private string filtro;
 
         private ReadOnlyCollection<IWebElement> Opcoes;
-        public myTupla chave { get => Elemento.chave; }
 
-        public QA_WebRobot Robot { get => Elemento.Robot; }
-        public TestRobotProject Projeto { get => Robot.Projeto; }
-        public TestTrace Trace { get => Robot.Trace; }
-
-        public QA_WebDominio(QA_WebElemento prmElemento)
+        public WebDominio(WebElemento prmElemento)
         {
             Elemento = prmElemento;
 
@@ -474,22 +451,24 @@ namespace Dooggy.CORE
         public void Setup(string prmLista, string prmSintaxe)
         {
 
-            lista.Parse(prmLista, ");");
+            lista.Parse(prmLista, "+");// ");");
 
             filtro = prmSintaxe;
 
         }
-        public bool SetAction(string prmValor)
+        public bool SetAction(string prmKey, string prmValor)
         {
 
             if (GetElementos())
             {
 
-                xLista Flow = new xLista(Projeto.Parameters.GetAdicaoElementos(), prmValor);
+                xLista Flow = new xLista(prmValor, prmSeparador: Projeto.Parameters.GetAdicaoElementos());
 
                 foreach (string item in Flow)
                 {
-                    if (!SetFlow(item))
+                    if (SetFlow(item))
+                        Trace.LogRobot.ActionElement("Select", prmKey, item);
+                    else
                         Trace.Erro.msgErro("Domínio não encontrado na lista ... " + item);
                 }
 
@@ -514,7 +493,6 @@ namespace Dooggy.CORE
         }
         private bool GetElementos()
         {
-
             Opcoes = Robot.GetElementsByXPath(GetXPath());
 
             if (!(Opcoes == null))
@@ -548,16 +526,16 @@ namespace Dooggy.CORE
         public bool IsFull()
         { return (lista.IsFull); }
     }
-    public class QA_WebTarget
+    public class WebTarget
     {
-        private QA_WebElemento Elemento;
+        private WebElemento Elemento;
 
         public IWebElement control;
 
         public myTupla chave { get => Elemento.chave; }
-        public QA_WebRobot Robot { get => Elemento.Robot; }
+        public WebRobot Robot { get => Elemento.Robot; }
 
-        public QA_WebTarget(QA_WebElemento prmElemento)
+        public WebTarget(WebElemento prmElemento)
         {
             Elemento  = prmElemento;
 
@@ -598,53 +576,53 @@ namespace Dooggy.CORE
             }
         }
     }
-     public class QA_WebAtributos
+     public class WebAtributos
     {
 
-        private QA_WebTarget Target;
-        public QA_WebAtributos(QA_WebTarget prmTarget)
+        private WebTarget Target;
+
+        private IWebElement control => Target.control;
+        public Point area => control.Location;
+        public Size dimensao => control.Size;
+        public bool IsVisivel => control.Displayed;
+        public bool IsHabilitado => control.Enabled;
+
+        public WebAtributos(WebTarget prmTarget)
         {
             Target = prmTarget;
 
         }
-        private IWebElement control
-        { get => Target.control; }
-        public bool IsVisivel
-        { get => control.Displayed; }
-        public bool IsHabilitado
-        { get => control.Enabled; }
-        public Point area
-        { get => control.Location; }
-        public Size dimensao
-        { get => control.Size; }
-    }
-    public class QA_WebAction
-    {
-        private QA_WebRobot Robot;
 
-        public QA_WebAction(QA_WebRobot prmRobot)
+    }
+    public class WebAction
+    {
+        private WebRobot Robot;
+
+        private TestTrace Trace => Robot.Trace;
+
+        public WebAction(WebRobot prmRobot)
         {
             Robot = prmRobot;
         }
-        private QA_WebPage Page
+        private WebPage Page
         {
             get { return Robot.Page; }
         }
-        private QA_WebMapping Mapa
+        private WebMapping Mapa
         {
             get { return Page.Mapa; }
         }
-        private QA_WebElemento Elemento
+        private WebElemento Elemento
         {
             get { return Page.Elemento; }
         }
         public bool GoURL(string prmUrl)
         {
             try
-            { Robot.driver.Navigate().GoToUrl(prmUrl); return (true); }
+            { Robot.WebDriver.Navigate().GoToUrl(prmUrl); return (true); }
 
-            catch
-            { }
+            catch (Exception e)
+            { Trace.Erro.msgErro(e.Message); }
 
             return (false);
         }
@@ -675,114 +653,7 @@ namespace Dooggy.CORE
             { Elemento.SendKeys(prmTexto); }
         }
     }
-    public class QA_MassaDados
-    {
-        private QA_WebRobot Robot;
 
-        public QA_FonteDados Fonte;
-
-        public myJSON JSON = new myJSON();
-
-        public bool IsON;
-
-        public QA_MassaDados(QA_WebRobot prmRobot)
-        {
-
-            Robot = prmRobot;
-
-            Fonte = new QA_FonteDados(this);
-
-        }
-
-        public TestRobotProject Project { get => Robot.Projeto; }
-        private TestTrace Trace { get => Robot.Trace; }
-        private DataPool Pool { get => Project.Pool; }
-        public bool IsOK { get => JSON.IsOK; }
-        public bool IsCurrent { get => JSON.IsCurrent; }
-        public void Add(string prmFlow)
-        {
-            //if (IsSTATIC)
-                JSON.Add(prmFlow);
-            //else
-                //AddCombine(prmFlow, prmMestre: DefaultView.json());
-        }
-        public void Add(string prmFlow, string prmView)
-        {
-            AddCombine(prmFlow, prmMestre: Pool.json(prmView));
-        }
-        private void AddCombine(string prmFlow, string prmMestre)
-        {
-            JSON.Add(prmFlow, prmMestre);
-        }
-        public bool Save()
-        {
-            IsON = true;
-
-            if (!JSON.Save())
-            { Trace.Erro.msgErro("ERRO{JSON:Save} " + JSON.Flow); }
-
-            return (JSON.IsOK);
-
-        }
-        public bool Next()
-        {
-            return (JSON.Next());
-        }
-
-        public string GetValor(string prmKey, string prmPadrao)
-        {
-            return (JSON.GetValor(prmKey, prmPadrao));
-        }
-
-    }
-    public class QA_FonteDados
-    {
-
-        private QA_MassaDados Massa;
-
-        private FileTXT _FileTXT;
-
-        private FileJUNIT _FileJUnit;
-
-        private TestConfig Config { get => Massa.Project.Config; }
-
-        public FileTXT FileTXT
-        {
-            get
-            {
-                if (_FileTXT is null)
-                    _FileTXT = new FileTXT();
-                return (_FileTXT);
-            }
-            set
-            {
-                _FileTXT = value;
-            }
-        }
-        public FileJUNIT FileJUnit
-        {
-            get
-            {
-                if (_FileJUnit is null)
-                {
-                    _FileJUnit = new FileJUNIT();
-                    _FileJUnit.SetEncoding(Config.EncodedDataJUNIT);
-                }
-                return (_FileJUnit);
-            }
-            set
-            {
-                _FileJUnit = value;
-            }
-        }
-        public QA_FonteDados(QA_MassaDados prmMassa)
-        {
-
-            Massa = prmMassa;
-
-        }
-
-    }
 }
 
 
